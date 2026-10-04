@@ -1,8 +1,8 @@
 ---
 title: "Day 2: pandas, plotting and scikit-learn"
 subtitle: Introduction to Scientific Python
-author: SWC/GCNU Neuroinformatics Unit
-date: today
+author: Neuroinformatics Unit
+date: 2026-10-06
 ---
 
 ```{python}
@@ -38,7 +38,7 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 * **Psychometric curve:** masks and broadcasting; today it takes one `groupby` line
 :::
 
-# pandas {background-color="#03A062"}
+# pandas
 
 ![](img/pandas_logo.svg){height="160px" fig-alt="pandas logo"}
 
@@ -55,9 +55,13 @@ gapminder = pd.wide_to_long(
 :::{.incremental}
 * Tables of data, built on NumPy
 * **DataFrame**: a table of named columns sharing one row **index**
-    * Each column is a NumPy array with its own dtype
+    * Each column has its own dtype (numbers are NumPy arrays)
 * **Series**: one column on its own, with the index
 * Reads and writes CSV, Excel, Parquet, SQL, ...
+:::
+
+::: {.callout-note}
+We use pandas 2.3. pandas 3 is out: text columns show as `str` instead of `object`; otherwise the same for this course.
 :::
 
 ## Reading a CSV file
@@ -180,6 +184,10 @@ all_countries = pd.read_csv("data/gapminder_all.csv", index_col="country")
 all_countries.groupby("continent")["lifeExp_2007"].mean().round(1)
 ```
 
+::: {.source-note}
+Beyond today: missing data and `merge`/`join` are stretch material in the notebook (PDSH chapter 3).
+:::
+
 ## Live coding: masks and group by {.live-coding}
 
 * Select countries by a condition on one column
@@ -207,29 +215,14 @@ grouped["lifeExp_gain"].median().sort_values()
 ```
 :::
 
-## Several summaries at once
-
-```{python}
-#| output-location: fragment
-all_countries.groupby("continent")["lifeExp_2007"].agg(["count", "median", "max"]).round(1)
-```
-
-:::{.incremental}
-* `.agg` takes a list of function names
-* `.sort_values()` to order the result
-* `.idxmax()` per group gives the label of the largest row
-:::
-
-::: {.source-note}
-Beyond today: missing data and `merge`/`join` are stretch material in the notebook (PDSH chapter 3).
-:::
-
 ## Your turn {.exercise-slide}
 
 Open [notebooks/day2_01_pandas.ipynb]{.notebook}
 
 1. **Boolean masks** (5 min): the end of section 2, on the units, combining text and number conditions
-2. **Group by** (15 min): yesterday's psychometric curve in one line, checked against your NumPy version, then **one grouping question of your own**
+2. **Group by** (10 min): yesterday's psychometric curve in one line, checked against your NumPy version
+
+**Stretch:** one grouping question of your own
 
 ## Tidy ("long") data
 
@@ -268,7 +261,7 @@ Open [notebooks/day2_01_pandas.ipynb]{.notebook}, **Part 4: tidy data**
 **8 minutes**. **Stretch:** Many Ways of Access; merging units with electrodes (PDSH)
 
 
-# Matplotlib {background-color="#03A062"}
+# Matplotlib
 
 ## Figures, axes and artists
 
@@ -451,7 +444,7 @@ Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 2: the whole record
 
 10 minutes
 
-# seaborn {background-color="#03A062"}
+# seaborn
 
 ## Statistical plots from DataFrames
 
@@ -533,7 +526,7 @@ Open [notebooks/day2_03_seaborn.ipynb]{.notebook}, **Your turn**
 
 **5 minutes**. **Stretch:** one plot of your own, answering a question about the trials or units. The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
 
-# scikit-learn {background-color="#03A062"}
+# scikit-learn
 
 ## What is scikit-learn?
 
@@ -651,7 +644,7 @@ Open [notebooks/day2_04_sklearn.ipynb]{.notebook}
 [scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html); SPL, [scikit-learn: machine learning in Python](https://lectures.scientific-python.org/packages/scikit-learn/index.html).
 :::
 
-# Where to go next {background-color="#03A062"}
+# Where to go next
 
 ## scikit-image: images are arrays
 

@@ -9,8 +9,9 @@ The exercises follow one real experiment from start to finish: a Neuropixels rec
 Do this **before Day 1**:
 
 1. Install [Miniforge](https://conda-forge.org/download/).
-2. Download this repository (`git clone`, or *Code → Download ZIP* on GitHub).
-3. In a terminal, from the repository folder:
+2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv).
+3. Download this repository (`git clone`, or *Code → Download ZIP* on GitHub).
+4. In a terminal, from the repository folder:
 
    ```sh
    conda env create -f environment.yml
@@ -20,7 +21,7 @@ Do this **before Day 1**:
 
    Every line should say `OK`. If not, send the output to the instructors.
 
-4. On the day, run `jupyter lab` from the repository folder and open the notebooks in `notebooks/`.
+5. On the day, run `jupyter lab` from the repository folder and open the notebooks in `notebooks/`.
 
 ## Schedule
 

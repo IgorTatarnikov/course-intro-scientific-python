@@ -30,7 +30,7 @@ format:
     code-overflow: wrap
     highlight-style: atom-one
     css: styles.css
-    footer: "Introduction to Scientific Python (https://neuroinformatics.dev/course-intro-scientific-python)"
+    footer: "[https://neuroinformatics.dev/course-intro-scientific-python](https://neuroinformatics.dev/course-intro-scientific-python)"
     from: markdown+emoji   # enable emoji support
     mermaid:
       theme: neutral

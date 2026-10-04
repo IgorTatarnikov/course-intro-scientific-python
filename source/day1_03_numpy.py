@@ -302,11 +302,11 @@ print(ssp_lfp.shape, in_brain.shape)
 # consecutive samples. It is large when the signal is busy, and is a cheap
 # measure of activity in seizure detection.
 #
-# Write `line_length_loop(signals)` using `for` loops over the channels and the
-# samples, and `line_length_numpy(signals)` using no loop at all. Each takes an
-# array of shape (time, channel) and returns one value per channel. Check that
-# they agree on `first_2_s`, then time both with `%timeit`. How
-# many times faster is NumPy? (Hint for the NumPy version: `signals[1:] -
+# `line_length_loop(signals)` below computes it with `for` loops over the
+# channels and the samples. Write `line_length_numpy(signals)`, which does the
+# same with no loop at all. Each takes an array of shape (time, channel) and
+# returns one value per channel. Check that they agree on `first_2_s`, then time
+# both with `%timeit`. How many times faster is NumPy? (Hint for the NumPy version: `signals[1:] -
 # signals[:-1]` gives every difference at once, or use `np.diff`. See also the
 # Handbook's [Profiling and Timing
 # Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html).)
@@ -316,7 +316,6 @@ first_2_s = lfp_uv[:1000]  # the first 2 s, in microvolts
 
 
 def line_length_loop(signals):
-    # BEGIN SOLUTION
     n_time, n_channels = signals.shape
     result = np.zeros(n_channels)
     for channel in range(n_channels):
@@ -325,7 +324,6 @@ def line_length_loop(signals):
             total += abs(signals[t, channel] - signals[t - 1, channel])
         result[channel] = total
     return result
-    # END SOLUTION
 
 
 def line_length_numpy(signals):
@@ -376,9 +374,9 @@ y = choice == 1
 #    `at_level & y[:, np.newaxis]` is `True` where a trial was at that contrast
 #    **and** the mouse chose right. Count, then divide.)
 #
-# The task also has **blocks** of trials. For a while the stimulus appears on
-# the left 80% of the time (`probability_left` 0.8), then on the right 80% of
-# the time (0.2).
+# The task also has **blocks** of trials. The session starts with 90 unbiased
+# trials (`probability_left` 0.5). Then, for a while, the stimulus appears on the
+# left 80% of the time (0.8), then on the right 80% of the time (0.2), and so on.
 #
 # 4. Make `frac_right_rb` and `frac_right_lb`: the same curve for the
 #    right-block trials (`probability_left == 0.2`) and the left-block trials

@@ -18,8 +18,9 @@
 # %% [markdown]
 # ## Part 1: conda (12 min)
 #
-# 1. Create an environment called `scratch` with Python 3.12 and **pandas**, taking
-#    packages only from the **conda-forge** channel.
+# 1. Create an environment called `scratch` with Python 3.12 and **pandas 3 or
+#    newer**, taking packages only from the **conda-forge** channel. (Quote the
+#    version spec in the terminal: `"pandas>=3"`.)
 # 2. Activate it and check which pandas version you got:
 #    `python -c "import pandas; print(pandas.__version__)"`
 # 3. You never asked for NumPy. Is it installed? Find out with `conda list`.
@@ -36,7 +37,7 @@
 # %% [markdown] tags=["answer"]
 # ```bash
 # # 1. Create
-# conda create -n scratch -c conda-forge --override-channels python=3.12 pandas
+# conda create -n scratch -c conda-forge --override-channels python=3.12 "pandas>=3"
 #
 # # 2. Activate and check
 # conda activate scratch
@@ -65,7 +66,7 @@
 # `scratch-full.yml` lists every package, NumPy included, with its exact build string, and
 # those builds are often specific to your operating system. It is a precise
 # record of *this* machine, but often fails to solve on a colleague's laptop.
-# `--from-history` keeps only what you asked for (`python=3.12`, `pandas`), so it
+# `--from-history` keeps only what you asked for (`python=3.12`, `pandas>=3`), so it
 # is portable. That is the one to commit, ideally with versions pinned the way
 # the course's own `environment.yml` does.
 #
@@ -82,20 +83,22 @@
 #
 # 1. Make a new project: `uv init uv-demo`, then `cd uv-demo`. Look at the files
 #    it created.
-# 2. Add **SciPy** as a dependency. What changed in `pyproject.toml`? What new
-#    files appeared? Is NumPy listed in `pyproject.toml`, in `uv.lock`, or both?
+# 2. Add **requests** (a package for downloading from the web) as a dependency.
+#    What changed in `pyproject.toml`? What new files appeared? requests needs
+#    `urllib3` to work: is `urllib3` listed in `pyproject.toml`, in `uv.lock`, or
+#    both?
 # 3. Replace the contents of `main.py` with:
 #
 #    ```python
-#    import scipy
-#    from scipy import constants
+#    import requests
+#    import urllib3
 #
-#    print("scipy", scipy.__version__, "speed of light:", constants.c)
+#    print("requests", requests.__version__, "urllib3", urllib3.__version__)
 #    ```
 #
 #    and run it **through uv**, without activating anything.
 # 4. Delete the `.venv` folder completely. Recreate the environment from the
-#    lockfile and run the script again. Is it the same SciPy version?
+#    lockfile and run the script again. Are they the same versions?
 #
 # Hints: `uv add`, `uv run`, `uv sync`.
 
@@ -104,7 +107,7 @@
 # uv init uv-demo
 # cd uv-demo              # pyproject.toml, main.py, README.md, .python-version, .gitignore
 #
-# uv add scipy            # adds "scipy>=..." to dependencies; creates uv.lock and .venv
+# uv add requests         # adds "requests>=..." to dependencies; creates uv.lock and .venv
 # uv run main.py          # creates/updates .venv if needed, then runs inside it
 #
 # rm -rf .venv            # on Windows: rmdir /s .venv
@@ -112,8 +115,9 @@
 # uv run main.py
 # ```
 #
-# NumPy is only in `uv.lock`: `pyproject.toml` lists what you asked for, and the
-# lockfile records every package that was installed, dependencies included.
+# `urllib3` is only in `uv.lock` (as are requests' other dependencies, `certifi`,
+# `idna` and `charset-normalizer`): `pyproject.toml` lists what you asked for, and
+# the lockfile records every package that was installed, dependencies included.
 #
 # `uv run` would also have recreated `.venv` on its own: it always syncs the
 # environment with the lockfile before running.

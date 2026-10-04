@@ -61,7 +61,11 @@ rates = pd.DataFrame(
     index=pd.Index(spike_unit, name="unit"),
     columns=(bin_start + 0.025).round(3),  # the centre of each bin
 )
-rates_long = rates.reset_index().melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+rates_long = (
+    rates.reset_index()
+    .melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+    .astype({"time_s": float})  # melt leaves the old column labels as objects
+)
 rates_long = rates_long.merge(units[["unit", "area"]], on="unit")  # add each unit's area
 rates_long.head()
 

@@ -1,11 +1,13 @@
 ---
 title: "Day 1: Environments, NumPy and SciPy"
 subtitle: Introduction to Scientific Python
-author: SWC/GCNU Neuroinformatics Unit
-date: today
+author: Neuroinformatics Unit
+date: 2026-10-05
 ---
 
-# Welcome {background-color="#03A062"}
+# Welcome
+
+While we get started: run `jupyter lab`, open [notebooks/day1_01_getting_help.ipynb]{.notebook} and run the first cell, the setup check.
 
 ## Course map
 
@@ -133,13 +135,13 @@ np.linspace(0, 1, int(n_points))   # fix
 
 Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
-1. Run the setup check: every line should say `OK`
+1. If you haven't yet: run the setup check, every line should say `OK`
 2. Look up `np.arange` three ways and answer the questions
 3. Read a traceback through two functions and fix the call
 
-**5 minutes**
+**5 minutes**. **Stretch:** section 4, tab completion and searching
 
-# Packages and environments {background-color="#03A062"}
+# Packages and environments
 
 ## What is a package?
 
@@ -156,7 +158,7 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 :::{.incremental}
 * `pip` installs packages from PyPI, the official Python package index
 * `conda` installs packages from conda or conda-forge, a community-maintained channel
-* `uv` installs packages from PyPI, drop in replacement for `pip`
+* `uv` installs packages from PyPI and manages whole projects (`uv pip` is a drop-in for `pip`)
 :::
 
 ## What is an environment?
@@ -194,7 +196,7 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 * **Project-based**: environments are tightly coupled to a project
     * Typically stored in the project folder (`./.venv`)
     * Managed with `venv` + `pip`, or `uv`
-* **Global or task-based**: environments exists globally, easy to share across projects
+* **Global or task-based**: environments exist globally, easy to share across projects
     * Typically stored in a central location (`~/miniforge3/envs/`)
     * Managed with `conda` or `pixi`
 :::
@@ -252,136 +254,23 @@ uv run python script.py    # no activation needed
 
 * Check which Python you are using: `which python` (macOS/Linux) or `where python` (Windows)
 
-## Installing packages
+## Cheat sheet: managing packages {.smaller}
 
-::: {.panel-tabset}
+| | conda | pip | uv |
+|---|---|---|---|
+| Install | `conda install numpy` | `pip install numpy` | `uv add numpy` |
+| Pin a version | `conda install tqdm=4.70.1` | `pip install tqdm==4.70.1` | `uv add tqdm==4.70.1` |
+| Update | `conda update scipy` | `pip install -U scipy` | `uv lock --upgrade-package scipy`, then `uv sync` |
+| List | `conda list` | `pip list` | `uv pip list` |
+| Remove | `conda remove numpy` | `pip uninstall numpy` | `uv remove numpy` |
 
-### Using `conda`
-
-```bash
-conda install numpy pandas matplotlib
-conda install -c conda-forge tqdm=4.70.1
-```
-
-### Using `pip`
-
-```bash
-pip install numpy pandas matplotlib
-pip install tqdm==4.70.1
-```
-
-### Using `uv`
-
-```bash
-uv add numpy pandas matplotlib
-uv add tqdm==4.70.1
-```
-
-:::
-
-:::{.incremental}
-* Note the version syntax: `=` for conda, `==` for pip and uv
+* Version syntax: `=` for conda, `==` for pip and uv
 * Install from the **terminal**, not from inside Python, and activate the environment first
-:::
-
-## Updating and listing packages
-
-::: {.panel-tabset}
-
-### Using `conda`
-
-```bash
-conda update scipy
-conda list            # everything in the active environment
-conda env list        # every environment on your machine
-```
-
-### Using `pip`
-
-```bash
-pip install -U scipy
-pip list
-```
-
-### Using `uv`
-
-```bash
-uv lock --upgrade-package scipy
-uv pip list
-```
-
-:::
-
-## Uninstalling packages
-
-::: {.panel-tabset}
-
-### Using `conda`
-
-```bash
-conda remove numpy pandas matplotlib
-```
-
-### Using `pip`
-
-```bash
-pip uninstall numpy pandas matplotlib
-```
-
-### Using `uv`
-
-```bash
-uv remove numpy pandas matplotlib
-```
-
-:::
+* `conda env list` shows every environment on your machine; the [conda cheat sheet](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html) has the rest
 
 ::: {.callout-tip}
-[conda cheat sheet](https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html)
-:::
-
 ## Terminal tips
-
-:::{.incremental}
-* Windows: use the **Miniforge Prompt**; macOS and Linux: any terminal
-* Arguments are separated by spaces; named ones start with `-` or `--`
-* Help: `-h`, `--help`, or `man <command>`
-* `Tab` completes commands and file names
-* `Up` and `Down` cycle through your command history
-* `Ctrl+C` cancels a running command; `q` quits a multi-page output
-:::
-
-## Live coding: a throwaway environment {.live-coding}
-
-* Create and activate a new conda environment
-* Try to import NumPy, then install it
-* Check where Python and NumPy come from
-* Remove the environment
-
-::: {.notes}
-```bash
-conda create -n demo -c conda-forge python=3.13
-conda activate demo
-which python
-python -c "import numpy"            # ModuleNotFoundError
-conda install -c conda-forge numpy
-python -c "import numpy; print(numpy.__version__, numpy.__file__)"
-conda list numpy
-conda env list                      # demo is there, * marks the active one
-conda deactivate
-conda env remove -n demo
-```
-
-Optional, same thing with venv + pip:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install numpy
-pip list
-deactivate
-rm -rf .venv
-```
+Windows: use the **Miniforge Prompt**. `--help` on any command; `Tab` completes names; `Up`/`Down` recall history; `Ctrl+C` cancels; `q` quits a long output.
 :::
 
 ## Sharing an environment
@@ -432,8 +321,8 @@ uv sync     # rebuild .venv from pyproject.toml and uv.lock
 * An environment file says what you **asked for**: `numpy=2.5`
 * A **lockfile** records the exact version of **every** package, dependencies included
     * Rebuilds the same environment, months later, on another machine
-* `uv` writes one automatically (`uv.lock`, `pixi.lock`)
-* `conda` needs an extra tool (`conda-lock`) (sometimes)
+* `uv` writes one automatically: `uv.lock`
+* `conda` needs an extra tool (`conda-lock`)
 :::
 
 ## Your turn {.exercise-slide}
@@ -441,14 +330,14 @@ uv sync     # rebuild .venv from pyproject.toml and uv.lock
 Open [notebooks/day1_02_environments.ipynb]{.notebook}. The work happens in a **terminal**.
 
 1. **conda** (12 min): create a scratch environment with pandas, export it, rebuild it under a new name, remove both
-2. **uv** (10 min): init a project, add SciPy, run a script, delete `.venv`, rebuild it from the lockfile
+2. **uv** (10 min): init a project, add requests, run a script, delete `.venv`, rebuild it from the lockfile
 3. **Debrief together:** which files would you commit?
 
 ::: {.callout-warning}
 Leave the course environment `scientific-python` alone: only work on the throwaway ones.
 :::
 
-# NumPy {background-color="#03A062"}
+# NumPy
 
 ![](img/numpylogoicon.svg){height="200px" fig-alt="NumPy logo"}
 
@@ -769,11 +658,39 @@ c = np.clip(a, 0, 10)
 
 * Most NumPy **functions** return a new array; **assignment into** `a[...]` and `+=` change it in place
 
+## The recording
+
+:::: {.columns}
+::: {.column width="45%"}
+:::{.incremental}
+* A mouse turns a wheel to move a striped patch on a screen to the centre; a correct turn earns a drop of water
+* The patch appears left or right, faint or strong: its **contrast**
+* A **Neuropixels probe** records from 384 sites along 3.8 mm of brain
+:::
+:::
+::: {.column width="55%"}
+::: {.fragment}
+| Array | Shape | Axes |
+|---|---|---|
+| `lfp` | (5000, 384) | time (500 Hz, 10 s), channel |
+| `spike_counts` | (51, 533, 30) | unit, trial, 50 ms bin |
+| `contrast`, `choice`, `rt`, ... | (533,) | trial |
+| `area`, `depth_um` | (384,) | channel |
+
+* Channel 0 is the **deepest** site
+:::
+:::
+::::
+
+::: {.source-note}
+International Brain Laboratory, Brain Wide Map, via DANDI [@ibl_bwm_dandi].
+:::
+
 ## Your turn {.exercise-slide}
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing**
 
-* A real recording: a Neuropixels probe in a mouse brain [@ibl_bwm_dandi]
+* The recording from the previous slide, loaded for you in the first cells
 * Fetch time windows from chosen channels, and trials from 3-D spike counts
 
 **12 minutes**. **Stretch** (section 5): views and copies, a function that changes its input by accident, `int16` pitfalls
@@ -1061,6 +978,35 @@ def sum_of_squares_numpy(values):
 PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html). Timings measured on an Apple-silicon laptop; yours will differ.
 :::
 
+## The psychometric curve
+
+:::: {.columns}
+::: {.column width="55%"}
+```{python}
+#| echo: false
+import matplotlib.pyplot as plt
+
+c = np.linspace(-100, 100, 401)
+fig, ax = plt.subplots(figsize=(5, 3.4))
+for bias, label in [(-0.8, "right blocks (0.2)"), (0, "unbiased (0.5)"), (0.8, "left blocks (0.8)")]:
+    ax.plot(c, 1 / (1 + np.exp(-(4 * np.tanh(c / 25) - bias))), label=label)
+ax.set_xlabel("contrast (%; negative = left)")
+ax.set_ylabel("fraction chose right")
+ax.set_title("Sketch, not the data", fontsize=10)
+ax.legend(title="probability_left", fontsize=8);
+```
+:::
+::: {.column width="45%"}
+:::{.incremental}
+* At each contrast: the fraction of trials on which the mouse chose **right**
+* Contrast 0: nothing to see, so the mouse has to guess
+* **Blocks:** 90 unbiased trials (`probability_left` 0.5), then the stimulus is on the left 80% of the time (0.8), then on the right 80% (0.2), ...
+* A mouse that learns the blocks guesses the likely side: its curve **shifts**
+* Part 3: does it?
+:::
+:::
+::::
+
 ## Your turn {.exercise-slide}
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks and vectorising**
@@ -1107,6 +1053,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 
 * Plot the psychometric curve in each kind of block
 * Does the picture agree with what you concluded from the numbers?
+* Didn't finish part 3? Copy the part 3c cells from [solutions/day1_03_numpy.ipynb]{.notebook}
 
 **5 minutes**
 
@@ -1115,7 +1062,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 
 10 minutes
 
-# SciPy {background-color="#03A062"}
+# SciPy
 
 ## What lives where
 
@@ -1219,8 +1166,9 @@ ax.plot(t, smooth);
 
 Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 2: filtering with `scipy.signal`**
 
-* A 60 Hz notch filter: what does it remove that the FFT version did not?
+* A 60 Hz notch filter: what did the FFT version remove that the notch didn't?
 * A 1-30 Hz band-pass filter on one channel, then on all 384, with no loop
+* Didn't finish part 1? Copy its cells from [solutions/day1_04_scipy.ipynb]{.notebook}: part 2 compares with `cleaned`
 
 **10 minutes**. **Stretch:** a smoother spectrum with `welch`, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)
 

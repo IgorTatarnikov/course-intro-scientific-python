@@ -17,8 +17,8 @@
 # 1. **Reading tabular data** (10 min): Reading Other Data, Inspecting Data, Writing Data
 # 2. **Selecting data** (15 min): Selection of Individual Values, Extent of
 #    Slicing, Selecting Indices, Practice with Selection, Boolean masks
-# 3. **Group by: split-apply-combine** (15 min): yesterday's psychometric curve
-#    in one line, then a grouping question of your own
+# 3. **Group by: split-apply-combine** (10 min): yesterday's psychometric curve
+#    in one line (stretch: a grouping question of your own)
 # 4. **Tidy data** (8 min): wide tables to long ones, ready for seaborn
 # 5. **Stretch:** Many Ways of Access, then merging
 #
@@ -248,8 +248,9 @@ psychometric
 # * Does the curve look like a mouse that can see the stimulus? What happens at
 #   contrast 0, where there is nothing to see?
 #
-# The task has **blocks**: for a while the stimulus appears on the left 80% of
-# the time (`probability_left` 0.8), then on the right 80% of the time (0.2).
+# The task has **blocks**: the session starts with 90 unbiased trials
+# (`probability_left` 0.5). Then, for a while, the stimulus appears on the left
+# 80% of the time (0.8), then on the right 80% of the time (0.2), and so on.
 # Group by two columns, and `unstack` one of them into columns:
 
 # %%
@@ -280,9 +281,9 @@ frac_right_rb = (at_level[right_block] & y[right_block, np.newaxis]).sum(axis=0)
 np.allclose(by_block.unstack("probability_left")[0.2], frac_right_rb)
 
 # %% [markdown]
-# ### Your own grouping question
+# ### Stretch: your own grouping question
 #
-# Ask and answer **one** question of your own that needs `groupby`, about
+# Skip to part 4 if you are short of time. Ask and answer **one** question of your own that needs `groupby`, about
 # `trials` or `units`. For example:
 #
 # * Does the mouse respond faster when the stimulus is stronger? (Hint: group
@@ -363,7 +364,11 @@ rates.iloc[:3, :6]
 #    and why?
 
 # %% tags=["solution"]
-rates_long = rates.reset_index().melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+rates_long = (
+    rates.reset_index()
+    .melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+    .astype({"time_s": float})  # melt leaves the old column labels as objects
+)
 print(rates.shape, rates_long.shape)
 rates_long.head()
 

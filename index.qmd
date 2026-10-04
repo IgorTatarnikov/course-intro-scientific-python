@@ -1,8 +1,7 @@
 ---
 title: Introduction to Scientific Python
-subtitle: Igor Tatarnikov
-author: SWC/GCNU Neuroinformatics Unit
-date: 2026-10-05 & 2026-10-06
+author: Neuroinformatics Unit
+date: 2026-10-05
 ---
 
 ## The two days
@@ -50,9 +49,10 @@ Every line should say `OK`.
 
 ## Where the material comes from
 
-- **Scientific Python Lectures** [@spl]: most NumPy, Matplotlib and SciPy exercises
+- **International Brain Laboratory, Brain Wide Map** [@ibl_bwm_dandi]: the Neuropixels recording every exercise is built on
+- **Scientific Python Lectures** [@spl]: the NumPy, SciPy and Matplotlib exercises, adapted to the recording
+- **Software Carpentry gapminder lesson** [@swc_gapminder]: the pandas exercises, adapted to the recording, and the gapminder data on the slides
 - **Python Data Science Handbook** [@pdsh]: background reading for NumPy, pandas and plotting
-- **Software Carpentry gapminder lesson** [@swc_gapminder]: pandas exercises and the gapminder dataset
 
 Material from these sources is adapted under their licences. See each notebook's header for details.
 

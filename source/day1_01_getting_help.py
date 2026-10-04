@@ -3,9 +3,9 @@
 #
 # **Block:** Welcome, setup check and help (10 min)
 #
-# How the exercises work: try each one yourself first. Cells that say
-# `# Your code here` or *Your answer here* are yours to fill in. The solutions are
-# released after each block.
+# How the exercises work: cells that say `# Your code here` or *Your answer
+# here* are yours to fill in. Worked solutions are in `solutions/`. Try each
+# exercise first.
 #
 # Material adapted from [Scientific Python Lectures, Getting help and finding
 # documentation](https://lectures.scientific-python.org/intro/help/help.html)
@@ -96,7 +96,7 @@ report("LFP, channel 100 (µV)", [112.5, -37.5, 84.4])
 report("LFP, channel 100 (µV)", np.array([112.5, -37.5, 84.4]))
 
 # %% [markdown]
-# ## 4. Tab completion and searching
+# ## 4. Stretch: tab completion and searching
 #
 # * Type `np.cum` in a cell and press <kbd>Tab</kbd>. Which functions start with `cum`?
 #   Pick one and use `?` to find out what it does.

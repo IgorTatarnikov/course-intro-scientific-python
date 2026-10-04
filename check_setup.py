@@ -10,6 +10,8 @@ output and send it to the instructors before the course starts.
 """
 
 import importlib
+import os
+import shutil
 import sys
 from pathlib import Path
 
@@ -23,6 +25,13 @@ PACKAGES = [
     ("h5py", "h5py"),
     ("jupyterlab", "jupyterlab"),
 ]
+
+# Command-line tools used in the environments block. conda is a shell function
+# once initialised, so fall back to CONDA_EXE, which conda sets on activation.
+TOOLS = {
+    "conda": lambda: shutil.which("conda") or os.environ.get("CONDA_EXE"),
+    "uv": lambda: shutil.which("uv"),
+}
 
 DATA_FILES = [
     "ibl_session.h5",
@@ -39,6 +48,17 @@ def check_packages() -> bool:
             version = importlib.import_module(module).__version__
             print(f"  OK       {name:<14} {version}")
         except ImportError:
+            print(f"  MISSING  {name}")
+            ok = False
+    return ok
+
+
+def check_tools() -> bool:
+    ok = True
+    for name, find in TOOLS.items():
+        if path := find():
+            print(f"  OK       {name:<14} {path}")
+        else:
             print(f"  MISSING  {name}")
             ok = False
     return ok
@@ -62,6 +82,8 @@ if __name__ == "__main__":
         print("  FAILED   Python 3.11 or newer is needed. Is the course environment active?")
     print("Packages:")
     results = [check_packages()]
+    print("\nTools:")
+    results.append(check_tools())
     print("\nData files:")
     results.append(check_data())
 
