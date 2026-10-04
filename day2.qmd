@@ -60,10 +60,6 @@ gapminder = pd.wide_to_long(
 * Reads and writes CSV, Excel, Parquet, SQL, ...
 :::
 
-::: {.callout-note}
-We use pandas 2.3. pandas 3 is out: text columns show as `str` instead of `object`; otherwise the same for this course.
-:::
-
 ## Reading a CSV file
 
 ```{python}
@@ -71,7 +67,7 @@ We use pandas 2.3. pandas 3 is out: text columns show as `str` instead of `objec
 import pandas as pd
 
 data = pd.read_csv("data/gapminder_gdp_europe.csv", index_col="country")
-data.iloc[:3, :4].round()
+data.head()
 ```
 
 :::{.incremental}
