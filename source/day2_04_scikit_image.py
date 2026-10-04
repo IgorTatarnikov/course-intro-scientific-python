@@ -1,16 +1,18 @@
 # %% [markdown]
 # # Day 2 · scikit-image: counting nuclei
 #
-# **Block:** scikit-image (45 min, about 8 of them slides)
+# **Block:** scikit-image (45 min, including slides and live coding)
 #
 # **Task:** count the nuclei in a fluorescence microscopy image of human cells, and
 # measure their sizes. You will:
 #
-# 1. **Look** at the image as a NumPy array (5 min)
-# 2. **Filter** it to reduce noise (5 min)
-# 3. **Threshold** it into foreground and background (10 min)
-# 4. **Clean up and label** the objects, then count them (10 min)
+# 1. **Look** at the image as a NumPy array (3 min)
+# 2. **Filter** it to reduce noise (4 min)
+# 3. **Threshold** it into foreground and background (8 min)
+# 4. **Clean up and label** the objects, then count them (8 min)
 # 5. **Measure** each object with `regionprops` (7 min)
+#
+# Sections 1 to 3 are the first "Your turn" slide, sections 4 and 5 the second.
 # 6. **Stretch:** separate touching nuclei with a watershed, then try the SPL coins
 #    exercises
 #

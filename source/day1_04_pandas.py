@@ -165,32 +165,36 @@ data_europe["gdpPercap_2007"] / data_europe["gdpPercap_1952"]
 # %% [markdown]
 # ### Boolean masks
 #
-# Comparisons give a DataFrame (or Series) of `True`/`False`, which can be used to
-# select rows, exactly like NumPy masks:
+# Comparisons give a Series of `True`/`False` that selects rows, exactly like
+# NumPy masks. They work on text columns too. `gapminder_all.csv` has every
+# country, with a `continent` column and three measurements per year:
+# `gdpPercap_*`, `lifeExp_*` and `pop_*`.
 
 # %%
-rich_2007 = data_europe["gdpPercap_2007"] > 30000
-data_europe.loc[rich_2007, ["gdpPercap_1952", "gdpPercap_2007"]]
+data_all = pd.read_csv("../data/gapminder_all.csv", index_col="country")
+in_africa = data_all["continent"] == "Africa"
+in_africa.sum()
 
 # %% [markdown]
-# Using masks, make:
+# Using masks on `data_all`, make:
 #
-# 1. `n_poor_1952`: the number of countries with a GDP per capita below 2000
-#    in 1952
-# 2. `middle_1982`: the 1952 and 2007 columns, for countries whose GDP per
-#    capita in 1982 was between 10000 and 20000
-# 3. `fast_growers`: the names of the countries whose GDP per capita grew
-#    more than five-fold from 1952 to 2007 (Hint: `.index`)
+# 1. `n_small_1952`: the number of countries with a population below one
+#    million in 1952
+# 2. `big_asia`: the `lifeExp_2007` and `pop_2007` columns, for countries in
+#    **Asia** with a population above 100 million in 2007
+# 3. `short_lived`: the names of the countries in the **Americas or
+#    Oceania** whose life expectancy in 2007 was below 70 (Hint: `.index`, and
+#    brackets around each comparison.)
 
 # %% tags=["solution"]
-n_poor_1952 = (data_europe["gdpPercap_1952"] < 2000).sum()
-in_range = (data_europe["gdpPercap_1982"] > 10000) & (data_europe["gdpPercap_1982"] < 20000)
-middle_1982 = data_europe.loc[in_range, ["gdpPercap_1952", "gdpPercap_2007"]]
-growth = data_europe["gdpPercap_2007"] / data_europe["gdpPercap_1952"]
-fast_growers = data_europe.index[growth > 5]
-print(n_poor_1952)
-print(middle_1982)
-print(fast_growers)
+n_small_1952 = (data_all["pop_1952"] < 1e6).sum()
+is_big_asian = (data_all["continent"] == "Asia") & (data_all["pop_2007"] > 100e6)
+big_asia = data_all.loc[is_big_asian, ["lifeExp_2007", "pop_2007"]]
+in_region = (data_all["continent"] == "Americas") | (data_all["continent"] == "Oceania")
+short_lived = data_all.index[in_region & (data_all["lifeExp_2007"] < 70)]
+print(n_small_1952)
+print(big_asia)
+print(short_lived)
 
 # %% [markdown]
 # ## 3. Group by: split-apply-combine
@@ -219,33 +223,28 @@ data_europe.groupby(wealth_score).sum()
 # %% [markdown]
 # ### Your own grouping question
 #
-# `gapminder_all.csv` has every country, with a `continent` column and three
-# measurements per year: `gdpPercap_*`, `lifeExp_*` and `pop_*`.
+# Ask and answer **one** question of your own about `data_all` that needs
+# `groupby`. For example:
 #
-# Ask and answer **one** question of your own that needs `groupby`. For example:
-#
-# * Which continent had the highest median life expectancy in 1952, and in 2007?
-# * How many countries does each continent have, and what is its total population in 2007?
-# * Within each continent, which country had the highest GDP per capita in 2007?
-#   (Hint: `idxmax`.)
-
-# %%
-data_all = pd.read_csv("../data/gapminder_all.csv", index_col="country")
-data_all.iloc[:5, :4]
+# * Which continent's total population grew the most from 1952 to 2007, as a
+#   multiple of its 1952 population?
+# * How spread out was life expectancy within each continent in 2007? (Hint:
+#   `.agg` with `"std"`, `"min"` and `"max"`.)
+# * How many countries in each continent had a life expectancy above 70 in
+#   2007? (Hint: a mask is a column of `True`/`False` values, and you can group it.)
 
 # %% tags=["solution"]
-# Median life expectancy by continent, at the start and end of the data.
-data_all.groupby("continent")[["lifeExp_1952", "lifeExp_2007"]].median()
+# Population growth per continent, 1952 to 2007.
+by_continent = data_all.groupby("continent")
+(by_continent["pop_2007"].sum() / by_continent["pop_1952"].sum()).sort_values()
 
 # %% tags=["solution"]
-# Number of countries and total population (in millions) per continent in 2007.
-data_all.groupby("continent")["pop_2007"].agg(["count", "sum"]).assign(
-    sum=lambda df: (df["sum"] / 1e6).round()
-)
+# Spread of life expectancy within each continent in 2007.
+by_continent["lifeExp_2007"].agg(["std", "min", "max"]).round(1)
 
 # %% tags=["solution"]
-# Richest country per continent in 2007.
-data_all.groupby("continent")["gdpPercap_2007"].idxmax()
+# Countries per continent with a life expectancy above 70 in 2007.
+(data_all["lifeExp_2007"] > 70).groupby(data_all["continent"]).sum()
 
 # %% [markdown]
 # ## 4. Stretch

@@ -1,10 +1,10 @@
 # %% [markdown]
 # # Day 2 · SciPy
 #
-# **Block:** SciPy (25 min, about 5 of them slides)
+# **Block:** SciPy (25 min, including slides and live coding)
 #
-# 1. **Curve fitting** (10 min): SPL Exercise 39, fit a yearly cycle to Alaska temperatures
-# 2. **Image denoising with the FFT** (10 min): SPL Exercise 42, clean up the moon landing image
+# 1. **Curve fitting** (8 min): SPL Exercise 39, fit a yearly cycle to Alaska temperatures
+# 2. **Image denoising with the FFT** (8 min): SPL Exercise 42, clean up the moon landing image
 # 3. **Stretch:** statistical distributions (SPL Exercise 41) and 2-D minimisation
 #    (SPL Exercise 40), then the chapter's summary exercises
 #

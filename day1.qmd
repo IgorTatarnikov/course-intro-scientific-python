@@ -12,41 +12,29 @@ date: today
 | Day | Before the break | After the break |
 |-----|------------------|-----------------|
 | **1** | Setup and help · packages and environments · **NumPy** | **pandas** |
-| 2 | Matplotlib · seaborn · SciPy | scikit-image · xarray, dask and napari |
+| 2 | SciPy · Matplotlib | scikit-image · xarray, dask and napari |
 
 <br>
 
 * Two days of 3 hours each
 * Today: from arrays to tables
-* Tomorrow: plotting them, then working with images
-    * Day 2 ends by segmenting and counting nuclei in a microscopy image
-
-## How each block works
-
-1. **Slides**: a few new ideas
-2. **Live coding**: we write the code together, you follow along
-3. **More slides**: the next few ideas
-4. **Your turn**: exercises in a notebook
-
-<br>
-
-* Live coding slides are marked 💻, with an amber bar on the left
-* Exercise slides are marked ✍️, with a green bar on the left
+* Tomorrow: numerical methods and plotting
 
 ## How the exercises work
 
 * Notebooks live in `notebooks/`, numbered by day and block
 * Cells that say `# Your code here` or *Your answer here* are for you
-* **Try first**, then the docs or a search engine, then an LLM chat if you are stuck
+* **Try first**, then the docs or a search engine, then an LLM (chat only) if you are stuck
 * **Stretch** exercises are for anyone who finishes early
     * Skipping them is fine
-* Solutions are in `solutions/`, released after each block
 
 ## Reading a traceback
 
+:::{.incremental}
 * Helps you find the source of the error
 * **Read from the bottom up**: error type, then message, then the line that raised it
 * Look for the last line that is *your* code
+:::
 
 ```{python}
 #| error: true
@@ -98,6 +86,7 @@ np.linspace??        # source code too
 * [numpy.org/doc](https://numpy.org/doc/stable/)
 * Or search for "numpy linspace"
 * Examples at the bottom of each page are often the fastest way in
+* LLMs can help, but **verify** the answer with the docs or a search engine
 
 :::
 
@@ -135,8 +124,8 @@ np.linspace(0, 1, int(n_points))   # fix
 Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
 1. Run the setup check: every line should say `OK`
-2. Look up `np.linspace` three ways and answer the questions
-3. Read the traceback and fix the broken call
+2. Look up `np.arange` three ways and answer the questions
+3. Read a traceback through two functions and fix the call
 
 **5 minutes**
 
@@ -440,8 +429,8 @@ uv sync     # rebuild .venv from pyproject.toml and uv.lock
 
 Open [notebooks/day1_02_environments.ipynb]{.notebook}. The work happens in a **terminal**.
 
-1. **conda** (12 min): create a scratch environment, export it, rebuild it under a new name, remove both
-2. **uv** (10 min): init a project, add NumPy, run a script, delete `.venv`, rebuild it from the lockfile
+1. **conda** (12 min): create a scratch environment with pandas, export it, rebuild it under a new name, remove both
+2. **uv** (10 min): init a project, add SciPy, run a script, delete `.venv`, rebuild it from the lockfile
 3. **Debrief together:** which files would you commit?
 
 ::: {.callout-warning}
@@ -684,8 +673,9 @@ c = np.clip(a, 0, 10)
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing, views and in-place changes**
 
-* Fetch rows, columns and blocks from an array
-* Change parts of an array, with and without changing the original
+* Fetch frames, pixels and crops from a 3-D array
+* Change part of a recording, with and without changing the original
+* Fix a function that changes its input by accident
 * Fix a dtype problem
 
 **15 minutes**
@@ -775,8 +765,8 @@ col * 10 + row                     # (3, 4)
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 2: aggregations and broadcasting**
 
-* Summarise a table of scores along each axis
-* Build arrays by broadcasting instead of looping
+* Summarise 3-D spike counts along one axis, or several
+* Distances between cells and ΔF/F by broadcasting, no loops
 * Fix a broadcasting error
 
 **12 minutes**
@@ -887,9 +877,9 @@ PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHan
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks, fancy indexing and vectorising**
 
-* Fetch and replace values by condition, in place and not
-* Pick elements with fancy indexing
-* Time a loop against NumPy
+* Reaction times: select trials by condition, and replace outliers with `NaN`
+* Fancy indexing: lookup tables, reordering, colouring a label image
+* Time a loop against NumPy on an animal's path
 * **Data statistics** (SPL Ex. 23): hare and lynx populations, **no for-loops**
 
 **20 minutes**. **Stretch:** a 3-D integral by broadcasting (SPL Ex. 24); Markov chain (SPL Ex. 26)
@@ -957,7 +947,7 @@ data.index
 data["gdpPercap_2007"]             # a Series
 type(data["gdpPercap_2007"])
 data["gdpPercap_2007"].max()
-data["gdpPercap_2007"].idxmax()    # the label, not the position
+data["gdpPercap_2007"].sort_values().tail(3)   # sorted, labels kept
 data.T.head()
 ```
 :::
@@ -1033,14 +1023,14 @@ long_lived = all_countries["lifeExp_2007"] > 80
 long_lived.sum()
 all_countries.loc[long_lived, ["continent", "lifeExp_2007"]]
 
-all_countries["growth"] = all_countries["gdpPercap_2007"] / all_countries["gdpPercap_1952"]
-all_countries["growth"].sort_values().tail()
+all_countries["lifeExp_gain"] = all_countries["lifeExp_2007"] - all_countries["lifeExp_1952"]
+all_countries["lifeExp_gain"].sort_values().tail()
 
 grouped = all_countries.groupby("continent")
 grouped["lifeExp_2007"].mean()
 grouped["lifeExp_2007"].agg(["count", "median", "max"])
 grouped["gdpPercap_2007"].idxmax()     # richest country per continent
-grouped["growth"].median().sort_values()
+grouped["lifeExp_gain"].median().sort_values()
 ```
 :::
 
@@ -1062,7 +1052,7 @@ Beyond today: missing data, `merge`/`join` and reshaping with `melt` are stretch
 
 Open [notebooks/day1_04_pandas.ipynb]{.notebook}
 
-1. **Boolean masks** (5 min): the end of section 2
+1. **Boolean masks** (5 min): the end of section 2, on every country, combining text and number conditions
 2. **Group by** (15 min): a wealth score for Europe, then **one grouping question of your own** on `gapminder_all.csv`
 
 **Stretch:** Many Ways of Access; missing data, merge and join, and reshaping (PDSH)

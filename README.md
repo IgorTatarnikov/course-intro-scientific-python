@@ -1,6 +1,6 @@
 # Introduction to Scientific Python
 
-A two-day course (3 hours a day) covering environments, NumPy, pandas, Matplotlib, seaborn, SciPy and scikit-image, with a short tour of xarray, dask and napari. Each block mixes short runs of slides with live coding (Day 1 so far), then ends with exercises in a Jupyter notebook.
+A two-day course (3 hours a day) covering environments, NumPy, pandas, Matplotlib, seaborn, SciPy and scikit-image, with a short tour of xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
 
 ## For learners
 
@@ -107,4 +107,5 @@ Some slides run code at render time and read from `data/`. CI installs `requirem
   - gapminder CSVs: from Software Carpentry (CC BY 4.0)
   - `face.png`: from `scipy.datasets`
   - `human_mitosis.png`: from `skimage.data`, CC0, courtesy of David Root, from Moffat *et al.*, *Cell* 2006
+  - Hubble Deep Field (Day 2 slides only): loaded from `skimage.data`, NASA, public domain
   - `air_temperature_daily.nc`: NCEP reanalysis via the xarray tutorial data, reduced to daily means

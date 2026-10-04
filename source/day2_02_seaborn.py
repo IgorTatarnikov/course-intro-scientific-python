@@ -6,7 +6,7 @@
 # The first part is a **live demo**: follow along, run the cells and change
 # things. The demo mirrors the Python Data Science Handbook's [Visualization
 # with Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
-# but uses the gapminder data from this morning. Then make **one plot of your
+# but uses the gapminder data from Day 1. Then make **one plot of your
 # own**.
 #
 # The [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) and

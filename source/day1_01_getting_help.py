@@ -23,11 +23,12 @@
 # %% [markdown]
 # ## 2. Three ways to read the documentation
 #
-# Look up `np.linspace` three ways:
+# On the slides we looked up `np.linspace`. Now look up **`np.arange`** the same
+# three ways:
 #
-# 1. `help(np.linspace)`, which works in any Python session
-# 2. `np.linspace?`, which works in Jupyter and IPython (and `np.linspace??` shows the source)
-# 3. The online docs: search for "numpy linspace", or go to <https://numpy.org/doc/stable/>
+# 1. `help(np.arange)`, which works in any Python session
+# 2. `np.arange?`, which works in Jupyter and IPython (and `np.arange??` tries to show the source)
+# 3. The online docs: search for "numpy arange", or go to <https://numpy.org/doc/stable/>
 #
 # Then answer the questions below.
 
@@ -35,60 +36,72 @@
 import numpy as np
 
 # %%
-help(np.linspace)
+help(np.arange)
 
 # %%
-# np.linspace?
+# np.arange?
 
 # %% [markdown]
 # **Questions**
 #
-# 1. How many points does `np.linspace(0, 1)` return if you do not pass `num`?
-# 2. What does `endpoint=False` change?
-# 3. Which argument makes `linspace` also return the spacing between points?
+# 1. Is the `stop` value included in the result? How is that different from `np.linspace`?
+# 2. What does `np.arange(3, 10, 2)` return? Predict first, then run it.
+# 3. What does the documentation recommend using instead when the step is not a
+#    whole number, such as 0.1?
+# 4. Which argument sets the dtype of the result?
 
 # %% [markdown] tags=["answer"]
-# 1. 50: the default is `num=50`.
-# 2. The stop value is left out, so the points are spaced by `(stop - start) / num`
-#    instead of `(stop - start) / (num - 1)`.
-# 3. `retstep=True` returns a tuple `(samples, step)`.
+# 1. No: `arange` stops *before* `stop`, like `range()`. `np.linspace` includes the
+#    stop value unless you pass `endpoint=False`.
+# 2. `[3, 5, 7, 9]`.
+# 3. `np.linspace`: with a float step, rounding can change how many values you get.
+# 4. `dtype`, for example `np.arange(5, dtype=float)`.
 
 # %% tags=["solution"]
-print(len(np.linspace(0, 1)))
-print(np.linspace(0, 1, 5))
-print(np.linspace(0, 1, 5, endpoint=False))
-print(np.linspace(0, 1, 5, retstep=True))
+print(np.arange(0, 1, 0.25))
+print(np.arange(3, 10, 2))
+print(np.arange(5, dtype=float))
 
 # %% [markdown]
 # ## 3. Read a traceback
 #
-# The cell below fails on purpose. Read the error from the **bottom up**:
+# The cell below fails on purpose. The error happens inside a function, which is
+# called from another function. Read the traceback from the **bottom up**:
 #
-# 1. What type of error is it?
-# 2. Which argument caused it, and why?
-# 3. Fix the call in the empty cell underneath.
+# 1. What type of error is it, and what does the message say?
+# 2. In which function, and on which line, did it break?
+# 3. Which line in the cell started the chain of calls?
+# 4. Fix it in the empty cell underneath, **without changing either function**.
 
 # %% tags=["raises-exception"]
-n_points = 100 / 8
-x = np.linspace(0, 1, n_points)
+def peak_to_peak(values):
+    return values.max() - values.min()
+
+
+def report(name, values):
+    print(name, "range:", peak_to_peak(values))
+
+
+report("weights", [61.2, 74.5, 58.9])
 
 # %% [markdown] tags=["answer"]
-# 1. A `TypeError`.
-# 2. `num` must be an integer, but `100 / 8` is the float `12.5`. Python's `/`
-#    always returns a float; use `//` or `int()` for a whole number.
+# 1. An `AttributeError`: `'list' object has no attribute 'max'`.
+# 2. In `peak_to_peak`, on the line `return values.max() - values.min()`.
+# 3. The last line, `report("weights", ...)`, which calls `report`, which calls `peak_to_peak`.
+# 4. A Python list has no `.max()` method; a NumPy array does. Pass an array instead.
 
 # %% tags=["solution"]
-n_points = 100 // 8
-x = np.linspace(0, 1, n_points)
-x.shape
+report("weights", np.array([61.2, 74.5, 58.9]))
 
 # %% [markdown]
 # ## 4. Tab completion and searching
 #
-# * Type `np.lin` in a cell and press <kbd>Tab</kbd>. What other functions start with `lin`?
+# * Type `np.cum` in a cell and press <kbd>Tab</kbd>. Which functions start with `cum`?
+#   Pick one and use `?` to find out what it does.
 # * `np.lookfor` was removed in NumPy 2, so search for a topic in the online docs instead.
 #   Search for "inverse of a matrix": which function do you find?
 
 # %% [markdown] tags=["answer"]
-# * `np.linspace` and `np.linalg` (the linear algebra submodule).
+# * `np.cumsum` and `np.cumprod` (running sum and product), and their newer names
+#   `np.cumulative_sum` and `np.cumulative_prod`.
 # * `np.linalg.inv`. (`np.linalg.pinv` is the pseudo-inverse, for matrices that have no inverse.)

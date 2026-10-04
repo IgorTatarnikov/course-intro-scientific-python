@@ -18,46 +18,54 @@
 # %% [markdown]
 # ## Part 1: conda (12 min)
 #
-# 1. Create an environment called `scratch` with Python 3.12 and NumPy, taking
+# 1. Create an environment called `scratch` with Python 3.12 and **pandas**, taking
 #    packages only from the **conda-forge** channel.
-# 2. Activate it and check which NumPy version you got:
-#    `python -c "import numpy; print(numpy.__version__)"`
-# 3. Export the environment to a file called `scratch.yml`. Try exporting it
+# 2. Activate it and check which pandas version you got:
+#    `python -c "import pandas; print(pandas.__version__)"`
+# 3. You never asked for NumPy. Is it installed? Find out with `conda list`.
+#    Why is it there?
+# 4. Export the environment to a file called `scratch.yml`. Try exporting it
 #    twice, with and without `--from-history`, and compare the two files.
-#    Which one would you put in a repository, and why?
-# 4. Deactivate, then build a **second** environment called `scratch-copy` from
+#    Which one mentions NumPy? Which would you put in a repository, and why?
+# 5. Deactivate, then build a **second** environment called `scratch-copy` from
 #    `scratch.yml`.
-# 5. List your environments to check that both exist, then remove both.
+# 6. List your environments to check that both exist, then remove both.
 #
 # Hints: `conda create --help`, `conda env export --help`, `conda env --help`.
 
 # %% [markdown] tags=["answer"]
 # ```bash
 # # 1. Create
-# conda create -n scratch -c conda-forge --override-channels python=3.12 numpy
+# conda create -n scratch -c conda-forge --override-channels python=3.12 pandas
 #
 # # 2. Activate and check
 # conda activate scratch
-# python -c "import numpy; print(numpy.__version__)"
+# python -c "import pandas; print(pandas.__version__)"
 #
-# # 3. Export, two ways
+# # 3. NumPy came along as a dependency of pandas
+# conda list numpy
+#
+# # 4. Export, two ways
 # conda env export > scratch-full.yml
 # conda env export --from-history > scratch.yml
 #
-# # 4. Rebuild under a new name
+# # 5. Rebuild under a new name
 # conda deactivate
 # conda env create -n scratch-copy -f scratch.yml
 #
-# # 5. Check, then clean up
+# # 6. Check, then clean up
 # conda env list
 # conda env remove -n scratch
 # conda env remove -n scratch-copy
 # ```
 #
-# `scratch-full.yml` lists every package with its exact build string, and
+# pandas is built on NumPy, so conda's solver installed NumPy (and pandas' other
+# dependencies) for you.
+#
+# `scratch-full.yml` lists every package, NumPy included, with its exact build string, and
 # those builds are often specific to your operating system. It is a precise
 # record of *this* machine, but often fails to solve on a colleague's laptop.
-# `--from-history` keeps only what you asked for (`python=3.12`, `numpy`), so it
+# `--from-history` keeps only what you asked for (`python=3.12`, `pandas`), so it
 # is portable. That is the one to commit, ideally with versions pinned the way
 # the course's own `environment.yml` does.
 #
@@ -74,20 +82,20 @@
 #
 # 1. Make a new project: `uv init uv-demo`, then `cd uv-demo`. Look at the files
 #    it created.
-# 2. Add NumPy as a dependency. What changed in `pyproject.toml`? What new
-#    files appeared?
+# 2. Add **SciPy** as a dependency. What changed in `pyproject.toml`? What new
+#    files appeared? Is NumPy listed in `pyproject.toml`, in `uv.lock`, or both?
 # 3. Replace the contents of `main.py` with:
 #
 #    ```python
-#    import numpy as np
+#    import scipy
+#    from scipy import constants
 #
-#    x = np.linspace(0, 1, 5)
-#    print("numpy", np.__version__, x.mean())
+#    print("scipy", scipy.__version__, "speed of light:", constants.c)
 #    ```
 #
 #    and run it **through uv**, without activating anything.
 # 4. Delete the `.venv` folder completely. Recreate the environment from the
-#    lockfile and run the script again. Is it the same NumPy version?
+#    lockfile and run the script again. Is it the same SciPy version?
 #
 # Hints: `uv add`, `uv run`, `uv sync`.
 
@@ -96,13 +104,16 @@
 # uv init uv-demo
 # cd uv-demo              # pyproject.toml, main.py, README.md, .python-version, .gitignore
 #
-# uv add numpy            # adds "numpy>=..." to dependencies; creates uv.lock and .venv
+# uv add scipy            # adds "scipy>=..." to dependencies; creates uv.lock and .venv
 # uv run main.py          # creates/updates .venv if needed, then runs inside it
 #
 # rm -rf .venv            # on Windows: rmdir /s .venv
 # uv sync                 # rebuilds .venv from uv.lock: same versions as before
 # uv run main.py
 # ```
+#
+# NumPy is only in `uv.lock`: `pyproject.toml` lists what you asked for, and the
+# lockfile records every package that was installed, dependencies included.
 #
 # `uv run` would also have recreated `.venv` on its own: it always syncs the
 # environment with the lockfile before running.

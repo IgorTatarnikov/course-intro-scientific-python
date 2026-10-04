@@ -1,11 +1,11 @@
 # %% [markdown]
 # # Day 2 · Matplotlib
 #
-# **Block:** Matplotlib (45 min, about 7 of them slides)
+# **Block:** Matplotlib (45 min, including slides and live coding)
 #
-# 1. **Simple plot** (15 min): build a sine/cosine figure step by step
-# 2. **Scatter and imshow** (10 min): SPL Exercises 28 and 31
-# 3. **Framing a Face** (12 min): crop and mask an image, held over from Day 1's NumPy
+# 1. **Simple plot** (12 min): build a sine/cosine figure step by step
+# 2. **Scatter and imshow** (7 min): SPL Exercises 28 and 31
+# 3. **Framing a Face** (10 min): crop and mask an image, held over from Day 1's NumPy
 # 4. **Stretch:** hare and lynx (SPL Exercise 23, part 6), multiple subplots,
 #    gapminder plots, and more SPL plot types
 #

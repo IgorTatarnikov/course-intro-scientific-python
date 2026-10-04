@@ -13,6 +13,10 @@
 # 4. **Stretch:** crude integral approximations (SPL Exercise 24)
 # 5. **Stretch:** Markov chain (SPL Exercise 26)
 #
+# The slides and live coding used 2-D tables of scores and a week of
+# temperatures. The exercises practise the same ideas on different data:
+# a small video, spike counts, reaction times and an animal's path.
+#
 # Most tasks ask you to store a result in a named variable. Print it, and
 # check it by eye against the array you started from. There is no plotting
 # yet; plotting starts on Day 2.
@@ -36,43 +40,49 @@ rng = np.random.default_rng(seed=0)
 # %% [markdown]
 # ## 1. Indexing, views and in-place changes
 #
-# ### 1a. Fetching parts of an array
+# ### 1a. Fetching parts of a 3-D array
 #
-# All the tasks in this section use `grid`:
+# On the slides the arrays were 2-D. Here `movie` is a tiny 3-D array: 3 frames
+# of a 4 x 5 pixel video, indexed as `movie[frame, row, column]`.
 
 # %%
-grid = np.arange(1, 37).reshape(6, 6)
-grid
+movie = np.arange(60).reshape(3, 4, 5)
+movie
 
 # %% [markdown]
 # Using **one indexing expression each** (no loops, no typing values in),
 # make:
 #
-# 1. `value`: the number in row 2, column 3 (counting from 0). It should be 16.
-# 2. `last_row`: the whole last row
-# 3. `third_column`: the whole third column
-# 4. `every_other`: every other column, starting with the first
-# 5. `centre`: the central 2 x 2 block, `[[15, 16], [21, 22]]`
-# 6. `bottom_right`: the bottom-right 3 x 3 block
-# 7. `upside_down`: `grid` with its rows in reverse order
-# 8. `corners`: the four corners, as a 2 x 2 array `[[1, 6], [31, 36]]`
-#    (Hint: a step can be larger than 1.)
+# 1. `first_frame`: the whole first frame, shape (4, 5)
+# 2. `pixel_value`: frame 1, row 2, column 3 (counting from 0). It should be 33.
+# 3. `pixel_trace`: the pixel at row 2, column 3 in **every** frame:
+#    `[13, 33, 53]`
+# 4. `last_two_frames`: the last two frames, shape (2, 4, 5)
+# 5. `top_rows`: the top row of every frame, shape (3, 5)
+# 6. `cropped`: rows 1 to 2 and columns 1 to 3 of every frame, shape (3, 2, 3)
+# 7. `mirrored`: every frame flipped left to right (columns reversed)
+# 8. `downsampled`: every other row and every other column of every frame,
+#    shape (3, 2, 3)
+#
+# Check the `.shape` of each result against the one given.
 
 # %%
 # BEGIN SOLUTION
-value = grid[2, 3]
-last_row = grid[-1]
-third_column = grid[:, 2]
-every_other = grid[:, ::2]
-centre = grid[2:4, 2:4]
-bottom_right = grid[-3:, -3:]
-upside_down = grid[::-1]
-corners = grid[::5, ::5]
+first_frame = movie[0]
+pixel_value = movie[1, 2, 3]
+pixel_trace = movie[:, 2, 3]
+last_two_frames = movie[-2:]
+top_rows = movie[:, 0, :]
+cropped = movie[:, 1:3, 1:4]
+mirrored = movie[:, :, ::-1]
+downsampled = movie[:, ::2, ::2]
 # END SOLUTION
 
 # %% tags=["solution"]
-print(value, last_row, third_column, sep="\n")
-print(every_other, centre, bottom_right, upside_down, corners, sep="\n\n")
+print(first_frame, pixel_value, pixel_trace, sep="\n\n")
+for result in [last_two_frames, top_rows, cropped, mirrored, downsampled]:
+    print(result.shape)
+print(mirrored[0], downsampled[0], sep="\n\n")
 
 # %% [markdown]
 # ### 1b. Build an array without typing it in (SPL Exercise 22, part 1)
@@ -99,111 +109,116 @@ print(rows_2_and_4)
 # %% [markdown]
 # ### 1c. Views and copies
 #
-# 1. Make `top_left`, the top-left 2 x 2 block of `grid`, and set all its
-#    values to `-1`. Print `grid`: did it change?
-# 2. Reset `grid`. Now do the same again, but this time **without changing
-#    `grid`**.
+# `recording` holds 8 time points from each of 3 electrodes (one row per
+# electrode).
+#
+# 1. Make `channel_1`, the second electrode's row. Its first two samples are an
+#    artefact: set them to 0 **in `channel_1`**. Print `recording`: did it change?
+# 2. Reset `recording`. Now do the same again, but this time **without changing
+#    `recording`**.
 
 # %%
-grid = np.arange(1, 37).reshape(6, 6)
+recording = np.arange(24).reshape(3, 8)
 
 # %% tags=["solution"]
-# 1. A slice is a view, so grid changes too.
-top_left = grid[:2, :2]
-top_left[:] = -1
-print(grid)
+# 1. A row of an array is a view, so recording changes too.
+channel_1 = recording[1]
+channel_1[:2] = 0
+print(recording)
 
 # %% tags=["solution"]
 # 2. Copy first.
-grid = np.arange(1, 37).reshape(6, 6)
-top_left = grid[:2, :2].copy()
-top_left[:] = -1
-print(grid)
+recording = np.arange(24).reshape(3, 8)
+channel_1 = recording[1].copy()
+channel_1[:2] = 0
+print(recording)
 
 # %% [markdown]
-# 3. Which of these share memory with `grid`, and which are copies? Find out
-#    with `np.shares_memory(grid, ...)` rather than guessing:
-#    `grid[1:3]`, `grid[:, 1]`, `grid[[1, 2]]`, `grid[grid > 10]`, `grid.T`,
-#    `grid.reshape(4, 9)`.
+# 3. Which of these share memory with `recording`, and which are copies? Find
+#    out with `np.shares_memory(recording, ...)` rather than guessing:
+#    `recording[1]`, `recording[:, ::2]`, `recording[[0, 2]]`,
+#    `recording[recording > 10]`, `recording.T`, `recording.ravel()`,
+#    `recording.flatten()`.
 
 # %% tags=["solution"]
 for name, candidate in [
-    ("grid[1:3]", grid[1:3]),
-    ("grid[:, 1]", grid[:, 1]),
-    ("grid[[1, 2]]", grid[[1, 2]]),
-    ("grid[grid > 10]", grid[grid > 10]),
-    ("grid.T", grid.T),
-    ("grid.reshape(4, 9)", grid.reshape(4, 9)),
+    ("recording[1]", recording[1]),
+    ("recording[:, ::2]", recording[:, ::2]),
+    ("recording[[0, 2]]", recording[[0, 2]]),
+    ("recording[recording > 10]", recording[recording > 10]),
+    ("recording.T", recording.T),
+    ("recording.ravel()", recording.ravel()),
+    ("recording.flatten()", recording.flatten()),
 ]:
-    print(f"{name:20} shares memory: {np.shares_memory(grid, candidate)}")
+    print(f"{name:27} shares memory: {np.shares_memory(recording, candidate)}")
 
 # %% [markdown] tags=["answer"]
-# Slices, `.T` and `reshape` are views. Indexing with a list of integers
-# (fancy indexing) or with a mask always makes a copy.
+# Rows, slices (even with a step), `.T` and `ravel()` are views. Indexing with a
+# list of integers (fancy indexing) or with a mask makes a copy, and so does
+# `flatten()`, which always copies (`ravel()` copies only when it has to).
 
 # %% [markdown]
 # ### 1d. In place, or a new array?
 #
-# Each task below starts from a fresh `grid`. Use **one line** for each.
-#
-# 1. Set the whole last column of `grid` to 0, in place.
-# 2. Add 100 to every value in row 1, in place.
-# 3. Make `doubled`, a new array with every value of `grid` doubled. `grid`
-#    must not change.
+# A colleague wrote this function to shift a signal so that its minimum is 0:
 
 # %%
-grid = np.arange(1, 37).reshape(6, 6)
+def remove_offset(signal):
+    signal -= signal.min()
+    return signal
 
-# %% tags=["solution"]
-grid[:, -1] = 0
-grid[1] += 100
-doubled = grid * 2
-print(grid)
-print(doubled)
+
+readings = np.array([12.0, 15.5, 13.2, 18.1])
+shifted = remove_offset(readings)
+print(shifted)
+print(readings)
 
 # %% [markdown]
-# `x` and `y` below are two names for the **same** array.
-#
-# 4. Double `x` so that `y` sees the change too. Print both.
-# 5. Reset them, then double `x` so that `y` keeps the old values.
-
-# %%
-x = np.arange(5)
-y = x
-
-# %% tags=["solution"]
-# 4. In place: x and y still point at the same array.
-x *= 2
-print(x, y)
-
-# %% tags=["solution"]
-# 5. x * 2 makes a new array, and the name x now points at it.
-x = np.arange(5)
-y = x
-x = x * 2
-print(x, y)
-
-# %% [markdown]
-# 6. Make `sorted_values`, a sorted copy of `values`, leaving `values`
-#    unchanged. Print `values` to check.
-# 7. Now sort `values` itself, in place. What does the method return?
-
-# %%
-values = rng.integers(0, 100, size=8)
-values
-
-# %% tags=["solution"]
-sorted_values = np.sort(values)
-print(values, sorted_values)
-
-# %% tags=["solution"]
-result = values.sort()
-print(values, result)
+# 1. `readings` changed, although the function returned a result. Why?
+# 2. Write `remove_offset_safe`, which returns the shifted signal but leaves its
+#    input alone. Check it on a fresh `readings`.
 
 # %% [markdown] tags=["answer"]
-# `np.sort(values)` returns a new array. The method `values.sort()` sorts in
-# place and returns `None`, so `values = values.sort()` would throw your data
-# away.
+# Inside the function, `signal` is just another name for the caller's array, and
+# `-=` changes that array in place. The function returns the same array it was
+# given, so `shifted` and `readings` are one array with two names.
+
+# %%
+def remove_offset_safe(signal):
+    # BEGIN SOLUTION
+    return signal - signal.min()
+    # END SOLUTION
+
+
+readings = np.array([12.0, 15.5, 13.2, 18.1])
+
+# %% tags=["solution"]
+shifted = remove_offset_safe(readings)
+print(shifted)
+print(readings)
+
+# %% [markdown]
+# NumPy's random generator has the same split. `rng.permutation(x)` returns a
+# shuffled copy and `rng.shuffle(x)` shuffles `x` itself.
+#
+# 3. Make `shuffled_order`, a shuffled copy of `order`, leaving `order`
+#    unchanged. Print `order` to check.
+# 4. Now shuffle `order` itself, in place. What does `rng.shuffle` return?
+
+# %%
+order = np.arange(10)
+
+# %% tags=["solution"]
+shuffled_order = rng.permutation(order)
+print(order, shuffled_order)
+
+# %% tags=["solution"]
+result = rng.shuffle(order)
+print(order, result)
+
+# %% [markdown] tags=["answer"]
+# `rng.shuffle` changes `order` in place and returns `None`, so
+# `order = rng.shuffle(order)` would throw your data away.
 
 # %% [markdown]
 # ### 1e. dtypes
@@ -217,70 +232,98 @@ counts += 0.5
 # %% [markdown]
 # 1. Make `counts_half`, a **float** array holding `counts + 0.5`.
 #
-# `pixels` holds three pixel brightnesses stored as `uint8` (0 to 255), as
-# images usually are.
-#
-# 2. Make `brighter`: every pixel 100 brighter, but **capped at 255** instead
-#    of wrapping round. `brighter` should still be `uint8`, and `pixels` must
-#    not change. (Hint: `.astype()` and `np.clip`.)
+# `frame_a` and `frame_b` are the same three pixels in two video frames,
+# stored as `uint8` (0 to 255), as images usually are. Subtracting them to see
+# what changed goes wrong:
 
 # %%
-pixels = np.array([10, 200, 250], dtype=np.uint8)
-pixels + 100  # wraps round: not what we want
+frame_a = np.array([12, 200, 250], dtype=np.uint8)
+frame_b = np.array([10, 210, 250], dtype=np.uint8)
+frame_b - frame_a  # 10 - 12 should be -2, not 254
+
+# %% [markdown]
+# 2. Make `change`, the correct difference `frame_b - frame_a`, `[-2, 10, 0]`.
+#    `frame_a` and `frame_b` must not change. (Hint: `.astype()` to a type that
+#    can hold negative numbers, such as `np.int16`.)
+# 3. Make `amount_of_change`: how much each pixel changed, whatever the
+#    direction, `[2, 10, 0]`.
 
 # %% tags=["solution"]
 counts_half = counts.astype(float) + 0.5  # or counts + 0.5, which makes a new float array
-brighter = np.clip(pixels.astype(np.int16) + 100, 0, 255).astype(np.uint8)
+change = frame_b.astype(np.int16) - frame_a.astype(np.int16)
+amount_of_change = np.abs(change)
 print(counts_half)
-print(brighter, brighter.dtype, pixels)
+print(change, change.dtype, amount_of_change)
 
 # %% [markdown]
 # ## 2. Aggregations and broadcasting
 #
-# ### 2a. Aggregations
+# ### 2a. Aggregations along more than one axis
 #
-# `scores` holds the marks of 6 students (rows) in 4 tests (columns).
-# Make:
-#
-# 1. `student_mean`: the mean mark of each student (6 values)
-# 2. `test_best`: the best mark in each test (4 values)
-# 3. `test_winner`: the **row number** of the student who did best in each test
-# 4. `overall_mean`: the mean of every mark in the table (one number)
+# `spikes` holds spike counts from a (simulated) experiment: 4 neurons, each
+# recorded in 5 trials, with each trial split into 10 time bins.
+# `spikes[n, t, b]` is the number of spikes neuron `n` fired in bin `b` of
+# trial `t`.
 
 # %%
-scores = rng.integers(40, 101, size=(6, 4))
-scores
+spikes = rng.poisson(3, size=(4, 5, 10))
+spikes.shape
+
+# %% [markdown]
+# Make:
+#
+# 1. `total_per_neuron`: the total number of spikes from each neuron, over all
+#    trials and bins (4 values). (Hint: `axis` also accepts a tuple of axes.)
+# 2. `psth`: for each neuron, the mean count in each time bin, averaged over
+#    trials. Shape (4, 10).
+# 3. `busiest_trial`: for each neuron, the **number** of the trial in which it
+#    fired the most spikes (4 values).
+# 4. `overall_mean`: the mean count over the whole array (one number)
 
 # %% tags=["solution"]
-student_mean = scores.mean(axis=1)
-test_best = scores.max(axis=0)
-test_winner = scores.argmax(axis=0)
-overall_mean = scores.mean()
-print(student_mean, test_best, test_winner, overall_mean, sep="\n")
+total_per_neuron = spikes.sum(axis=(1, 2))
+psth = spikes.mean(axis=1)
+busiest_trial = spikes.sum(axis=2).argmax(axis=1)
+overall_mean = spikes.mean()
+print(total_per_neuron, psth.shape, busiest_trial, overall_mean, sep="\n")
 
 # %% [markdown]
 # ### 2b. Broadcasting
 #
 # No loops in this section.
 #
-# 1. `times_table`: the 10 x 10 multiplication table, where `times_table[i, j]`
-#    is `(i + 1) * (j + 1)`. (Hint: one row and one column from `np.arange`.)
-# 2. `scores_centred`: `scores` with each **test's** mean subtracted, so every
-#    column has mean 0.
-# 3. `scores_fraction`: each student's marks divided by that student's total,
-#    so every **row** sums to 1. (Hint: `keepdims=True`.)
+# 1. `points` holds the (x, y) positions of 5 cells. Make `distances`, the
+#    5 x 5 array where `distances[i, j]` is the distance between cell `i` and
+#    cell `j`. (Hint: give one copy of `points` the shape (5, 1, 2) and another
+#    the shape (1, 5, 2). Their difference has shape (5, 5, 2). Then square, sum
+#    over the last axis and take the square root.) Check that the diagonal is 0.
+
+# %%
+points = rng.random((5, 2))
 
 # %% tags=["solution"]
-n = np.arange(1, 11)
-times_table = n[:, np.newaxis] * n
-scores_centred = scores - scores.mean(axis=0)
-scores_fraction = scores / scores.sum(axis=1, keepdims=True)
-print(times_table)
-print(scores_centred.mean(axis=0).round(10))
-print(scores_fraction.sum(axis=1))
+offsets = points[:, np.newaxis, :] - points[np.newaxis, :, :]
+distances = np.sqrt((offsets**2).sum(axis=-1))
+print(distances.round(2))
 
 # %% [markdown]
-# 4. **(SPL Exercise 22, part 2)** Divide each **column** of `a` element-wise
+# 2. `traces` holds the fluorescence of 3 neurons over 50 time points, with a
+#    response from time point 30. Make `dff`, the change relative to each
+#    neuron's baseline, `(traces - baseline) / baseline`, where `baseline` is
+#    the mean of that neuron's **first 10** time points. `dff[:, 30:35]` should
+#    be about 0.4.
+
+# %%
+traces = rng.normal(100, 5, size=(3, 50))
+traces[:, 30:35] += 40
+
+# %% tags=["solution"]
+baseline = traces[:, :10].mean(axis=1, keepdims=True)  # shape (3, 1)
+dff = (traces - baseline) / baseline
+print(dff[:, 28:36].round(2))
+
+# %% [markdown]
+# 3. **(SPL Exercise 22, part 2)** Divide each **column** of `a` element-wise
 #    by `b`, so that row `i` is divided by `b[i]`. (Hint: `np.newaxis`.)
 
 # %%
@@ -298,92 +341,127 @@ a / b[:, np.newaxis]
 # so always check which axis broadcasting used.
 
 # %% [markdown]
-# 5. The cell below fails. Fix it so that 0 is added to the first row of
-#    `ones`, 1 to the second and 2 to the third.
+# 4. The cell below should weight each **trial** of `spikes` (shape
+#    (4, 5, 10)) by `trial_weights`, but it fails. Fix it.
 
 # %% tags=["raises-exception"]
-ones = np.ones((3, 2))
-ones + np.arange(3)
+trial_weights = np.array([1.0, 1.0, 0.5, 0.5, 0.0])
+spikes * trial_weights
 
 # %% tags=["solution"]
-# Broadcasting compares shapes from the right: (3, 2) against (3,) lines up
-# 2 against 3. Making the second operand (3, 1) lines 3 up with 3 instead.
-ones + np.arange(3)[:, np.newaxis]
+# Shapes are compared from the right: (4, 5, 10) against (5,) lines up 10
+# against 5. Making the weights (5, 1) lines 5 up with the trial axis instead.
+weighted = spikes * trial_weights[:, np.newaxis]
+weighted.shape
 
 # %% [markdown]
 # ## 3. Masks, fancy indexing and vectorising
 #
 # ### 3a. Boolean masks
 #
-# `temps` holds 30 daily temperatures.
+# `rt` holds reaction times (in ms) from 40 trials of a task, and `correct`
+# says whether the answer on each trial was right. A few trials are odd.
 
 # %%
-temps = rng.normal(8, 7, size=30).round(1)
-temps
+rt = rng.normal(450, 120, size=40).round()
+rt[[5, 21, 33]] = [95, 120, 1450]
+correct = rng.random(40) < 0.8
+rt[:10], correct[:10]
 
 # %% [markdown]
 # Make:
 #
-# 1. `warm`: only the temperatures above 15
-# 2. `n_frost`: the number of days below 0
-# 3. `mild`: the temperatures from 5 to 15, inclusive
-# 4. `no_frost`: a **new** array in which every negative temperature is
-#    replaced by 0. `temps` must not change. (Hint: `np.where`, or a copy.)
-#
-# Then:
-#
-# 5. Replace every negative value **in `temps` itself** by 0, in one line.
+# 1. `too_fast`: the reaction times below 150 ms (anticipations)
+# 2. `n_correct`: the number of correct trials
+# 3. `mean_rt_correct`: the mean reaction time of the **correct** trials only
+# 4. `slow_errors`: the reaction times of trials that were **wrong** and slower
+#    than 500 ms
+# 5. `rt_clean`: a **new** array in which every reaction time below 150 or above
+#    1000 is replaced by `np.nan`. `rt` must not change. Then compare
+#    `rt.mean()` with `np.nanmean(rt_clean)`.
 
 # %% tags=["solution"]
-warm = temps[temps > 15]
-n_frost = (temps < 0).sum()
-mild = temps[(temps >= 5) & (temps <= 15)]
-no_frost = np.where(temps < 0, 0, temps)
-print(warm, n_frost, mild, no_frost, temps, sep="\n")
-
-# %% tags=["solution"]
-temps[temps < 0] = 0
-print(temps)
+too_fast = rt[rt < 150]
+n_correct = correct.sum()
+mean_rt_correct = rt[correct].mean()
+slow_errors = rt[~correct & (rt > 500)]
+rt_clean = np.where((rt < 150) | (rt > 1000), np.nan, rt)
+print(too_fast, n_correct, mean_rt_correct, slow_errors, sep="\n")
+print(rt.mean(), np.nanmean(rt_clean))
 
 # %% [markdown]
-# 6. Using `scores` from part 2, make `top_students`: the rows (whole rows)
-#    of students who scored **above 90 in at least one test**. (Hint:
-#    `np.any` with an `axis`.)
+# 6. Using `spikes` from part 2, make `full_trials`: for neuron 0, the trials
+#    (whole rows of `spikes[0]`) in which it fired in **every** time bin.
+#    (Hint: `np.all` with an `axis`.)
 
 # %% tags=["solution"]
-top_students = scores[np.any(scores > 90, axis=1)]
-print(top_students)
+full_trials = spikes[0][np.all(spikes[0] > 0, axis=1)]
+print(full_trials)
 
 # %% [markdown]
 # ### 3b. Fancy indexing
+#
+# An integer array can index into a **lookup table**: every code is replaced
+# by the matching entry.
+#
+# 1. Each trial of an experiment has a condition code, 0, 1 or 2. Make
+#    `condition_names`: the name of each trial's condition, from `conditions`.
 
 # %%
-grid = np.arange(1, 37).reshape(6, 6)
-grid
+conditions = np.array(["rest", "left", "right"])
+codes = rng.integers(0, 3, size=12)
+codes
+
+# %% tags=["solution"]
+condition_names = conditions[codes]
+print(condition_names)
 
 # %% [markdown]
-# Make:
-#
-# 1. `some_rows`: rows 0, 2 and 5 of `grid`
-# 2. `shuffled`: `grid` with its columns in the order 3, 0, 5, 1, 4, 2
-# 3. `anti_diagonal`: the diagonal from the top-right corner to the
-#    bottom-left, `[6, 11, 16, 21, 26, 31]`. (Hint: one array of row numbers
-#    and one of column numbers.)
+# 2. Make `rt_sorted`, the reaction times from 3a sorted fastest first, and
+#    `correct_sorted`, the `correct` values reordered **the same way** so that they
+#    still belong to the same trials. (Hint: `argsort`.)
+
+# %% tags=["solution"]
+order = rt.argsort()
+rt_sorted = rt[order]
+correct_sorted = correct[order]
+print(rt_sorted[:5], correct_sorted[:5])
+
+# %% [markdown]
+# 3. `labels` is a small segmented image: 0 is background, 1 and 2 are two
+#    cells. `palette` gives one RGB colour per label. Make `colour_image`, an
+#    RGB version of `labels`, using **one** indexing expression. What shape is
+#    it, and why?
 #
 # Then, in place:
 #
-# 4. Set the main diagonal of `grid` (top-left to bottom-right) to 0.
+# 4. Set every pixel in the first and last **rows** of `labels` to 0, using one
+#    integer list as the index.
+
+# %%
+labels = np.array(
+    [
+        [0, 1, 1, 0, 0],
+        [0, 1, 1, 0, 2],
+        [0, 0, 0, 2, 2],
+        [0, 0, 0, 2, 2],
+    ]
+)
+palette = np.array([[0, 0, 0], [255, 0, 0], [0, 0, 255]])  # black, red, blue
 
 # %% tags=["solution"]
-some_rows = grid[[0, 2, 5]]
-shuffled = grid[:, [3, 0, 5, 1, 4, 2]]
-rows = np.arange(6)
-anti_diagonal = grid[rows, rows[::-1]]
-print(some_rows, shuffled, anti_diagonal, sep="\n\n")
+colour_image = palette[labels]
+print(colour_image.shape)
+print(colour_image[1])
+
+# %% [markdown] tags=["answer"]
+# `(4, 5, 3)`: every entry of the (4, 5) `labels` array is replaced by a row of
+# `palette`, which has 3 values. Fancy indexing gives the shape of the index
+# array, followed by the remaining axes of the array being indexed.
 
 # %% tags=["solution"]
-grid[rows, rows] = 0  # or np.fill_diagonal(grid, 0)
-print(grid)
+labels[[0, -1]] = 0
+print(labels)
 
 # %% [markdown]
 # 5. **(SPL Exercise 22, part 3; harder)** `r` is a 10 x 3 array of random
@@ -407,42 +485,51 @@ print(closest.round(2))
 # %% [markdown]
 # ### 3c. Vectorised versus loops
 #
-# Write `sum_of_squares_loop(values)` using a `for` loop, and
-# `sum_of_squares_numpy(values)` using no loop at all. Check that they agree, then
-# time both with `%timeit` on one million values. How many times faster is NumPy?
-# (See the Handbook's [Profiling and Timing
+# `path` holds the (x, y) position of an animal at 100 000 time points (a random
+# walk). Its **path length** is the sum of the distances between consecutive
+# positions.
+#
+# Write `path_length_loop(path)` using a `for` loop over the positions, and
+# `path_length_numpy(path)` using no loop at all. Check that they agree, then
+# time both with `%timeit`. How many times faster is NumPy? (Hint for the NumPy
+# version: `path[1:] - path[:-1]` gives every step at once. See also the
+# Handbook's [Profiling and Timing
 # Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html).)
 
 # %%
-values = rng.random(1_000_000)
+path = rng.normal(0, 1, size=(100_000, 2)).cumsum(axis=0)
 
 
-def sum_of_squares_loop(values):
+def path_length_loop(path):
     # BEGIN SOLUTION
     total = 0.0
-    for v in values:
-        total += v * v
+    for k in range(1, len(path)):
+        dx = path[k, 0] - path[k - 1, 0]
+        dy = path[k, 1] - path[k - 1, 1]
+        total += (dx**2 + dy**2) ** 0.5
     return total
     # END SOLUTION
 
 
-def sum_of_squares_numpy(values):
+def path_length_numpy(path):
     # BEGIN SOLUTION
-    return np.sum(values**2)
+    steps = path[1:] - path[:-1]
+    return np.sqrt((steps**2).sum(axis=1)).sum()
     # END SOLUTION
 
 
 # %% tags=["solution"]
-np.isclose(sum_of_squares_loop(values), sum_of_squares_numpy(values))
+np.isclose(path_length_loop(path), path_length_numpy(path))
 
 # %% tags=["solution"]
-# %timeit -n 3 -r 3 sum_of_squares_loop(values)
-# %timeit -n 3 -r 3 sum_of_squares_numpy(values)
+# %timeit -n 3 -r 3 path_length_loop(path)
+# %timeit -n 3 -r 3 path_length_numpy(path)
 
 # %% [markdown] tags=["answer"]
-# On a typical laptop the loop takes tens of milliseconds and NumPy well under
-# one: roughly 50 to 100 times faster. `values @ values` (a dot product) is
-# faster still, because it never allocates the `values**2` temporary array.
+# On a typical laptop the loop takes tens of milliseconds and NumPy under one:
+# roughly 50 times faster. The loop pays for Python work at every time point
+# (indexing, arithmetic, `** 0.5`); NumPy does each step once, over the whole
+# array, in compiled code.
 
 # %% [markdown]
 # ### 3d. Data statistics (SPL Exercise 23, parts 1 to 5)
