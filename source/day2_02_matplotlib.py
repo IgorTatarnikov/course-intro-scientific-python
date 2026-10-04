@@ -1,15 +1,20 @@
 # %% [markdown]
 # # Day 2 · Matplotlib
 #
-# **Block:** Matplotlib (45 min, including slides and live coding)
+# **Block:** Matplotlib (25 min, including slides and live coding)
 #
-# 1. **Simple plot** (12 min): build a figure of two LFP traces step by step
-# 2. **Scatter and imshow** (7 min): after SPL Exercises 28 and 31, the neurons
-#    along the probe and the whole recording as an image
-# 3. **Spike counts as an image** (10 min): crop, normalise and sort an image,
-#    held over from Day 1's NumPy
-# 4. **Stretch:** the population response, multiple subplots, the LFP's
-#    envelope, and more SPL plot types
+# 1. **Simple plot** (8 min): build a figure of two LFP traces step by step,
+#    then save it
+# 2. **The whole recording as an image** (8 min): after SPL Exercise 31, fix a
+#    first attempt that shows the data badly
+# 3. **Stretch:** polish the first figure, a scatter of the neurons along the
+#    probe, spike counts as an image, the population response, multiple
+#    subplots, the LFP's envelope, and more SPL plot types
+#
+# You will often get a first version of a plot from an LLM or a colleague's
+# script. The skills here are the ones you need to **check and fix** such a
+# plot: know which object each line changes, and look hard at the axes, the
+# units and the colours.
 #
 # We plot the recording from Day 1 (IBL, via the DANDI archive). The exercises
 # follow [Scientific Python Lectures, Matplotlib:
@@ -68,29 +73,19 @@ ax.plot(time, deep)
 ax.plot(time, superficial);
 
 # %% [markdown]
-# **Step 2: colours and line widths.** Make a new figure of size 10 x 4 inches
-# (`figsize`). Plot `deep` in blue and `superficial` in red, both with a line
-# width of 1. Add `label="VISC, 1.0 mm"` and `label="SSp-n, 3.0 mm"`: you will
-# need them for the legend.
+# **Step 2: colours, line widths and a legend.** Make a new figure of size
+# 10 x 4 inches (`figsize`). Plot `deep` in blue and `superficial` in red, both
+# with a line width of 1, with `label="VISC, 1.0 mm"` and `label="SSp-n, 3.0
+# mm"`. Add a legend in the upper left corner.
 
 # %% tags=["solution"]
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(time, deep, color="blue", linewidth=1, label="VISC, 1.0 mm")
-ax.plot(time, superficial, color="red", linewidth=1, label="SSp-n, 3.0 mm");
+ax.plot(time, superficial, color="red", linewidth=1, label="SSp-n, 3.0 mm")
+ax.legend(loc="upper left", frameon=False);
 
 # %% [markdown]
-# **Step 3: limits.** Make the x axis run exactly from the first to the last
-# time point, and the y axis from -1.2 to 1.2 times the largest absolute value in
-# either trace (`ax.set_xlim`, `ax.set_ylim`), so 0 µV is in the middle.
-
-# %% tags=["solution"]
-ax.set_xlim(time.min(), time.max())
-largest = max(np.abs(deep).max(), np.abs(superficial).max())
-ax.set_ylim(-1.2 * largest, 1.2 * largest)
-fig
-
-# %% [markdown]
-# **Step 4: ticks and tick labels.** Three stimuli appeared during this slice:
+# **Step 3: ticks and tick labels.** Three stimuli appeared during this slice:
 # trials 88, 89 and 90. Put x ticks only at their times (`stim_on[88:91] -
 # lfp_start` seconds into the slice) and label them `"trial 88"` and so on. Put
 # y ticks at -400, 0 and 400 and label them with units, such as `"-400 µV"`.
@@ -103,7 +98,39 @@ ax.set_yticks([-400, 0, 400], labels=["-400 µV", "0", "400 µV"])
 fig
 
 # %% [markdown]
-# **Step 5: spines.** Spines are the lines around the plotting area. Hide the top
+# **Step 4: save it.** Save the figure as `lfp_traces.png` at 150 dpi and as
+# `lfp_traces.pdf`. Open both files. What happens when you zoom in on each?
+
+# %% tags=["solution"]
+fig.savefig("lfp_traces.png", dpi=150, bbox_inches="tight")
+fig.savefig("lfp_traces.pdf", bbox_inches="tight")
+
+# %% [markdown] tags=["solution"]
+# The PNG is a grid of pixels and goes blocky when you zoom in. The PDF is a
+# **vector** format and stays sharp, which is what journals usually want for
+# line plots. Use `dpi=300` or more for raster images in print. (With very
+# many points, as in a long recording, a vector file can get large and slow to
+# open; then a high-dpi PNG is the better choice.)
+
+# %% [markdown]
+# ### Optional: polish the figure
+#
+# Skip to part 2 if you are short of time. These steps keep changing the same
+# `fig` and `ax`.
+
+# %% [markdown]
+# **Limits.** Make the x axis run exactly from the first to the last
+# time point, and the y axis from -1.2 to 1.2 times the largest absolute value in
+# either trace (`ax.set_xlim`, `ax.set_ylim`), so 0 µV is in the middle.
+
+# %% tags=["solution"]
+ax.set_xlim(time.min(), time.max())
+largest = max(np.abs(deep).max(), np.abs(superficial).max())
+ax.set_ylim(-1.2 * largest, 1.2 * largest)
+fig
+
+# %% [markdown]
+# **Spines.** Spines are the lines around the plotting area. Hide the top
 # and right ones, and move the bottom one 10 points down, away from the traces
 # (`ax.spines["bottom"].set_position(("outward", 10))`). Then draw a thin black
 # horizontal line at 0 µV with `ax.axhline`.
@@ -115,14 +142,7 @@ ax.axhline(0, color="black", linewidth=0.5)
 fig
 
 # %% [markdown]
-# **Step 6: legend.** Add a legend in the upper left corner.
-
-# %% tags=["solution"]
-ax.legend(loc="upper left", frameon=False)
-fig
-
-# %% [markdown]
-# **Step 7 (optional, skip it if you are short of time): annotate.** Draw a
+# **Annotate.** Draw a
 # dashed grey vertical line at each stimulus (`ax.axvline`). Label trial 89's
 # with `ax.annotate`, for example "stimulus: 25% contrast, left" with an arrow
 # pointing at the line. See the [annotation
@@ -143,51 +163,14 @@ ax.annotate(
 fig
 
 # %% [markdown]
-# **Step 8: save it.** Save the figure as `lfp_traces.png` at 150 dpi and as
-# `lfp_traces.pdf`. Open both files. What happens when you zoom in on each?
+# Save the polished figure again, over the old files.
 
 # %% tags=["solution"]
 fig.savefig("lfp_traces.png", dpi=150, bbox_inches="tight")
 fig.savefig("lfp_traces.pdf", bbox_inches="tight")
 
-# %% [markdown] tags=["solution"]
-# The PNG is a grid of pixels and goes blocky when you zoom in. The PDF is a
-# **vector** format and stays sharp, which is what journals usually want for
-# line plots. Use `dpi=300` or more for raster images in print. (With very
-# many points, as in a long recording, a vector file can get large and slow to
-# open; then a high-dpi PNG is the better choice.)
-
 # %% [markdown]
-# ## 2. Other types of plots
-#
-# ### Scatter (after SPL Exercise 28)
-#
-# Each of the 481 units sits at some height on the probe. Starting from the code
-# below, make a scatter plot of where the units are and what they look like,
-# paying attention to marker **size**, **colour** and **transparency**:
-#
-# * Make each marker's size and colour show the unit's firing rate, with a
-#   colorbar for the colour.
-# * Make the markers half-transparent, so you can see where they pile up.
-# * Put the amplitude on a log scale (`ax.set_xscale("log")`), and label both
-#   axes with their units.
-
-# %%
-fig, ax = plt.subplots()
-ax.scatter(unit_amplitude, unit_depth);
-
-# %% tags=["solution"]
-fig, ax = plt.subplots(figsize=(5, 7))
-points = ax.scatter(
-    unit_amplitude, unit_depth, s=5 * unit_rate, c=unit_rate, alpha=0.5, cmap="viridis"
-)
-fig.colorbar(points, ax=ax, label="firing rate (spikes/s)")
-ax.set_xscale("log")
-ax.set_xlabel("median spike amplitude (µV)")
-ax.set_ylabel("height above probe tip (µm)");
-
-# %% [markdown]
-# ### Imshow (after SPL Exercise 31)
+# ## 2. The whole recording as an image (after SPL Exercise 31)
 #
 # The whole recording is a 2-D array, so it can be shown as an image: one row of
 # pixels per channel, one column per time point. The first attempt below is not
@@ -234,7 +217,39 @@ ax.set_ylabel("height above probe tip (µm)");
 # sign, which tells you where the currents behind them flow.
 
 # %% [markdown]
-# ## 3. Spike counts as an image (held over from Day 1's NumPy)
+# ## 3. Stretch
+#
+# Work through any of these, in any order.
+
+# %% [markdown]
+# ### Scatter (after SPL Exercise 28)
+#
+# Each of the 481 units sits at some height on the probe. Starting from the code
+# below, make a scatter plot of where the units are and what they look like,
+# paying attention to marker **size**, **colour** and **transparency**:
+#
+# * Make each marker's size and colour show the unit's firing rate, with a
+#   colorbar for the colour.
+# * Make the markers half-transparent, so you can see where they pile up.
+# * Put the amplitude on a log scale (`ax.set_xscale("log")`), and label both
+#   axes with their units.
+
+# %%
+fig, ax = plt.subplots()
+ax.scatter(unit_amplitude, unit_depth);
+
+# %% tags=["solution"]
+fig, ax = plt.subplots(figsize=(5, 7))
+points = ax.scatter(
+    unit_amplitude, unit_depth, s=5 * unit_rate, c=unit_rate, alpha=0.5, cmap="viridis"
+)
+fig.colorbar(points, ax=ax, label="firing rate (spikes/s)")
+ax.set_xscale("log")
+ax.set_xlabel("median spike amplitude (µV)")
+ax.set_ylabel("height above probe tip (µm)");
+
+# %% [markdown]
+# ### Spike counts as an image
 #
 # `psth[unit, bin]` is each unit's mean spike count in each 50 ms bin, averaged
 # over all 533 trials. It is a small image: one row per unit.
@@ -299,8 +314,6 @@ ax.set_xlabel("time from stimulus (s)")
 ax.set_ylabel("unit, deepest first");
 
 # %% [markdown]
-# ## 4. Stretch
-#
 # ### The population response (part 6 of the data statistics in Day 1's NumPy)
 #
 # Plot the mean firing rate of all 51 units (in spikes per second: divide the

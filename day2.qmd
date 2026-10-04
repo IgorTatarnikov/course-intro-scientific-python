@@ -18,8 +18,8 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 | Before the break | After the break |
 |------------------|-----------------|
-| **pandas** (60 min) | **seaborn** (20 min) |
-| **Matplotlib** (45 min) | **scikit-learn** (30 min) |
+| **pandas** (60 min) | **seaborn** (15 min) |
+| **Matplotlib** (25 min) | **scikit-learn** (30 min) |
 | | Where to go next · wrap-up |
 
 <br>
@@ -324,6 +324,7 @@ ax.set_xlabel("time (s)")
 :::{.incremental}
 * You used `fig, ax` yesterday; we use it throughout: it scales to many panels and works inside functions
 * Most `plt.xlabel(...)` calls become `ax.set_xlabel(...)`
+* Code from an LLM or the web often mixes the two: settle on one before you change it
 :::
 
 ::: {.source-note}
@@ -342,12 +343,25 @@ fig.savefig("figure.png", dpi=300, bbox_inches="tight")  # raster: images, slide
 * `bbox_inches="tight"` trims the white border
 :::
 
+## Plots from an LLM
+
+:::{.incremental}
+* Fine for a first draft: you rarely need to remember `ax.spines[...]` or `annotate` arguments
+* **Ask well:** the shape and dtype of your arrays or the columns of your DataFrame, units, the message of the plot; ask for `fig, ax` code
+* **Read before you run:** which data goes on which axis, and which `ax` each line changes
+* **Check what you see:**
+    * Axis labels **with units**; limits that do not hide data
+    * Colormap: sequential for magnitudes, diverging only for data centred on zero
+    * Images: `origin`, `aspect` and `extent`
+    * Legend entries that match the lines
+* The figure carries your name, not the LLM's
+:::
+
 ## Live coding: a first figure {.live-coding}
 
 * Plot a damped oscillation with the defaults
-* Improve it: size, colours, line styles, limits, labels, legend
-* Save it as PNG and PDF
-* The same plot in `pyplot` style, for comparison
+* Improve it: size, colours, labels, legend; save it as PNG and PDF
+* The same plot in `pyplot` style, then translate it back to `fig, ax`
 
 ::: {.notes}
 ```python
@@ -382,10 +396,9 @@ plt.xlabel("time (s)")
 Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 
 * Build a figure of two LFP traces step by step, from the recording [@ibl_bwm_dandi]
-* Colours, limits, ticks at the stimuli, spines, legend, then save it
-* Step 7 (annotations) is optional
+* Colours and a legend, ticks at the stimuli, then save it
 
-**12 minutes**
+**8 minutes**. **Optional:** limits, spines and an annotation
 
 ## More plot types
 
@@ -426,46 +439,13 @@ for ax in axes:
 :::
 ::::
 
-## Live coding: panels and images {.live-coding}
-
-* Reaction times: a histogram and a scatter plot side by side
-* Colour points by a second variable
-* Show an image with a colormap and a colorbar
-* Crop with slicing, then show the crop
-
-::: {.notes}
-```python
-rng = np.random.default_rng(0)
-rt = rng.normal(450, 120, size=200)
-correct = rng.random(200) < 0.8
-
-fig, axes = plt.subplots(1, 2, figsize=(9, 3))
-axes[0].hist(rt, bins=20)
-axes[0].set_xlabel("reaction time (ms)")
-axes[1].scatter(np.arange(200), rt, c=correct, s=10, cmap="coolwarm")
-axes[1].set_xlabel("trial")
-axes[1].set_ylabel("reaction time (ms)")
-
-moon = plt.imread("data/moonlanding.png")
-moon.shape, moon.dtype
-
-fig, ax = plt.subplots()
-im = ax.imshow(moon, cmap="gray")
-fig.colorbar(im, ax=ax)
-
-fig, ax = plt.subplots()
-ax.imshow(moon[100:250, 50:300], cmap="magma")   # a crop, another colormap
-```
-:::
-
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Parts 2 and 3**
+Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 2: the whole recording as an image** (after SPL Ex. 31)
 
-* **Scatter and imshow** (after SPL Ex. 28 and 31): the units along the probe, and the whole LFP as an image
-* **Spike counts as an image**: normalise, crop and sort by depth
+* A first attempt shows the LFP badly: fix its aspect, origin, axis units and colormap
 
-**17 minutes**. **Stretch:** the population response (part 6 of the data statistics in Day 1's NumPy), `subplot_mosaic` layouts, the LFP's envelope, more plot types
+**8 minutes**. **Stretch:** a scatter of the units along the probe, spike counts as an image, the population response, `subplot_mosaic` layouts, the LFP's envelope, more plot types
 
 ## Break {background-color="#1E1E1E"}
 
@@ -524,9 +504,7 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 ## Live coding: the seaborn tour {.live-coding}
 
 * Back to the recording: `trials`, `units`, and `rates_long` from the pandas block
-* `relplot`: units by depth, amplitude, area and firing rate
-* `lineplot`: firing rate over time per brain area, with confidence bands
-* Distributions with `histplot` and `boxplot`, and one panel per brain area
+* `relplot`, `lineplot` with confidence bands, distributions, one panel per brain area
 
 ::: {.notes}
 Follow the Demo section of `day2_03_seaborn.ipynb`, which loads `trials`, `units` and `rates_long` in its first cells.
@@ -551,10 +529,9 @@ sns.displot(data=units, x="firing_rate_Hz", col="area", col_wrap=4, height=2.5)
 
 Open [notebooks/day2_03_seaborn.ipynb]{.notebook}, **Your turn**
 
-1. **The psychometric curve** (4 min) straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
-2. **One plot of your own** (8 min): ask a question of the trials or units and answer it with one plot; proper axis labels, then save it
+* **The psychometric curve** straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
 
-The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
+**5 minutes**. **Stretch:** one plot of your own, answering a question about the trials or units. The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
 
 # scikit-learn {background-color="#03A062"}
 

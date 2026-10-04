@@ -1,17 +1,17 @@
 # %% [markdown]
 # # Day 2 · seaborn
 #
-# **Block:** seaborn (20 min)
+# **Block:** seaborn (15 min)
 #
-# The first part is a **live demo** (8 min): follow along, run the cells and
+# The first part is a **live demo** (6 min): follow along, run the cells and
 # change things. The demo mirrors the Python Data Science Handbook's
 # [Visualization with
 # Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
 # but uses the tidy tables you made in the pandas block. Then it is your turn:
 #
-# 1. **The psychometric curve** (4 min), straight from the trials table, with
+# 1. **The psychometric curve** (5 min), straight from the trials table, with
 #    confidence intervals
-# 2. **One plot of your own** (8 min)
+# 2. **Stretch:** one plot of your own
 #
 # The [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) and
 # [example gallery](https://seaborn.pydata.org/examples/index.html) are the best
@@ -143,18 +143,6 @@ sns.displot(
 );
 
 # %% [markdown]
-# ### Regression: `lmplot`
-#
-# A straight-line fit with its confidence band, here of log response time
-# against stimulus strength, on the trials that were not unusually slow:
-
-# %%
-quick = trials[trials["response_time_s"] < 5].copy()
-quick["strength"] = quick["contrast"].abs()
-quick["log_rt"] = np.log10(quick["response_time_s"])
-sns.lmplot(data=quick, x="strength", y="log_rt", x_jitter=1, scatter_kws={"alpha": 0.3}, height=4, aspect=1.4);
-
-# %% [markdown]
 # Every seaborn figure is still Matplotlib underneath: axes-level functions
 # (`lineplot`, `boxplot`) take `ax=` and return an `Axes`; figure-level
 # functions (`relplot`, `displot`, `lmplot`, `catplot`) return a `FacetGrid` `g`,
@@ -191,7 +179,7 @@ ax.set(xlabel="Contrast (%; negative = left)", ylabel="Fraction of rightward cho
 # which the plain curve from the NumPy block did not show.
 
 # %% [markdown]
-# ### 2. One plot of your own
+# ### 2. Stretch: one plot of your own
 #
 # Use `trials`, `units` or `rates_long` to make one seaborn plot that answers a
 # question **you** find interesting. Give it proper axis labels and save it to a
@@ -206,6 +194,8 @@ ax.set(xlabel="Contrast (%; negative = left)", ylabel="Fraction of rightward cho
 
 # %% tags=["solution"]
 # One possible answer: response times on correct and wrong trials, by stimulus strength.
+quick = trials[trials["response_time_s"] < 5].copy()
+quick["strength"] = quick["contrast"].abs()
 quick["outcome"] = np.where(quick["correct"], "correct", "wrong")
 g = sns.catplot(
     data=quick,

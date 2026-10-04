@@ -28,9 +28,9 @@ Do this **before Day 1**:
 |---|---|---|---|
 | Welcome, setup check and help | 10 | Recap | 5 |
 | Packages and environments | 30 | pandas | 60 |
-| NumPy | 80 | Matplotlib | 45 |
+| NumPy | 80 | Matplotlib | 25 |
 | *Break* | 10 | *Break* | 10 |
-| SciPy | 30 | seaborn | 20 |
+| SciPy | 30 | seaborn | 15 |
 | Wrap-up | 5 | scikit-learn | 30 |
 | | | Where to go next (slides only) and wrap-up | 10 |
 
@@ -41,7 +41,7 @@ Do this **before Day 1**:
 | `day1_03_numpy` | NumPy | An IBL Neuropixels recording (DANDI 000409), plus SPL Ex. 22 and 23 |
 | `day1_04_scipy` | SciPy: filtering | After SPL Ex. 42, on the LFP (stretch: Ex. 40 and 41) |
 | `day2_01_pandas` | pandas | SWC gapminder episodes 7 and 8, on the IBL trials and units tables |
-| `day2_02_matplotlib` | Matplotlib | After SPL *Simple plot*, Ex. 28, 31 and 35, on the recording |
+| `day2_02_matplotlib` | Matplotlib | After SPL *Simple plot* and Ex. 31, on the recording (stretch: Ex. 28 and 35) |
 | `day2_03_seaborn` | seaborn | Live demo on the trials and units, after PDSH 4.14 |
 | `day2_04_sklearn` | scikit-learn | Logistic regression of the mouse's choices; decoding them from spike counts (stretch) |
 
