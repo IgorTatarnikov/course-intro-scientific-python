@@ -1,0 +1,442 @@
+---
+title: "Day 2: Plotting, SciPy and images"
+subtitle: Introduction to Scientific Python
+author: SWC/GCNU Neuroinformatics Unit
+date: today
+---
+
+```{python}
+#| echo: false
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
+```
+
+## Today
+
+| Before the break | After the break |
+|------------------|-----------------|
+| **Matplotlib** (45 min) | **scikit-image**: count nuclei (45 min) |
+| **seaborn** (15 min) | **Whirlwind tour**: xarray, dask, napari (35 min) |
+| **SciPy** (25 min) | Wrap-up |
+
+<br>
+
+Yesterday ended with arrays and tables. Today we **look** at them, use SciPy's algorithms on them, and finish by segmenting a microscopy image.
+
+# Matplotlib {background-color="#03A062"}
+
+## Figures, axes and artists
+
+:::: {.columns}
+::: {.column width="50%"}
+```{python}
+x = np.linspace(0, 2 * np.pi, 100)
+
+fig, ax = plt.subplots(figsize=(4.5, 2.6))
+ax.plot(x, np.sin(x), label="sin")
+ax.plot(x, np.cos(x), label="cos")
+ax.set_xlabel("x")
+ax.set_title("A Figure holding one Axes")
+ax.legend();
+```
+:::
+::: {.column width="50%"}
+- **Figure**: the whole canvas, which you save to a file
+- **Axes**: one plot area, with its own x and y axis. A figure can hold many
+- **Artists**: everything drawn (lines, text, ticks, legend), each with properties you can change
+:::
+::::
+
+## `pyplot` versus `fig, ax`
+
+:::: {.columns}
+::: {.column width="50%"}
+**pyplot style**: acts on the "current" axes
+
+```python
+plt.plot(x, y)
+plt.xlabel("time (s)")
+plt.title("Trial 3")
+```
+
+Fine for a quick look at one plot.
+:::
+::: {.column width="50%"}
+**Object-oriented style**: says which axes
+
+```python
+fig, axes = plt.subplots(1, 2)
+axes[0].plot(x, y)
+axes[0].set_xlabel("time (s)")
+axes[1].hist(y)
+```
+
+Use it for anything with more than one panel, and in functions. We use this style throughout.
+:::
+::::
+
+<br>
+
+Most `plt.xlabel(...)` calls become `ax.set_xlabel(...)`. The Matplotlib docs explain [the two interfaces](https://matplotlib.org/stable/users/explain/figure/api_interfaces.html).
+
+## Images, colormaps and saving
+
+:::: {.columns}
+::: {.column width="50%"}
+```{python}
+face = plt.imread("data/face.png").mean(axis=2)
+
+fig, axes = plt.subplots(1, 2, figsize=(5, 2))
+axes[0].imshow(face)
+axes[1].imshow(face, cmap="gray")
+for ax in axes:
+    ax.set_axis_off()
+```
+:::
+::: {.column width="50%"}
+- A 2-D array has no colour: `imshow` maps values through a **colormap**
+- Use perceptually uniform maps (`viridis`, `gray`); diverging maps (`RdBu_r`) only for data centred on zero
+- `origin="lower"` for graphs, the default `"upper"` for images
+:::
+::::
+
+```python
+fig.savefig("figure.pdf")                         # vector: line plots, for papers
+fig.savefig("figure.png", dpi=300, bbox_inches="tight")  # raster: images, slides
+```
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}
+
+1. **Simple plot** (15 min): build the sine and cosine figure step by step: colours, limits, ticks, spines, legend, saving
+2. **Scatter and imshow** (10 min): SPL Ex. 28 and 31
+3. **Framing a Face** (12 min): crop the raccoon and frame it with a mask
+
+**Stretch:** hare versus lynx (SPL Ex. 23.6), `subplot_mosaic` layouts, gapminder plots, and more plot types
+
+# seaborn {background-color="#03A062"}
+
+## Statistical plots from DataFrames
+
+```{python}
+#| echo: false
+wide = pd.read_csv("data/gapminder_all.csv")
+gapminder = pd.wide_to_long(
+    wide, stubnames=["gdpPercap", "lifeExp", "pop"], i="country", j="year", sep="_"
+).reset_index()
+```
+
+:::: {.columns}
+::: {.column width="45%"}
+```{python}
+#| output: false
+import seaborn as sns
+
+sns.relplot(
+    data=gapminder.query("year == 2007"),
+    x="gdpPercap", y="lifeExp",
+    hue="continent", size="pop",
+    sizes=(10, 600),
+).set(xscale="log")
+```
+
+- Each argument maps a **column** to a visual property
+- Legends, colours and sizes come for free
+:::
+::: {.column width="55%"}
+```{python}
+#| echo: false
+#| fig-width: 6
+#| fig-height: 4
+sns.set_theme(style="whitegrid")
+g = sns.relplot(
+    data=gapminder.query("year == 2007"),
+    x="gdpPercap", y="lifeExp", hue="continent", size="pop",
+    sizes=(10, 600), alpha=0.7, height=4, aspect=1.3,
+)
+g.set(xscale="log", xlabel="GDP per capita (log)", ylabel="Life expectancy")
+sns.reset_orig()
+plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
+```
+:::
+::::
+
+## When to reach for seaborn
+
+| seaborn | plain Matplotlib |
+|---|---|
+| Data already in a tidy DataFrame: one row per observation | Arrays, images, custom layouts |
+| Colour, size or facet by a category | Full control of every artist |
+| Aggregates with confidence intervals (`lineplot`, `barplot`) | Unusual plot types |
+| Distributions: `histplot`, `kdeplot`, `boxplot`, `violinplot` | Animations, interactive widgets |
+
+<br>
+
+seaborn draws **with** Matplotlib, so `ax=`, `fig.savefig` and everything from the last block still work.
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_02_seaborn.ipynb]{.notebook}
+
+1. **Follow the live demo** (7 min): long-format data, `relplot`, `lineplot`, distributions, facets
+2. **One plot of your own** (5 min): ask a question of the gapminder data and answer it with a plot
+
+The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
+
+# SciPy {background-color="#03A062"}
+
+## What lives where
+
+| Submodule | For |
+|---|---|
+| `scipy.optimize` | Fitting (`curve_fit`), minimising, root finding |
+| `scipy.stats` | Distributions, statistical tests |
+| `scipy.signal` | Filtering, spectra, peak finding |
+| `scipy.fft` | Fourier transforms |
+| `scipy.ndimage` | N-D image filters, morphology, measurements |
+| `interpolate` · `integrate` · `linalg` · `sparse` · `spatial` | … and more |
+
+`import scipy as sp`, then `sp.optimize.curve_fit`, `sp.stats.ttest_ind` and so on.
+
+## Check SciPy before writing your own
+
+:::: {.columns}
+::: {.column width="55%"}
+```{python}
+import scipy as sp
+
+def model(t, amplitude, rate):
+    return amplitude * np.exp(-rate * t)
+
+t = np.linspace(0, 5, 40)
+rng = np.random.default_rng(1)
+y = model(t, 3.0, 1.2) + rng.normal(0, 0.1, t.size)
+
+params, cov = sp.optimize.curve_fit(model, t, y,
+                                    p0=[1, 1])
+errors = np.sqrt(np.diag(cov))
+params.round(2), errors.round(2)
+```
+:::
+::: {.column width="45%"}
+- Tested, documented and fast (usually compiled code underneath)
+- Returns uncertainties too: the square root of the covariance's diagonal gives the standard errors
+- Search the [API reference](https://docs.scipy.org/doc/scipy/reference/) **before** writing a loop
+:::
+::::
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_03_scipy.ipynb]{.notebook}. The exercises come from Scientific Python Lectures [@spl].
+
+1. **Curve fitting** (10 min, SPL Ex. 39): a yearly cycle fitted to Alaska temperatures
+2. **FFT denoising** (10 min, SPL Ex. 42): remove periodic noise from the moon landing photo
+
+**Stretch:** statistical distributions (Ex. 41), the six-hump camelback minimisation (Ex. 40), and the summary exercises
+
+## Break {background-color="#1E1E1E"}
+
+10 minutes
+
+# scikit-image {background-color="#03A062"}
+
+## Images are NumPy arrays
+
+:::: {.columns}
+::: {.column width="45%"}
+```{python}
+import skimage as ski
+
+image = ski.io.imread("data/human_mitosis.png")
+print(image.shape, image.dtype)
+
+fig, ax = plt.subplots(figsize=(3, 3))
+ax.imshow(image, cmap="gray")
+ax.set_axis_off()
+```
+:::
+::: {.column width="55%"}
+- 2-D grey `(rows, cols)`; colour `(rows, cols, 3)`; stacks add `z` or time axes
+- Usually `uint8` (0–255) or `uint16`. Remember yesterday's overflow!
+- Most filters return `float` images in [0, 1]
+- Everything from NumPy works: slicing crops, masks select, `.mean()` measures
+- Human cells stained for DNA, from Moffat *et al.* (2006), CC0
+:::
+::::
+
+## Filtering and thresholding
+
+```{python}
+smoothed = ski.filters.gaussian(image, sigma=1)   # reduce noise
+threshold = ski.filters.threshold_otsu(smoothed)  # automatic threshold
+binary = smoothed > threshold                     # a boolean mask
+
+fig, axes = plt.subplots(1, 3, figsize=(9, 3))
+images = {"original": image, "gaussian": smoothed, "Otsu": binary}
+for ax, (title, im) in zip(axes, images.items()):
+    ax.imshow(im[:150, :150], cmap="gray")
+    ax.set_title(title)
+    ax.set_axis_off()
+```
+
+## Labelling and segmentation
+
+```{python}
+cleaned = ski.morphology.remove_small_objects(binary, max_size=30)
+cleaned = ski.segmentation.clear_border(cleaned)
+labels = ski.measure.label(cleaned)  # 0 = background, 1..N = objects
+print("objects found:", labels.max())
+
+overlay = ski.color.label2rgb(labels, image=image, bg_label=0)
+fig, ax = plt.subplots(figsize=(9, 2.2))
+ax.imshow(overlay[180:330, :])
+ax.set_axis_off()
+```
+
+Touching nuclei merge into one object; a **watershed** separates them (stretch exercise).
+
+## Measuring objects with `regionprops`
+
+:::: {.columns}
+::: {.column width="62%"}
+```{python}
+props = ski.measure.regionprops_table(
+    labels,
+    intensity_image=image,
+    properties=["label", "area",
+                "eccentricity", "intensity_mean"],
+)
+nuclei = pd.DataFrame(props)
+nuclei.head(4).round(2)
+```
+:::
+::: {.column width="38%"}
+- One row per object, ready for pandas and seaborn
+- Dozens of properties: `area`, `perimeter`, `centroid`, `bbox`, `orientation`, `intensity_*`, …
+- Measurements in **pixels**: multiply by the pixel size for µm
+:::
+::::
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_04_scikit_image.ipynb]{.notebook} and **count the nuclei**:
+
+1. **Look** (5 min): shape, dtype, histogram
+2. **Filter** (5 min) and **threshold** (10 min): Gaussian, Otsu, `try_all_threshold`
+3. **Clean, label and count** (10 min)
+4. **Measure** (7 min): `regionprops_table` into pandas; what are the biggest objects?
+
+**Stretch:** split touching nuclei with a watershed; the SPL coins exercises
+
+# Whirlwind tour {background-color="#03A062"}
+
+## xarray: labelled N-D arrays
+
+:::: {.columns}
+::: {.column width="55%"}
+**Problem:** with NumPy you must remember that time is axis 0 and look up indices by hand.
+
+```python
+ds = xr.open_dataset("air_temperature_daily.nc")
+air = ds["air"]
+air.sel(lat=50, lon=260, method="nearest")
+air.sel(time="2013-07").mean(dim="time")
+air.groupby("time.season").mean()
+```
+:::
+::: {.column width="45%"}
+- Dimensions have **names**; coordinates have **values** (dates, latitudes, µm)
+- Select by label, reduce by name, group by season
+- Reads and writes netCDF and Zarr, and plots in one line
+- Fits imaging too: `(z, channel, y, x)` with physical units
+:::
+::::
+
+[notebooks/day2_05_xarray.ipynb]{.notebook} · [tutorial.xarray.dev](https://tutorial.xarray.dev)
+
+## dask: bigger than memory, in parallel
+
+:::: {.columns}
+::: {.column width="55%"}
+```python
+import dask.array as da
+
+# 3.2 GB, in 100 chunks of 32 MB
+x = da.random.random((20_000, 20_000),
+                     chunks=(2_000, 2_000))
+
+# instant: only builds a task graph
+result = ((x - x.mean(axis=0)) ** 2).mean()
+
+# runs the graph, chunk by chunk
+result.compute()
+```
+:::
+::: {.column width="45%"}
+- A dask array is a grid of NumPy **chunks**
+- Operations are **lazy**: they build a task graph
+- `.compute()` runs it on all cores, using little memory at a time
+- `xr.open_dataset(..., chunks={...})` makes xarray use dask
+:::
+::::
+
+[notebooks/day2_06_dask.ipynb]{.notebook} · [tutorial.dask.org](https://tutorial.dask.org)
+
+## napari: look at your data
+
+:::: {.columns}
+::: {.column width="55%"}
+```python
+import napari
+
+viewer = napari.Viewer()
+viewer.add_image(image, name="nuclei")
+viewer.add_labels(labels, name="seg")
+```
+
+Edit the labels with the brush or fill tool, then read them back:
+
+```python
+edited = viewer.layers["seg"].data
+```
+:::
+::: {.column width="45%"}
+- An interactive viewer for N-D images and their annotations: labels, points, shapes, tracks
+- Sliders for z, time and channels
+- Everything is a NumPy array you can read back from the layer
+- Opens a **desktop window**: run it on your own laptop
+:::
+::::
+
+[notebooks/day2_07_napari.ipynb]{.notebook} · [napari.org/stable/tutorials](https://napari.org/stable/tutorials/)
+
+## Also worth knowing
+
+| Package | What it is for |
+|---|---|
+| **scikit-learn** | Machine learning: classification, clustering, regression, dimensionality reduction ([SPL chapter](https://lectures.scientific-python.org/packages/scikit-learn/index.html), [PDSH ch. 5](https://jakevdp.github.io/PythonDataScienceHandbook/05.02-introducing-scikit-learn.html)) |
+| **Zarr** | Chunked, compressed N-D arrays on disk or in the cloud. Pairs with dask, xarray and napari |
+| **Polars** | Fast DataFrames with a lazy query engine: an alternative to pandas for large tables |
+| **Numba** | Compiles Python loops to machine code with one decorator, `@numba.njit`, for when vectorising is awkward ([SPL, Optimizing code](https://lectures.scientific-python.org/advanced/optimizing/index.html)) |
+
+## Wrap-up
+
+- **Plot** with `fig, ax = plt.subplots()`; reach for seaborn when the data is a tidy DataFrame
+- **Check SciPy** (and scikit-image) before writing an algorithm yourself
+- **Images are arrays**: filter, threshold, label, then measure into a DataFrame
+- **Scale up** with xarray (labels), dask (size) and napari (looking)
+
+**Keep going:** the [Scientific Python Development Guide](https://learn.scientific-python.org/development/), the advanced chapters of Scientific Python Lectures [@spl], and the [BioImage Analysis Notebooks](https://haesleinhuepf.github.io/BioImageAnalysisNotebooks/).
+
+::: {.source-note}
+Exercises adapted from Scientific Python Lectures [@spl] (CC BY 4.0) and the Software Carpentry gapminder lesson [@swc_gapminder] (CC BY 4.0). Further reading in the Python Data Science Handbook [@pdsh].
+:::
+
+## References {.smaller}
+
+::: {#refs}
+:::

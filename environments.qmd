@@ -1,0 +1,103 @@
+# Environments and Packages
+
+## What is a package?
+
+* Collection of modules (Python files) that provide specific functionality
+* Can be installed from the Python Package Index (PyPI) or conda-forge
+* Dependencies are solved automatically by package managers (pip, conda)
+* One of the best and worst things about Python
+    * Best: huge ecosystem of packages for almost anything
+    * Worst: packages go out of date, are abandoned, or conflict with each other
+
+## What is an environment?
+
+* An environment is a collection of packages and an interpreter
+* Isolated from other environments
+    * Allows multiple versions of the same package to coexist
+* Can be exported and shared or recreated
+
+## Working with environments
+
+* **Project-based**: one environment per project
+    * Typically stored in the project folder (`./.venv`)
+    * Managed with `pip venv` or `uv`
+* **Task-based**: one environment per task (e.g., data analysis, image processing)
+    * Typically stored in a central location (`~/miniforge3/envs/`)
+    * Managed with `conda` or `pixi`
+
+## Creating an environment
+
+::: {.panel-tabset}
+
+### Using `conda`
+
+```{bash}
+conda create -n myenv python=3.13
+```
+
+### Using `pip venv`
+
+```{bash}
+python -m venv .venv
+```
+
+:::
+
+## Activating an environment
+
+::: {.panel-tabset}
+
+### Using `conda`
+
+```{bash}
+conda activate myenv
+```
+
+### Using `pip venv`
+```{bash}
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
+```
+
+:::
+
+## Installing packages
+
+::: {.panel-tabset}
+
+### Using `conda`
+
+```{bash}
+conda install numpy pandas matplotlib
+conda install -c conda-forge napari=0.9.1
+```
+
+### Using `pip`
+
+```{bash}
+pip install numpy pandas matplotlib
+pip install napari==0.9.1
+```
+
+:::
+
+## Uninstalling packages
+
+::: {.panel-tabset}
+
+### Using `conda`
+
+```{bash}
+conda remove numpy pandas matplotlib
+```
+
+### Using `pip`
+
+```{bash}
+pip uninstall numpy pandas matplotlib
+```
+
+:::
+
+## Your turn!
+* Do the exercises in `notebooks/day1_01-environments.ipynb` to practice creating, activating and installing packages in environments.

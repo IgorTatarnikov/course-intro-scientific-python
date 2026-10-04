@@ -1,11 +1,17 @@
 project:
   type: default
   output-dir: build
+  # Only the slide decks are rendered; notebooks, source/ and plan.md are not.
+  render:
+    - index.qmd
+    - day1.qmd
+    - day2.qmd
 
 bibliography: references.bib
 
 execute:
   enabled: true
+  echo: true
 
 format:
   revealjs:
@@ -23,6 +29,8 @@ format:
     auto-play-media: true
     code-overflow: wrap
     highlight-style: atom-one
+    css: styles.css
+    footer: "Introduction to Scientific Python"
     from: markdown+emoji   # enable emoji support
     mermaid:
       theme: neutral

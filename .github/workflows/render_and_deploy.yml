@@ -44,7 +44,7 @@ jobs:
           # Quarto will use the currently-activated venv's Python
           QUARTO_PYTHON: python
         run: |
-          quarto render index.qmd
+          quarto render
 
       - name: Create .nojekyll file
         run: |

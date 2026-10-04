@@ -1,64 +1,110 @@
-# quarto-presentation-template
+# Introduction to Scientific Python
 
-## Prerequisites
+A two-day course (3 hours a day) covering environments, NumPy, pandas, Matplotlib, seaborn, SciPy and scikit-image, with a short tour of xarray, dask and napari. Each block mixes short runs of slides with live coding (Day 1 so far), then ends with exercises in a Jupyter notebook.
 
-You only need to do these once locally. 
-* Install [Quarto](https://quarto.org/docs/get-started/)
-* Install the [VS Code Quarto extension](https://quarto.org/docs/get-started/hello/vscode.html)
-* Install [uv](https://docs.astral.sh/uv/) to manage your Python environments (recommended if you want to execute code in your presentation)
+## For learners
 
-## Create a new presentation
+Do this **before Day 1**:
 
-### Step 1: Create a new repository from this template
-* Click on "Use this template" -> "Create a new repository"
-* Choose a repository name that starts with `slides-` (this should help us spot quarto presentation repositories at a glance, especially important if they proliferate)
-* Clone the newly created repository and navigate to its root folder
+1. Install [Miniforge](https://conda-forge.org/download/).
+2. Download this repository (`git clone`, or *Code → Download ZIP* on GitHub).
+3. In a terminal, from the repository folder:
 
-### Step 2: Set up your Python environment
+   ```sh
+   conda env create -f environment.yml
+   conda activate scientific-python
+   python check_setup.py
+   ```
 
-> [!note]
-> You can skip this step if you don't require any code execution in your presentation.
+   Every line should say `OK`. If not, send the output to the instructors.
 
-If you have additional requirements for your execution environment (e.g. your Python package) append them to `requirements.txt`.
+4. On the day, run `jupyter lab` from the repository folder and open the notebooks in `notebooks/`.
 
-We recommend using [uv](https://uv.sh/) to manage your Python environment:
-* Create a new environment with `uv venv --python=3.13`. Make sure the Python version matches the one used in your GitHub Actions workflow.
-* Activate the environment with `source .venv/bin/activate` 
-* Install the required packages with `uv pip install -r requirements.txt`
+napari opens a desktop window, so please use your own laptop rather than JupyterHub or a remote server.
 
-> [!warning]
-> Make sure Quarto is using the correct Python environment 
-> by setting the `QUARTO_PYTHON` environment variable.
-> 
-> An easy way to do this once you have activated the environment is:
-> ```sh
-> export QUARTO_PYTHON=$(which python)
-> ```
+## Schedule
 
-### Step 3: Edit and preview the presentation
+| Day 1 | min | Day 2 | min |
+|---|---|---|---|
+| Welcome, setup check and help | 10 | Matplotlib | 45 |
+| Packages and environments | 30 | seaborn | 15 |
+| NumPy | 75 | SciPy | 25 |
+| *Break* | 10 | *Break* | 10 |
+| pandas | 55 | scikit-image: counting nuclei | 45 |
+| Wrap-up | 5 | Whirlwind tour: xarray, dask, napari | 35 |
+| | | Wrap-up | 5 |
 
-* Edit the `index.qmd` file to your liking, using the example slides as a guide. Additional images should be placed in the `img/` folder whereas references should be added to the `references.bib` file in BibTeX format.
-* To build the presentation locally, you can either use the VS Code extension's GUI ("Render" button) or run `quarto render index.qmd` in the terminal.
-* The rendered presentation will be available as `build/index.html` in the root folder. Note that the `build/` folder is included in `.gitignore` to avoid committing generated files to the repository.
+| Notebook | Block | Main sources |
+|---|---|---|
+| `day1_01_getting_help` | Setup and help | SPL *Getting help* |
+| `day1_02_environments` | Environments (terminal work) | conda and uv docs |
+| `day1_03_numpy` | NumPy | SPL Ex. 22–24 and 26, plus indexing, views-and-copies and in-place tasks |
+| `day1_04_pandas` | pandas | SWC gapminder, episodes 7 and 8 |
+| `day2_01_matplotlib` | Matplotlib | SPL *Simple plot*, Ex. 28 and 31, *Framing a Face* |
+| `day2_02_seaborn` | seaborn | Live demo on gapminder, after PDSH 4.14 |
+| `day2_03_scipy` | SciPy | SPL Ex. 39 and 42 (stretch: 40 and 41) |
+| `day2_04_scikit_image` | scikit-image | Nuclei segmentation (stretch: SPL coins exercises) |
+| `day2_05_xarray`, `day2_06_dask`, `day2_07_napari` | Whirlwind tour | Each project's tutorial |
 
-> [!tip]
-> If you want to preview the rendered slides as you're editing them, you can type `quarto preview index.qmd` in the terminal.
+Compared with the original three-day outline in `plan.md`, the two-day version moves these exercises to **stretch** (they are still in the notebooks): NumPy Ex. 24, pandas *Many Ways of Access*, the Matplotlib annotation step (now optional), SciPy Ex. 40 and 41, and the SPL coins exercises. The environments comparison is now a debrief led by the instructor, and the four "one slide each" packages share one slide.
 
-### Step 4: Deploy the presentation on GitHub Pages
+## Repository layout
 
-For the first deployment:
+```
+day1.qmd, day2.qmd, index.qmd   slide decks (Quarto + reveal.js)
+source/                         single source for every notebook (Jupytext percent scripts)
+notebooks/                      exercise notebooks (generated: solutions stripped)
+solutions/                      solution notebooks (generated)
+data/                           every dataset used, so nothing downloads in class
+environment.yml, check_setup.py the learners' environment and its check
+scripts/build_notebooks.py      builds notebooks/ and solutions/ from source/
+scripts/fetch_data.py           rebuilds data/ from the original sources
+```
 
-* Create an empty `gh-pages` branch:
-  ```sh
-  git checkout --orphan gh-pages
-  git reset --hard # make sure all changes are committed before running this!
-  git commit --allow-empty -m "Initialising gh-pages branch"
-  git push origin gh-pages
-  ```
-* Review the repository Settings/Pages to ensure that deployment is enabled from the `gh-pages` branch.
-* Make the first release on GitHub, tagged with a version number (see below for versioning schemes).
+## For instructors
 
-For all subsequent deployments:
-* Simply make a new release tagged with the appropriate version number. For presentations, we prefer a date-based versioning scheme, e.g. `YY.MM` or `YY.MM.DD`. You are encouraged to include some additional information on location, event, etc. in the release notes. If the release is a work-in-progress, append `dev` to the version tag (`YY.MM.dev`) and tick the "Set as a pre-release" checkbox.
-* GitHub actions will take care of the rest (see example deployment [here](https://neuroinformatics-unit.github.io/quarto-presentation-template/#/title-slide))
-* Deployed presentations can be found at `https://{USER}.github.io/{REPOSITORY-NAME}/#/title-slide`. For repositories of the neuroinformatics-unit organisation, this redirects to `https://neuroinformatics.dev/{REPOSITORY-NAME}/#/title-slide`
+### Editing notebooks
+
+Edit the files in `source/`, never the generated `.ipynb` files. In a source file:
+
+- `# %% tags=["solution"]` marks a code cell as a solution. The exercise version gets an empty `# Your code here` cell. A markdown cell tagged `solution` (an explanation) is dropped from the exercise version.
+- `# %% [markdown] tags=["answer"]` marks the answer to a question. The exercise version shows *Your answer here.*
+- `# BEGIN SOLUTION` / `# END SOLUTION` inside a cell blanks just that part, for example a function body.
+- `tags=["raises-exception"]` marks a cell that is meant to fail. `tags=["no-execute"]` marks a cell the build skips (napari).
+
+Then rebuild, inside the course environment plus `jupytext`:
+
+```sh
+pip install jupytext          # once; not part of the learners' environment
+python scripts/build_notebooks.py           # build and execute everything
+python scripts/build_notebooks.py day2_04   # just one notebook
+```
+
+The build executes every solution notebook **and** every exercise notebook, so it fails if a provided cell depends on a solution the learner hasn't written yet. It also fails if any solution line leaks into an exercise notebook, or if a solution marker is malformed.
+
+### Releasing solutions
+
+`solutions/` is generated alongside `notebooks/`. To release solutions block by block, keep `solutions/` out of the branch learners clone (add it to `.gitignore`, or publish it from a separate branch), and push each file after its block.
+
+### Slides
+
+Install [Quarto](https://quarto.org/docs/get-started/). Point `QUARTO_PYTHON` at an environment with the course packages, then run:
+
+```sh
+export QUARTO_PYTHON=$(which python)   # with the course environment active
+quarto render                          # renders index, day1 and day2 into build/
+quarto preview day1.qmd                # live preview while editing
+```
+
+Some slides run code at render time and read from `data/`. CI installs `requirements.txt` and renders all decks; pushing a release tag deploys them to GitHub Pages (see `.github/workflows/render_and_deploy.yml`).
+
+## Licences and attribution
+
+- Exercises adapted from [Scientific Python Lectures](https://lectures.scientific-python.org) (CC BY 4.0) and Software Carpentry's [Plotting and Programming in Python](https://swcarpentry.github.io/python-novice-gapminder/) (CC BY 4.0).
+- The [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/) is linked for reading only. Its text is CC BY-NC-ND, so none of it is copied here.
+- Data:
+  - `populations.txt` and `moonlanding.png`: from SPL (CC BY 4.0)
+  - gapminder CSVs: from Software Carpentry (CC BY 4.0)
+  - `face.png`: from `scipy.datasets`
+  - `human_mitosis.png`: from `skimage.data`, CC0, courtesy of David Root, from Moffat *et al.*, *Cell* 2006
+  - `air_temperature_daily.nc`: NCEP reanalysis via the xarray tutorial data, reduced to daily means

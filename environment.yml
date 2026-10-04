@@ -1,0 +1,27 @@
+# Course environment for "Introduction to Scientific Python".
+#
+#   conda env create -f environment.yml
+#   conda activate scientific-python
+#   python check_setup.py
+#
+# Versions are pinned to the minor release the course material was tested
+# against (October 2026). Patch releases are allowed to float.
+name: scientific-python
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy=2.5
+  - scipy=1.18
+  - pandas=2.3
+  - matplotlib=3.11
+  - seaborn=0.13
+  - scikit-image=0.26
+  - xarray=2026.9
+  - netcdf4=1.7
+  - dask=2026.8
+  - napari=0.9
+  - pyqt=5.15
+  - jupyterlab=4.6
+  - ipykernel=6.31
+  - pooch=1.9

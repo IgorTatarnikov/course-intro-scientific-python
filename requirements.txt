@@ -1,2 +1,10 @@
+# Packages needed to render the slide decks (some slides run code).
+# Learners use environment.yml instead.
 jupyter
 jupyter-cache
+numpy
+scipy
+pandas
+matplotlib
+seaborn
+scikit-image
