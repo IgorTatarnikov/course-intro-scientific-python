@@ -1,12 +1,12 @@
 # %% [markdown]
-# # Day 1 · scikit-learn
+# # Day 2 · scikit-learn
 #
-# **Block:** scikit-learn (35 min, including slides and live coding)
+# **Block:** scikit-learn (30 min, including slides and live coding)
 #
 # 1. **Fit a model** (10 min): predict the mouse's choice from the contrast and
 #    the block, and check it on trials it has not seen
 # 2. **Look inside the model** (10 min): its coefficients, and its curves on top
-#    of the psychometric curve from the NumPy block
+#    of the psychometric curve from the pandas block
 # 3. **Stretch:** a better feature, whether the block helps, cross-validation,
 #    and decoding the choice from the neurons
 #
@@ -21,6 +21,7 @@
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.pipeline import make_pipeline
@@ -28,29 +29,43 @@ from sklearn.preprocessing import StandardScaler
 
 rng = np.random.default_rng(seed=0)
 
+
+def read_table(group):
+    """Read one group of ../data/ibl_session.h5 into a DataFrame (as in the pandas block)."""
+    with h5py.File("../data/ibl_session.h5") as f:
+        columns = {}
+        for name, values in f[group].items():
+            values = values[:]
+            if values.dtype.kind == "S":
+                values = values.astype(str)
+            columns[name] = values
+    return pd.DataFrame(columns)
+
+
+trials = read_table("trials")
+trials["chose_right"] = trials["choice"] == 1
+
 with h5py.File("../data/ibl_session.h5") as f:
-    contrast = f["trials/contrast"][:]
-    probability_left = f["trials/probability_left"][:]
-    choice = f["trials/choice"][:]
     spike_counts = f["spike_counts/data"][:]
 
 # %% [markdown]
-# These are the results of parts 2c and 3c of the NumPy block, so you can start
-# here even if you did not finish them: the features `X` and the answers `y`,
-# and the psychometric curve in each kind of block.
+# A model wants its data as a table `X` with **one row per sample** (here, a
+# trial) and **one column per feature**, plus `y`, the answer for each sample.
+# A DataFrame works as `X`, and so does a 2-D NumPy array. Our features are the
+# contrast and the block; the answer is whether the mouse chose right:
 
 # %%
-X = np.column_stack([contrast, probability_left])  # one row per trial
-y = choice == 1  # True where the mouse chose right
-
-levels = np.unique(contrast)
-at_level = contrast[:, np.newaxis] == levels
-right_block = probability_left == 0.2
-left_block = probability_left == 0.8
-frac_right_rb = (at_level[right_block] & y[right_block, np.newaxis]).sum(axis=0) / at_level[right_block].sum(axis=0)
-frac_right_lb = (at_level[left_block] & y[left_block, np.newaxis]).sum(axis=0) / at_level[left_block].sum(axis=0)
-
+X = trials[["contrast", "probability_left"]]
+y = trials["chose_right"]
 X.shape, y.shape
+
+# %% [markdown]
+# And the psychometric curve from part 3 of the pandas block, one column per
+# block, to compare the model with:
+
+# %%
+psychometric = trials.groupby(["contrast", "probability_left"])["chose_right"].mean().unstack()
+psychometric.round(2)
 
 # %% [markdown]
 # ## 1. Fit a model
@@ -62,14 +77,14 @@ X.shape, y.shape
 #
 # 1. Split `X` and `y` into a training set and a test set with
 #    `train_test_split(X, y, test_size=0.25, random_state=0)`. It returns four
-#    arrays: `X_train, X_test, y_train, y_test`. How many trials are in each?
+#    tables: `X_train, X_test, y_train, y_test`. How many trials are in each?
 # 2. Make a `LogisticRegression()` called `model` and `fit` it on the
 #    **training** set.
 # 3. `model.score(X, y)` gives the fraction of trials whose choice the model
 #    predicts correctly. Score it on the training set and on the test set.
 # 4. Is that good? Work out the **baseline**: the score you would get by always
 #    guessing the more common choice in the test set. (Hint: the mean of a
-#    boolean array is the fraction that is `True`.)
+#    boolean column is the fraction that is `True`.)
 
 # %% tags=["solution"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
@@ -95,16 +110,17 @@ print(f"baseline {baseline:.3f}")
 # 1. `model.coef_` holds one weight per feature (in the order of the columns of
 #    `X`) and `model.intercept_` the constant. What does the **sign** of each
 #    weight tell you about the mouse?
-# 2. Make `grid`, 201 contrasts from -100 to 100. For each kind of block, build
-#    a feature array for the grid, shape (201, 2), with the block's
-#    `probability_left` (0.2 or 0.8) in every row of column 1. (Hint:
-#    `np.full_like(grid, 0.2)`.)
-# 3. `model.predict_proba(X_grid)` returns one column per class, in the order of
+# 2. Make `grid`, 201 contrasts from -100 to 100. For each kind of block, make a
+#    DataFrame with the same columns as `X`: the grid as `contrast`, and the
+#    block's `probability_left` (0.2 or 0.8) in every row. (Hint:
+#    `pd.DataFrame({"contrast": grid, "probability_left": 0.2})` repeats the
+#    single value.)
+# 3. `model.predict_proba(...)` returns one column per class, in the order of
 #    `model.classes_`. Take the probability of `True` (chose right) for each
 #    block.
-# 4. Plot the two model curves against `grid`, with the data from the NumPy
-#    block (`frac_right_rb` and `frac_right_lb` against `levels`) as points on
-#    top. Where does the model miss the data?
+# 4. Plot the two model curves against `grid`, with the data
+#    (`psychometric[0.2]` and `psychometric[0.8]` against `psychometric.index`)
+#    as points in the same colours. Where does the model miss the data?
 
 # %% tags=["solution"]
 print(model.coef_, model.intercept_)
@@ -113,22 +129,22 @@ print(model.coef_, model.intercept_)
 # The contrast weight is positive: the more the stimulus is on the right, the
 # more likely the mouse turns right. The `probability_left` weight is negative:
 # in blocks where the stimulus is usually on the left, the mouse is less likely
-# to choose right, whatever it sees. That is the prior you saw in the NumPy
-# block, now as a number.
+# to choose right, whatever it sees. That is the prior you saw in the
+# psychometric curve, now as a number.
 
 # %% tags=["solution"]
 grid = np.linspace(-100, 100, 201)
-X_grid_rb = np.column_stack([grid, np.full_like(grid, 0.2)])
-X_grid_lb = np.column_stack([grid, np.full_like(grid, 0.8)])
+grid_rb = pd.DataFrame({"contrast": grid, "probability_left": 0.2})
+grid_lb = pd.DataFrame({"contrast": grid, "probability_left": 0.8})
 print(model.classes_)  # column 1 is True
-p_right_rb = model.predict_proba(X_grid_rb)[:, 1]
-p_right_lb = model.predict_proba(X_grid_lb)[:, 1]
+p_right_rb = model.predict_proba(grid_rb)[:, 1]
+p_right_lb = model.predict_proba(grid_lb)[:, 1]
 
 fig, ax = plt.subplots()
 ax.plot(grid, p_right_rb, color="tab:red", label="model, right blocks")
 ax.plot(grid, p_right_lb, color="tab:blue", label="model, left blocks")
-ax.plot(levels, frac_right_rb, "o", color="tab:red", label="data, right blocks")
-ax.plot(levels, frac_right_lb, "o", color="tab:blue", label="data, left blocks")
+ax.plot(psychometric.index, psychometric[0.2], "o", color="tab:red", label="data, right blocks")
+ax.plot(psychometric.index, psychometric[0.8], "o", color="tab:blue", label="data, left blocks")
 ax.set_xlabel("contrast (%; negative = left)")
 ax.set_ylabel("probability of choosing right")
 ax.legend();
@@ -136,37 +152,38 @@ ax.legend();
 # %% [markdown] tags=["answer"]
 # The model's curves rise far too slowly. The mouse is already nearly always
 # right at 12.5% and 25% contrast, but the model says only 0.73 and 0.86 in
-# right blocks, and 0.46 and 0.66 in left blocks. Logistic regression assumes each extra percent of contrast changes the
-# odds by the same factor, all the way to 100%. The mouse's vision saturates:
-# going from 0 to 25% matters far more than going from 25 to 100%. The model
-# is only as good as the features you give it (stretch: a better feature).
+# right blocks, and 0.46 and 0.66 in left blocks. Logistic regression assumes
+# each extra percent of contrast changes the odds by the same factor, all the
+# way to 100%. The mouse's vision saturates: going from 0 to 25% matters far
+# more than going from 25 to 100%. The model is only as good as the features
+# you give it (stretch: a better feature).
 
 # %% [markdown]
 # ## 3. Stretch
 #
 # ### A better feature
 #
-# Replace the contrast column by `np.tanh(contrast / 25)`, which rises steeply
-# near 0 and flattens out by about ±50%. Refit on the same split (the same
-# `random_state`), score it on the test set, and add its curves to the plot. Is
-# it better?
+# Make `X_tanh`, a DataFrame with a `tanh_contrast` column,
+# `np.tanh(contrast / 25)`, which rises steeply near 0 and flattens out by
+# about ±50%, and the `probability_left` column. Refit on the same split (the
+# same `random_state`), score it on the test set, and add its curves to the
+# plot. Is it better?
 
 # %% tags=["solution"]
-X_tanh = np.column_stack([np.tanh(contrast / 25), probability_left])
+def tanh_features(contrast, probability_left):
+    return pd.DataFrame({"tanh_contrast": np.tanh(contrast / 25), "probability_left": probability_left})
+
+
+X_tanh = tanh_features(trials["contrast"], trials["probability_left"])
 Xt_train, Xt_test, _, _ = train_test_split(X_tanh, y, test_size=0.25, random_state=0)
 model_tanh = LogisticRegression().fit(Xt_train, y_train)
 print(f"test {model_tanh.score(Xt_test, y_test):.3f}")
 
-
-def tanh_features(c, p_left):
-    return np.column_stack([np.tanh(c / 25), np.full_like(c, p_left)])
-
-
 fig, ax = plt.subplots()
 ax.plot(grid, model_tanh.predict_proba(tanh_features(grid, 0.2))[:, 1], color="tab:red", label="tanh model, right blocks")
 ax.plot(grid, model_tanh.predict_proba(tanh_features(grid, 0.8))[:, 1], color="tab:blue", label="tanh model, left blocks")
-ax.plot(levels, frac_right_rb, "o", color="tab:red")
-ax.plot(levels, frac_right_lb, "o", color="tab:blue")
+ax.plot(psychometric.index, psychometric[0.2], "o", color="tab:red")
+ax.plot(psychometric.index, psychometric[0.8], "o", color="tab:blue")
 ax.set_xlabel("contrast (%; negative = left)")
 ax.set_ylabel("probability of choosing right")
 ax.legend();
@@ -180,18 +197,19 @@ ax.legend();
 #
 # ### Does the block help? One split is not enough
 #
-# 1. Fit a model on the contrast alone (`X_train[:, :1]`: the slice keeps it
-#    2-D) and score it on the test set. Does adding the block help?
+# 1. Fit a model on the contrast alone (`X_train[["contrast"]]`: the double
+#    brackets keep it a DataFrame, so it stays 2-D) and score it on the test
+#    set. Does adding the block help?
 # 2. One random split is one roll of the dice. `cross_val_score(model, X, y,
 #    cv=5)` splits the data five ways, fits and scores on each, and returns the
 #    five scores. Compare the two models on their mean cross-validated score.
 
 # %% tags=["solution"]
-model_contrast = LogisticRegression().fit(X_train[:, :1], y_train)
-print(f"contrast only, test {model_contrast.score(X_test[:, :1], y_test):.3f}")
+model_contrast = LogisticRegression().fit(X_train[["contrast"]], y_train)
+print(f"contrast only, test {model_contrast.score(X_test[['contrast']], y_test):.3f}")
 
-print(f"both, cross-validated      {cross_val_score(LogisticRegression(), X, y, cv=5).mean():.3f}")
-print(f"contrast only, cross-validated {cross_val_score(LogisticRegression(), X[:, :1], y, cv=5).mean():.3f}")
+print(f"both, cross-validated          {cross_val_score(LogisticRegression(), X, y, cv=5).mean():.3f}")
+print(f"contrast only, cross-validated {cross_val_score(LogisticRegression(), X[['contrast']], y, cv=5).mean():.3f}")
 
 # %% [markdown] tags=["solution"]
 # On our one split the block seems to help (0.836 to 0.851). Cross-validated,
@@ -204,7 +222,8 @@ print(f"contrast only, cross-validated {cross_val_score(LogisticRegression(), X[
 #
 # Can you predict the mouse's choice from what its neurons did? Use the total
 # spike count of each of the 51 units after the stimulus as the features:
-# `X_spikes = spike_counts[:, :, 10:].sum(axis=2).T`, shape (533, 51).
+# `X_spikes = spike_counts[:, :, 10:].sum(axis=2).T`, a NumPy array of shape
+# (533, 51).
 #
 # 1. The units fire at very different rates, so scale each feature to mean 0
 #    and standard deviation 1 first. `make_pipeline(StandardScaler(),

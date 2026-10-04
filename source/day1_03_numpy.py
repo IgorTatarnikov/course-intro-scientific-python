@@ -1,16 +1,16 @@
 # %% [markdown]
 # # Day 1 · NumPy
 #
-# **Block:** NumPy (65 min, including slides and live coding)
+# **Block:** NumPy (80 min, including slides and live coding)
 #
 # The block alternates slides, live coding and exercises. Each part below
 # matches one "Your turn" slide:
 #
-# 1. **Indexing** (10 min): time windows from chosen channels, and trials from
+# 1. **Indexing** (12 min): time windows from chosen channels, and trials from
 #    3-D spike counts
-# 2. **Aggregations and broadcasting** (12 min), finishing with the table that
-#    scikit-learn will need this afternoon
-# 3. **Masks and vectorising** (15 min): select trials and channels by
+# 2. **Aggregations and broadcasting** (15 min): summaries along axes,
+#    re-referencing and baseline correction
+# 3. **Masks and vectorising** (18 min): select trials and channels by
 #    condition, time a loop against NumPy, then the mouse's psychometric curve
 #    without a single loop
 # 4. **Check your work with a plot** (5 min)
@@ -247,26 +247,6 @@ correct_only = spike_counts * correct[:, np.newaxis]
 correct_only.shape
 
 # %% [markdown]
-# ### 2c. A table for scikit-learn
-#
-# This afternoon a scikit-learn model will predict the mouse's choice. Models
-# like it want a 2-D array `X` with **one row per sample** (here, a trial) and
-# **one column per feature**, plus a 1-D array `y` with the answer for each
-# sample.
-#
-# 1. Make `X`, shape (533, 2), with `contrast` in column 0 and
-#    `probability_left` in column 1. (Hint: `np.column_stack`.)
-# 2. Make `y`, shape (533,): `True` where the mouse chose right (`choice` is 1).
-# 3. Check that `X[:, 0]` is `contrast` again (`np.array_equal`).
-
-# %% tags=["solution"]
-X = np.column_stack([contrast, probability_left])
-y = choice == 1
-print(X.shape, y.shape)
-print(X[:3])
-print(np.array_equal(X[:, 0], contrast))
-
-# %% [markdown]
 # ## 3. Masks and vectorising
 #
 # ### 3a. Boolean masks
@@ -380,8 +360,13 @@ levels
 
 # %% [markdown]
 # The obvious way is a loop over `levels`, picking out the trials at each one.
-# Do it with a mask and broadcasting instead, using `y` from part 2c (`True`
-# where the mouse chose right):
+# Do it with a mask and broadcasting instead. `y` is `True` where the mouse
+# chose right:
+
+# %%
+y = choice == 1
+
+# %% [markdown]
 #
 # 1. `at_level`: a (533, 9) boolean array, `True` where trial `i` had contrast
 #    `levels[j]`. (Hint: compare `contrast` with `levels`. Which of them needs

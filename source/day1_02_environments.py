@@ -1,7 +1,7 @@
 # %% [markdown]
 # # Day 1 · Packages and environments
 #
-# **Block:** Packages and environments (25 min, including slides and a live demo)
+# **Block:** Packages and environments (30 min, including slides and a live demo)
 #
 # These exercises happen in a **terminal**, not in this notebook. Keep the
 # notebook open as your instructions. On Windows use the "Miniforge Prompt";

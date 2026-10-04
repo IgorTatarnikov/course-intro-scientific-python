@@ -1,13 +1,13 @@
 # %% [markdown]
 # # Day 1 · SciPy
 #
-# **Block:** SciPy (25 min, including slides and live coding)
+# **Block:** SciPy (30 min, including slides and live coding)
 #
 # Filtering a signal is the job most of you will hand to SciPy first.
 #
-# 1. **Filtering with the FFT** (8 min): after SPL Exercise 42, find the mains
+# 1. **Filtering with the FFT** (10 min): after SPL Exercise 42, find the mains
 #    hum in the LFP's spectrum and remove it
-# 2. **Filtering with `scipy.signal`** (8 min): the same job with a notch
+# 2. **Filtering with `scipy.signal`** (10 min): the same job with a notch
 #    filter, then a band-pass filter on one channel and on all 384 at once
 # 3. **Stretch:** a smoother spectrum with Welch's method, which distribution
 #    fits the response times (after SPL Exercise 41), and 2-D minimisation (SPL

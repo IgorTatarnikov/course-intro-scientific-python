@@ -1,5 +1,5 @@
 ---
-title: "Day 2: pandas and plotting"
+title: "Day 2: pandas, plotting and scikit-learn"
 subtitle: Introduction to Scientific Python
 author: SWC/GCNU Neuroinformatics Unit
 date: today
@@ -18,15 +18,15 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 | Before the break | After the break |
 |------------------|-----------------|
-| **pandas** (60 min) | **seaborn** (25 min) |
-| **Matplotlib** (45 min) | **Capstone**: one figure from two days (15 min) |
+| **pandas** (60 min) | **seaborn** (20 min) |
+| **Matplotlib** (45 min) | **scikit-learn** (30 min) |
 | | Where to go next · wrap-up |
 
 <br>
 
 :::{.incremental}
-* Yesterday: arrays, filtering them with SciPy, and a model with scikit-learn
-* Today: **tables** of the same recording, then **figures** of everything
+* Yesterday: arrays, and filtering them with SciPy
+* Today: **tables** of the same recording, **figures** of them, then a first **model**
 :::
 
 ## Yesterday in one slide
@@ -35,7 +35,6 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 * **Arrays:** one dtype, a shape; index, slice and mask them
 * **Vectorise:** aggregations along an `axis`, broadcasting, no Python loops
 * **SciPy:** `sp.fft` and `sp.signal` filtered the mains hum out of the LFP
-* **scikit-learn:** `X` (trials × features) and `y`; `fit`, then `score` on held-out trials
 * **Psychometric curve:** masks and broadcasting; today it takes one `groupby` line
 :::
 
@@ -552,30 +551,128 @@ sns.displot(data=units, x="firing_rate_Hz", col="area", col_wrap=4, height=2.5)
 
 Open [notebooks/day2_03_seaborn.ipynb]{.notebook}, **Your turn**
 
-1. **The psychometric curve** (5 min) straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
-2. **One plot of your own** (10 min): ask a question of the trials or units and answer it with one plot; proper axis labels, then save it
+1. **The psychometric curve** (4 min) straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
+2. **One plot of your own** (8 min): ask a question of the trials or units and answer it with one plot; proper axis labels, then save it
 
 The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
 
-# Capstone {background-color="#03A062"}
+# scikit-learn {background-color="#03A062"}
 
-## One figure from two days
+## What is scikit-learn?
 
 :::{.incremental}
-* **A.** The psychometric curve per block: data from pandas, model curves from scikit-learn
-* **B.** The LFP before and after a band-pass filter from SciPy
-* Same colour for the same block, units on every axis, a legend in words
-* Panel letters, no top or right spines, saved as PDF
+* Machine learning in Python, built on NumPy and SciPy
+* **Supervised**: learn to predict `y` from `X` (classification, regression)
+* **Unsupervised**: find structure in `X` alone (clustering, dimensionality reduction)
+* Every model has the **same interface**: learn it once
+:::
+
+## `X` and `y`
+
+:::{.incremental}
+* `X`: a table, **one row per sample**, **one column per feature**
+    * A DataFrame or a 2-D NumPy array
+    * Here: one row per trial; `trials[["contrast", "probability_left"]]`
+* `y`: a 1-D array, one answer per sample
+    * Here: did the mouse choose right?
+* `X` must be 2-D even with one feature: `trials[["contrast"]]`, not `trials["contrast"]`
+:::
+
+## The estimator pattern
+
+:::: {.columns}
+::: {.column width="55%"}
+```{python}
+#| output-location: fragment
+from sklearn.linear_model import LogisticRegression
+
+rng = np.random.default_rng(0)
+hours = rng.uniform(0, 10, size=(100, 1))     # X: 100 x 1
+passed = hours[:, 0] + rng.normal(0, 2, 100) > 5   # y
+
+model = LogisticRegression()
+model.fit(hours, passed)
+model.predict([[2.0], [8.0]])
+```
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+model.predict_proba([[2.0], [8.0]]).round(2)
+```
+:::
+:::
+::: {.column width="45%"}
+:::{.incremental}
+* **Make** the model, with its settings
+* **`fit(X, y)`** learns from the data
+* **`predict(X)`** for new samples
+* **`predict_proba(X)`**: one column per class, in the order of `model.classes_`
+* Learned values end in `_`: `model.coef_`
+:::
+:::
+::::
+
+## Train and test
+
+:::{.incremental}
+* A model scored on the data it learned from looks better than it is
+* Hold some samples back: **fit** on the training set, **score** on the test set
+* Compare with a **baseline**, such as always guessing the most common answer
+* **Cross-validation** repeats the split several ways: `cross_val_score`
+:::
+
+. . .
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+model.fit(X_train, y_train)
+model.score(X_test, y_test)          # fraction correct
+```
+
+## Live coding: hours of study {.live-coding}
+
+* The pass/fail data from the slide: split, fit, score
+* Compare with the baseline
+* `coef_`, then `predict_proba` on a grid, plotted over the data
+
+::: {.notes}
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+rng = np.random.default_rng(0)
+hours = rng.uniform(0, 10, size=(100, 1))
+passed = hours[:, 0] + rng.normal(0, 2, 100) > 5
+hours.shape, passed.shape
+
+h_train, h_test, p_train, p_test = train_test_split(hours, passed, test_size=0.25, random_state=0)
+model = LogisticRegression().fit(h_train, p_train)
+model.score(h_train, p_train), model.score(h_test, p_test)
+max(p_test.mean(), 1 - p_test.mean())      # baseline
+
+model.coef_, model.intercept_, model.classes_
+grid = np.linspace(0, 10, 101)[:, np.newaxis]   # 2-D!
+fig, ax = plt.subplots()
+ax.plot(hours[:, 0], passed, "o", alpha=0.4)
+ax.plot(grid[:, 0], model.predict_proba(grid)[:, 1])
+```
 :::
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_04_capstone.ipynb]{.notebook}
+Open [notebooks/day2_04_sklearn.ipynb]{.notebook}
 
-* The first cells recompute everything you need, whatever you finished yesterday
-* Build the figure step by step, as in the Matplotlib block, then save it
+1. **Fit a model** (10 min): predict the mouse's choice from contrast and block; score it on held-out trials against a baseline
+2. **Look inside** (10 min): what do the coefficients say about the mouse? Plot the model's curves over the psychometric curve from the pandas block
 
-**15 minutes**. **Extra:** a third panel with the spectrum before and after a 60 Hz notch
+**Stretch:** a better feature, whether the block helps (cross-validation), decoding the choice from the neurons
+
+::: {.source-note}
+[scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html); SPL, [scikit-learn: machine learning in Python](https://lectures.scientific-python.org/packages/scikit-learn/index.html).
+:::
 
 # Where to go next {background-color="#03A062"}
 
@@ -675,7 +772,7 @@ edited = viewer.layers["segmentation"].data          # read your edits back as a
 :::{.incremental}
 * **Tables:** `loc` versus `iloc`, masks, `groupby`, and tidy (long) data
 * **Plot** with `fig, ax = plt.subplots()`; seaborn for tidy DataFrames
-* **Two days, one figure:** arrays, SciPy and scikit-learn underneath, pandas and Matplotlib on top
+* **scikit-learn:** `X` is samples × features; `fit`, then score on held-out data against a baseline
 * **Check the ecosystem** before writing an algorithm yourself: SciPy, scikit-image, xarray, dask, napari
 :::
 

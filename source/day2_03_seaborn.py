@@ -1,17 +1,17 @@
 # %% [markdown]
 # # Day 2 · seaborn
 #
-# **Block:** seaborn (25 min)
+# **Block:** seaborn (20 min)
 #
-# The first part is a **live demo** (10 min): follow along, run the cells and
+# The first part is a **live demo** (8 min): follow along, run the cells and
 # change things. The demo mirrors the Python Data Science Handbook's
 # [Visualization with
 # Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
 # but uses the tidy tables you made in the pandas block. Then it is your turn:
 #
-# 1. **The psychometric curve** (5 min), straight from the trials table, with
+# 1. **The psychometric curve** (4 min), straight from the trials table, with
 #    confidence intervals
-# 2. **One plot of your own** (10 min)
+# 2. **One plot of your own** (8 min)
 #
 # The [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) and
 # [example gallery](https://seaborn.pydata.org/examples/index.html) are the best

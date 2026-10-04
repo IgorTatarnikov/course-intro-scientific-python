@@ -1,8 +1,8 @@
 # Introduction to Scientific Python
 
-A two-day course (3 hours a day). Day 1 covers environments, NumPy, SciPy and scikit-learn; Day 2 covers pandas, Matplotlib and seaborn, ending with a capstone figure and pointers to scikit-image, xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
+A two-day course (3 hours a day). Day 1 covers environments, NumPy and SciPy; Day 2 covers pandas, Matplotlib, seaborn and scikit-learn, ending with pointers to scikit-image, xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
 
-The exercises follow one real experiment from start to finish: a Neuropixels recording from a mouse doing a visual decision task, from the [International Brain Laboratory](https://www.internationalbrainlab.com/) via the [DANDI archive](https://dandiarchive.org/dandiset/000409). Students index its voltage traces by time and recording site, mask channels by brain area, compute the mouse's psychometric curve without a loop, filter mains hum out of the LFP, predict the mouse's choices with a logistic regression, summarise its trials and neurons with pandas, and finally plot all of it in one figure.
+The exercises follow one real experiment from start to finish: a Neuropixels recording from a mouse doing a visual decision task, from the [International Brain Laboratory](https://www.internationalbrainlab.com/) via the [DANDI archive](https://dandiarchive.org/dandiset/000409). Students index its voltage traces by time and recording site, mask channels by brain area, compute the mouse's psychometric curve without a loop, filter mains hum out of the LFP, summarise its trials and neurons with pandas, plot them, and predict the mouse's choices with a logistic regression.
 
 ## For learners
 
@@ -27,12 +27,12 @@ Do this **before Day 1**:
 | Day 1 | min | Day 2 | min |
 |---|---|---|---|
 | Welcome, setup check and help | 10 | Recap | 5 |
-| Packages and environments | 25 | pandas | 60 |
-| NumPy | 65 | Matplotlib | 45 |
+| Packages and environments | 30 | pandas | 60 |
+| NumPy | 80 | Matplotlib | 45 |
 | *Break* | 10 | *Break* | 10 |
-| SciPy | 25 | seaborn | 25 |
-| scikit-learn | 35 | Capstone: one figure from two days | 15 |
-| Wrap-up | 5 | Where to go next (slides only) and wrap-up | 15 |
+| SciPy | 30 | seaborn | 20 |
+| Wrap-up | 5 | scikit-learn | 30 |
+| | | Where to go next (slides only) and wrap-up | 10 |
 
 | Notebook | Block | Main sources |
 |---|---|---|
@@ -40,11 +40,10 @@ Do this **before Day 1**:
 | `day1_02_environments` | Environments (terminal work) | conda and uv docs |
 | `day1_03_numpy` | NumPy | An IBL Neuropixels recording (DANDI 000409), plus SPL Ex. 22 and 23 |
 | `day1_04_scipy` | SciPy: filtering | After SPL Ex. 42, on the LFP (stretch: Ex. 40 and 41) |
-| `day1_05_sklearn` | scikit-learn | Logistic regression of the mouse's choices; decoding them from spike counts (stretch) |
 | `day2_01_pandas` | pandas | SWC gapminder episodes 7 and 8, on the IBL trials and units tables |
 | `day2_02_matplotlib` | Matplotlib | After SPL *Simple plot*, Ex. 28, 31 and 35, on the recording |
 | `day2_03_seaborn` | seaborn | Live demo on the trials and units, after PDSH 4.14 |
-| `day2_04_capstone` | Capstone | One two-panel figure from both days' results |
+| `day2_04_sklearn` | scikit-learn | Logistic regression of the mouse's choices; decoding them from spike counts (stretch) |
 
 Each block has a core that most learners should finish in the time given, followed by stretch exercises for those who finish early. Each notebook recomputes what it needs from earlier blocks in its first cells, so a learner who did not finish one block can still start the next. scikit-image, xarray, dask and napari appear only on the "where to go next" slides, with code that is shown but not run, so they are not in the course environment.
 
@@ -77,7 +76,7 @@ Then rebuild, inside the course environment plus `jupytext`:
 ```sh
 pip install jupytext          # once; not part of the learners' environment
 python scripts/build_notebooks.py           # build and execute everything
-python scripts/build_notebooks.py day1_05   # just one notebook
+python scripts/build_notebooks.py day2_04   # just one notebook
 ```
 
 The build executes every solution notebook **and** every exercise notebook, so it fails if a provided cell depends on a solution the learner hasn't written yet. It also fails if any solution line leaks into an exercise notebook, or if a solution marker is malformed.
