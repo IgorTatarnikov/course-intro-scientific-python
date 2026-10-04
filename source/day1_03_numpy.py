@@ -1,17 +1,21 @@
 # %% [markdown]
 # # Day 1 · NumPy
 #
-# **Block:** NumPy (75 min, including slides and live coding)
+# **Block:** NumPy (65 min, including slides and live coding)
 #
 # The block alternates slides, live coding and exercises. Each part below
 # matches one "Your turn" slide:
 #
-# 1. **Indexing, views and in-place changes** (15 min)
-# 2. **Aggregations and broadcasting** (12 min)
-# 3. **Masks, fancy indexing and vectorising** (20 min), finishing with data
-#    statistics on the whole recording (after SPL Exercise 23)
-# 4. **Stretch:** crude integral approximations (SPL Exercise 24)
-# 5. **Stretch:** Markov chain (SPL Exercise 26)
+# 1. **Indexing** (10 min): time windows from chosen channels, and trials from
+#    3-D spike counts
+# 2. **Aggregations and broadcasting** (12 min), finishing with the table that
+#    scikit-learn will need this afternoon
+# 3. **Masks and vectorising** (15 min): select trials and channels by
+#    condition, time a loop against NumPy, then the mouse's psychometric curve
+#    without a single loop
+# 4. **Check your work with a plot** (5 min)
+# 5. **Stretch**, for anyone who finishes early: views and copies, in-place
+#    changes, dtypes, more broadcasting, fancy indexing and data statistics
 #
 # The slides and live coding used 2-D tables of scores and a week of
 # temperatures. The exercises use one real experiment, a recording from a
@@ -19,8 +23,9 @@
 # arrays.
 #
 # Most tasks ask you to store a result in a named variable. Print it, and
-# check its `.shape` and values against the array you started from. There is
-# no plotting yet; plotting starts on Day 2.
+# check its `.shape` and values against the array you started from. Part 4
+# shows just enough Matplotlib to check a result by eye; plotting proper is on
+# Day 2.
 #
 # The SPL exercises are adapted from [Scientific Python Lectures, NumPy
 # exercises](https://lectures.scientific-python.org/intro/numpy/exercises.html)
@@ -35,6 +40,7 @@
 
 # %%
 import h5py
+import matplotlib.pyplot as plt
 import numpy as np
 
 rng = np.random.default_rng(seed=0)
@@ -45,8 +51,7 @@ rng = np.random.default_rng(seed=0)
 # A mouse sits in front of a screen. A striped patch (the stimulus) appears on
 # the left or the right, faint or strong, and the mouse turns a wheel to move it
 # to the centre. A correct turn earns a drop of water. Meanwhile a
-# **Neuropixels probe**, a 10 mm needle with 384 recording sites along its
-# lowest 3.8 mm, records from the mouse's brain.
+# **Neuropixels probe** records from the mouse's brain.
 #
 # The data come from the [International Brain Laboratory](https://www.internationalbrainlab.com/)
 # and were downloaded from the [DANDI archive](https://dandiarchive.org/dandiset/000409)
@@ -69,6 +74,9 @@ with h5py.File("../data/ibl_session.h5") as f:
     depth_um = f["electrodes/depth_um"][:]
     # One entry per trial
     stim_on = f["trials/stim_on_s"][:]
+    contrast = f["trials/contrast"][:]
+    probability_left = f["trials/probability_left"][:]
+    choice = f["trials/choice"][:]
     rt = f["trials/response_time_s"][:]
     correct = f["trials/correct"][:]
     # Spike counts of 51 neurons, in 50 ms bins around each stimulus
@@ -76,6 +84,9 @@ with h5py.File("../data/ibl_session.h5") as f:
     bin_start = f["spike_counts/bin_start_s"][:]
     # One entry per neuron (unit), including those not in spike_counts
     unit_channel = f["units/channel"][:]
+
+# The raw LFP is in amplifier counts; this is the same data in microvolts
+lfp_uv = lfp * uV_per_count
 
 print(lfp.shape, lfp.dtype)
 print(spike_counts.shape, spike_counts.dtype)
@@ -85,7 +96,7 @@ print(stim_on.shape, area.shape)
 # * **`lfp[time, channel]`** is the *local field potential*: the slow voltage
 #   changes near each site, from 618 s into the session (`lfp_start`). Row `i` is
 #   time `i / sampling_rate` seconds into the slice. The values are raw counts
-#   from the amplifier; multiply by `uV_per_count` for microvolts.
+#   from the amplifier; **`lfp_uv`** is the same in microvolts.
 # * **Channels** are numbered from the **tip** of the probe: channel 0 is the
 #   deepest site, and `depth_um` gives each site's height above the tip. `area`
 #   says which brain area each site sits in (for example `SSp-n`, primary
@@ -94,18 +105,18 @@ print(stim_on.shape, area.shape)
 # * **`spike_counts[unit, trial, bin]`** is the number of spikes neuron `unit`
 #   fired in time bin `bin` of trial `trial`. Bin `b` starts `bin_start[b]`
 #   seconds after the stimulus, from -0.5 s (before it) to 0.95 s.
-# * **`stim_on`**, **`rt`** and **`correct`** give, for each of the 533 trials,
-#   when the stimulus appeared (seconds into the session), how long the mouse
-#   took to respond, and whether it was right.
+# * The **trial** arrays have one entry for each of the 533 trials: when the
+#   stimulus appeared (`stim_on`, seconds into the session), its `contrast` (in
+#   %, negative on the left, positive on the right), the block's
+#   `probability_left` (explained in part 3), the mouse's `choice` (-1 left, 1
+#   right), its response time `rt`, and whether it was `correct`.
 
 # %%
 print(area[:12])
 print(depth_um[:12])
 
 # %% [markdown]
-# ## 1. Indexing, views and in-place changes
-#
-# ### 1a. Fetching a time window from some of the channels
+# ## 1. Indexing
 #
 # Using **one indexing expression each** (no loops, no typing values in),
 # make:
@@ -171,7 +182,289 @@ around_stimulus = lfp[stim_sample - 250 : stim_sample + 500]
 print(stim_sample, around_stimulus.shape)
 
 # %% [markdown]
-# ### 1b. Build an array without typing it in (SPL Exercise 22, part 1)
+# ## 2. Aggregations and broadcasting
+#
+# ### 2a. Aggregations along more than one axis
+#
+# Back to `spike_counts[unit, trial, bin]`, shape (51, 533, 30). Make:
+#
+# 1. `total_per_unit`: the total number of spikes from each unit, over all
+#    trials and bins (51 values). (Hint: `axis` also accepts a tuple of axes.)
+# 2. `psth`: for each unit, the mean count in each time bin, averaged over
+#    trials. Shape (51, 30). This is called a *peri-stimulus time histogram*.
+# 3. `busiest_trial`: for each unit, the **number** of the trial in which it
+#    fired the most spikes (51 values).
+# 4. `overall_mean`: the mean count over the whole array (one number)
+# 5. `population`: the mean over units **and** trials, one value per bin, in
+#    spikes per second (divide by the 0.05 s bin width). Does the population
+#    fire more after the stimulus (bin 10 onwards) than before?
+
+# %% tags=["solution"]
+total_per_unit = spike_counts.sum(axis=(1, 2))
+psth = spike_counts.mean(axis=1)
+busiest_trial = spike_counts.sum(axis=2).argmax(axis=1)
+overall_mean = spike_counts.mean()
+population = spike_counts.mean(axis=(0, 1)) / 0.05
+print(total_per_unit, psth.shape, busiest_trial, overall_mean, sep="\n")
+print(population.round(1))
+
+# %% [markdown] tags=["answer"]
+# Yes: about 3 spikes per second before the stimulus and about 4 after it,
+# rising from bin 12 (0.1 s after the stimulus appears).
+
+# %% [markdown]
+# ### 2b. Broadcasting
+#
+# No loops in this section.
+#
+# 1. Noise that reaches every site at once (from the mouse moving, say) can be
+#    removed by subtracting, at each time point, the median over all channels.
+#    Make `lfp_car` (for *common average reference*) from `lfp_uv`, using
+#    `np.median` with `keepdims=True`. Its shape should still be (5000, 384).
+# 2. Make `psth_change`: each unit's `psth` minus that unit's mean over the
+#    bins **before** the stimulus (the first 10 bins). Shape (51, 30); the first
+#    10 values of each row should average 0.
+
+# %% tags=["solution"]
+lfp_car = lfp_uv - np.median(lfp_uv, axis=1, keepdims=True)  # (5000, 384) - (5000, 1)
+baseline = psth[:, :10].mean(axis=1, keepdims=True)  # (51, 1)
+psth_change = psth - baseline
+print(lfp_car.shape, psth_change.shape)
+print(psth_change[:, :10].mean(axis=1).round(10)[:5])
+
+# %% [markdown]
+# 3. The cell below should keep the spike counts of the **correct** trials and
+#    set the others to 0, by multiplying by `correct` (one `True`/`False` per
+#    trial), but it fails. Fix it.
+
+# %% tags=["raises-exception"]
+spike_counts * correct
+
+# %% tags=["solution"]
+# Shapes are compared from the right: (51, 533, 30) against (533,) lines up 30
+# against 533. Making correct (533, 1) lines 533 up with the trial axis instead.
+correct_only = spike_counts * correct[:, np.newaxis]
+correct_only.shape
+
+# %% [markdown]
+# ### 2c. A table for scikit-learn
+#
+# This afternoon a scikit-learn model will predict the mouse's choice. Models
+# like it want a 2-D array `X` with **one row per sample** (here, a trial) and
+# **one column per feature**, plus a 1-D array `y` with the answer for each
+# sample.
+#
+# 1. Make `X`, shape (533, 2), with `contrast` in column 0 and
+#    `probability_left` in column 1. (Hint: `np.column_stack`.)
+# 2. Make `y`, shape (533,): `True` where the mouse chose right (`choice` is 1).
+# 3. Check that `X[:, 0]` is `contrast` again (`np.array_equal`).
+
+# %% tags=["solution"]
+X = np.column_stack([contrast, probability_left])
+y = choice == 1
+print(X.shape, y.shape)
+print(X[:3])
+print(np.array_equal(X[:, 0], contrast))
+
+# %% [markdown]
+# ## 3. Masks and vectorising
+#
+# ### 3a. Boolean masks
+#
+# `rt` holds the mouse's response time on each trial, in seconds from the
+# stimulus to its choice, and `correct` says whether the choice was right.
+# Some trials are odd: on a few the mouse was already turning the wheel, and on
+# others it lost interest.
+
+# %%
+rt[:10].round(3), correct[:10]
+
+# %% [markdown]
+# Make:
+#
+# 1. `too_fast`: the response times below 0.15 s (faster than the mouse could
+#    have seen the stimulus)
+# 2. `n_correct`: the number of correct trials
+# 3. `mean_rt_correct`: the mean response time of the **correct** trials only
+# 4. `slow_errors`: the response times of trials that were **wrong** and slower
+#    than 1 s
+# 5. `rt_clean`: a **new** array in which every response time below 0.15 or
+#    above 5 s is replaced by `np.nan`. `rt` must not change. Then compare
+#    `rt.mean()` with `np.nanmean(rt_clean)`.
+
+# %% tags=["solution"]
+too_fast = rt[rt < 0.15]
+n_correct = correct.sum()
+mean_rt_correct = rt[correct].mean()
+slow_errors = rt[~correct & (rt > 1)]
+rt_clean = np.where((rt < 0.15) | (rt > 5), np.nan, rt)
+print(too_fast, n_correct, mean_rt_correct, slow_errors.round(2), sep="\n")
+print(rt.mean(), np.nanmean(rt_clean))
+
+# %% [markdown]
+# Masks work on channels too. `area` has one entry per channel, so a mask built
+# from it picks out **columns** of `lfp_uv`. Make:
+#
+# 6. `ssp_lfp`: the LFP of every site in primary somatosensory cortex
+#    (`"SSp-n"`), shape (5000, 128)
+# 7. `in_brain`: the LFP of every site **except** those above the brain
+#    (`"void"`), shape (5000, 378)
+
+# %% tags=["solution"]
+ssp_lfp = lfp_uv[:, area == "SSp-n"]
+in_brain = lfp_uv[:, area != "void"]
+print(ssp_lfp.shape, in_brain.shape)
+
+# %% [markdown]
+# ### 3b. Vectorised versus loops
+#
+# The **line length** of a signal is the sum of the absolute differences between
+# consecutive samples. It is large when the signal is busy, and is a cheap
+# measure of activity in seizure detection.
+#
+# Write `line_length_loop(signals)` using `for` loops over the channels and the
+# samples, and `line_length_numpy(signals)` using no loop at all. Each takes an
+# array of shape (time, channel) and returns one value per channel. Check that
+# they agree on `first_2_s`, then time both with `%timeit`. How
+# many times faster is NumPy? (Hint for the NumPy version: `signals[1:] -
+# signals[:-1]` gives every difference at once, or use `np.diff`. See also the
+# Handbook's [Profiling and Timing
+# Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html).)
+
+# %%
+first_2_s = lfp_uv[:1000]  # the first 2 s, in microvolts
+
+
+def line_length_loop(signals):
+    # BEGIN SOLUTION
+    n_time, n_channels = signals.shape
+    result = np.zeros(n_channels)
+    for channel in range(n_channels):
+        total = 0.0
+        for t in range(1, n_time):
+            total += abs(signals[t, channel] - signals[t - 1, channel])
+        result[channel] = total
+    return result
+    # END SOLUTION
+
+
+def line_length_numpy(signals):
+    # BEGIN SOLUTION
+    return np.abs(signals[1:] - signals[:-1]).sum(axis=0)
+    # END SOLUTION
+
+
+# %% tags=["solution"]
+np.allclose(line_length_loop(first_2_s), line_length_numpy(first_2_s))
+
+# %% tags=["solution"]
+# %timeit -n 1 -r 3 line_length_loop(first_2_s)
+# %timeit -n 3 -r 3 line_length_numpy(first_2_s)
+
+# %% [markdown] tags=["answer"]
+# On a typical laptop the loop takes tens of milliseconds and NumPy under one:
+# roughly 100 times faster. The loop pays for Python work at every one of the
+# 384 000 samples (indexing, subtraction, `abs`); NumPy does each step once,
+# over the whole array, in compiled code. If you catch yourself writing a `for`
+# loop over the values of an array, there is almost always a NumPy way.
+
+# %% [markdown]
+# ### 3c. The psychometric curve, without a loop
+#
+# Does the mouse do the task? The **psychometric curve** is the fraction of
+# trials on which it chose **right**, at each contrast. There are 9 contrasts:
+
+# %%
+levels = np.unique(contrast)
+levels
+
+# %% [markdown]
+# The obvious way is a loop over `levels`, picking out the trials at each one.
+# Do it with a mask and broadcasting instead, using `y` from part 2c (`True`
+# where the mouse chose right):
+#
+# 1. `at_level`: a (533, 9) boolean array, `True` where trial `i` had contrast
+#    `levels[j]`. (Hint: compare `contrast` with `levels`. Which of them needs
+#    a new axis so that the result is (533, 9)?)
+# 2. `n_at_level`: the number of trials at each contrast (9 values).
+# 3. `frac_right`: the fraction of rightward choices at each contrast. (Hint:
+#    `at_level & y[:, np.newaxis]` is `True` where a trial was at that contrast
+#    **and** the mouse chose right. Count, then divide.)
+#
+# The task also has **blocks** of trials. For a while the stimulus appears on
+# the left 80% of the time (`probability_left` 0.8), then on the right 80% of
+# the time (0.2).
+#
+# 4. Make `frac_right_rb` and `frac_right_lb`: the same curve for the
+#    right-block trials (`probability_left == 0.2`) and the left-block trials
+#    (0.8) only. (Hint: select the rows of `at_level` and `y` with a mask
+#    first.) Compare the two at contrast 0, where there is nothing to see. Has
+#    the mouse learned the blocks?
+
+# %% tags=["solution"]
+at_level = contrast[:, np.newaxis] == levels  # (533, 1) == (9,) -> (533, 9)
+n_at_level = at_level.sum(axis=0)
+frac_right = (at_level & y[:, np.newaxis]).sum(axis=0) / n_at_level
+print(n_at_level)
+print(frac_right.round(2))
+
+# %% tags=["solution"]
+right_block = probability_left == 0.2
+left_block = probability_left == 0.8
+frac_right_rb = (at_level[right_block] & y[right_block, np.newaxis]).sum(axis=0) / at_level[right_block].sum(axis=0)
+frac_right_lb = (at_level[left_block] & y[left_block, np.newaxis]).sum(axis=0) / at_level[left_block].sum(axis=0)
+print(frac_right_rb.round(2))
+print(frac_right_lb.round(2))
+
+# %% [markdown] tags=["answer"]
+# At strong contrasts the mouse is nearly always right, whatever the block. At
+# contrast 0 it chooses right about half the time in right blocks but under a
+# third of the time in left blocks: when it cannot see the stimulus, it guesses
+# the side that has been more likely lately. It has learned the blocks and uses
+# them as a prior. (`(at_level & y[:, np.newaxis]).mean(axis=0)` would be wrong:
+# it divides by all 533 trials, not by the trials at each contrast.)
+
+# %% [markdown]
+# ## 4. Check your work with a plot
+#
+# A column of numbers is hard to judge; a plot is easy. Here is all the
+# Matplotlib you need today. Day 2 covers it properly.
+
+# %%
+time = np.arange(500) / sampling_rate  # the first second, in seconds
+
+fig, ax = plt.subplots()
+ax.plot(time, lfp_uv[:500, 100], label="channel 100")
+ax.plot(time, lfp_uv[:500, 300], label="channel 300")
+ax.set_xlabel("time (s)")
+ax.set_ylabel("LFP (µV)")
+ax.legend();
+
+# %% [markdown]
+# * `fig, ax = plt.subplots()` makes a figure with one set of axes
+# * `ax.plot(x, y)` draws a line; `ax.plot(x, y, "o-")` adds a marker at each
+#   point
+# * `ax.set_xlabel`, `ax.set_ylabel` and `ax.legend()` (which uses each line's
+#   `label=`) label it
+#
+# Plot `frac_right_rb` and `frac_right_lb` against `levels` on one set of axes,
+# with markers, labelled axes and a legend. Does the plot agree with what you
+# concluded from the numbers?
+
+# %% tags=["solution"]
+fig, ax = plt.subplots()
+ax.plot(levels, frac_right_rb, "o-", label="right blocks (p left = 0.2)")
+ax.plot(levels, frac_right_lb, "o-", label="left blocks (p left = 0.8)")
+ax.set_xlabel("contrast (%; negative = left)")
+ax.set_ylabel("fraction of rightward choices")
+ax.legend();
+
+# %% [markdown]
+# ## 5. Stretch
+#
+# For anyone who finishes early, in any order.
+#
+# ### 5a. Build an array without typing it in (SPL Exercise 22, part 1)
 #
 # Form the 2-D array below **without typing it in explicitly**, and call it
 # `a`:
@@ -193,7 +486,7 @@ print(a)
 print(rows_2_and_4)
 
 # %% [markdown]
-# ### 1c. Views and copies
+# ### 5b. Views and copies
 #
 # 1. Make `channel_100`, the trace of channel 100. Its first 0.1 s (50 samples)
 #    is an artefact: set them to 0 **in `channel_100`**. Then print
@@ -241,7 +534,7 @@ for name, candidate in [
 # `flatten()`, which always copies (`ravel()` copies only when it has to).
 
 # %% [markdown]
-# ### 1d. In place, or a new array?
+# ### 5c. In place, or a new array?
 #
 # A colleague wrote this function to shift a signal so that its minimum is 0.
 # `readings` are four LFP samples, in microvolts:
@@ -307,76 +600,45 @@ print(order, result)
 # `order = rng.shuffle(order)` would throw your data away.
 
 # %% [markdown]
-# ### 1e. dtypes
+# ### 5d. dtypes
 #
 # `lfp` holds whole numbers from the amplifier, stored as `int16` (2 bytes
-# each, from -32768 to 32767) to save space. Converting it to microvolts in
-# place fails:
+# each, from -32768 to 32767) to save space. That is why the first cell of this
+# notebook made `lfp_uv` as a **new** array: converting `lfp` to microvolts in
+# place fails.
 
 # %% tags=["raises-exception"]
 lfp *= uV_per_count
 
 # %% [markdown]
-# 1. Make `lfp_uv`, a **float** array holding the LFP in microvolts. `lfp` must
-#    not change.
-#
 # The power of a signal is its square. Squaring the raw counts goes wrong:
 
 # %%
 (lfp**2).min()  # a square can't be negative
 
 # %% [markdown]
-# 2. Why? (Hint: what is 225 squared, and what is the largest `int16`?)
+# 1. Why does the in-place conversion fail, and what is the dtype of `lfp_uv`?
+# 2. Why is the square negative? (Hint: what is 225 squared, and what is the
+#    largest `int16`?)
 # 3. Make `lfp_power`, the square of every sample in microvolts squared, and
 #    check that its minimum is not negative.
 
 # %% tags=["solution"]
-lfp_uv = lfp * uV_per_count  # a new float64 array; lfp stays int16
-lfp_power = lfp_uv**2
 print(lfp_uv.dtype, lfp.dtype)
+lfp_power = lfp_uv**2
 print(lfp_power.min(), lfp_power.max())
 
 # %% [markdown] tags=["answer"]
-# The largest value in `lfp` is 225, and 225² = 50625 does not fit in an
-# `int16`, whose largest value is 32767. NumPy keeps the dtype of its inputs
-# and does not warn you: the result wraps round to a negative number. Converting
-# to float first (or to a wider integer such as `np.int32`) avoids it.
+# An in-place operation has to keep the array's dtype, and the product of an
+# `int16` and a float is a float, which cannot be stored back into `int16`.
+# `lfp * uV_per_count` makes a new `float64` array instead. The largest value
+# in `lfp` is 225, and 225² = 50625 does not fit in an `int16`, whose largest
+# value is 32767. NumPy keeps the dtype of its inputs and does not warn you: the
+# result wraps round to a negative number. Converting to float first (or to a
+# wider integer such as `np.int32`) avoids it.
 
 # %% [markdown]
-# ## 2. Aggregations and broadcasting
-#
-# ### 2a. Aggregations along more than one axis
-#
-# Back to `spike_counts[unit, trial, bin]`, shape (51, 533, 30). Make:
-#
-# 1. `total_per_unit`: the total number of spikes from each unit, over all
-#    trials and bins (51 values). (Hint: `axis` also accepts a tuple of axes.)
-# 2. `psth`: for each unit, the mean count in each time bin, averaged over
-#    trials. Shape (51, 30). This is called a *peri-stimulus time histogram*.
-# 3. `busiest_trial`: for each unit, the **number** of the trial in which it
-#    fired the most spikes (51 values).
-# 4. `overall_mean`: the mean count over the whole array (one number)
-# 5. `population`: the mean over units **and** trials, one value per bin, in
-#    spikes per second (divide by the 0.05 s bin width). Does the population
-#    fire more after the stimulus (bin 10 onwards) than before?
-
-# %% tags=["solution"]
-total_per_unit = spike_counts.sum(axis=(1, 2))
-psth = spike_counts.mean(axis=1)
-busiest_trial = spike_counts.sum(axis=2).argmax(axis=1)
-overall_mean = spike_counts.mean()
-population = spike_counts.mean(axis=(0, 1)) / 0.05
-print(total_per_unit, psth.shape, busiest_trial, overall_mean, sep="\n")
-print(population.round(1))
-
-# %% [markdown] tags=["answer"]
-# Yes: about 3 spikes per second before the stimulus and about 4 after it,
-# rising from bin 12 (0.1 s after the stimulus appears).
-
-# %% [markdown]
-# ### 2b. Broadcasting
-#
-# No loops in this section.
+# ### 5e. More broadcasting
 #
 # 1. The sites of a Neuropixels probe sit in a staggered pattern: `x_um` and
 #    `depth_um` give each site's position in micrometres. Make `distances`, the
@@ -395,23 +657,7 @@ print(distances.shape, np.diag(distances).max())
 print(distances[:4, :4].round(1))
 
 # %% [markdown]
-# 2. Noise that reaches every site at once (from the mouse moving, say) can be
-#    removed by subtracting, at each time point, the median over all channels.
-#    Make `lfp_car` (for *common average reference*) from `lfp_uv`, using
-#    `np.median` with `keepdims=True`. Its shape should still be (5000, 384).
-# 3. Make `psth_change`: each unit's `psth` minus that unit's mean over the
-#    bins **before** the stimulus (the first 10 bins). Shape (51, 30); the first
-#    10 values of each row should average 0.
-
-# %% tags=["solution"]
-lfp_car = lfp_uv - np.median(lfp_uv, axis=1, keepdims=True)  # (5000, 384) - (5000, 1)
-baseline = psth[:, :10].mean(axis=1, keepdims=True)  # (51, 1)
-psth_change = psth - baseline
-print(lfp_car.shape, psth_change.shape)
-print(psth_change[:, :10].mean(axis=1).round(10)[:5])
-
-# %% [markdown]
-# 4. **(SPL Exercise 22, part 2)** Divide each **column** of `a` element-wise
+# 2. **(SPL Exercise 22, part 2)** Divide each **column** of `a` element-wise
 #    by `b`, so that row `i` is divided by `b[i]`. (Hint: `np.newaxis`.)
 
 # %%
@@ -429,78 +675,22 @@ a / b[:, np.newaxis]
 # so always check which axis broadcasting used.
 
 # %% [markdown]
-# 5. The cell below should keep the spike counts of the **correct** trials and
-#    set the others to 0, by multiplying by `correct` (one `True`/`False` per
-#    trial), but it fails. Fix it.
-
-# %% tags=["raises-exception"]
-spike_counts * correct
-
-# %% tags=["solution"]
-# Shapes are compared from the right: (51, 533, 30) against (533,) lines up 30
-# against 533. Making correct (533, 1) lines 533 up with the trial axis instead.
-correct_only = spike_counts * correct[:, np.newaxis]
-correct_only.shape
-
-# %% [markdown]
-# ## 3. Masks, fancy indexing and vectorising
+# ### 5f. More masks
 #
-# ### 3a. Boolean masks
-#
-# `rt` holds the mouse's response time on each trial, in seconds from the
-# stimulus to its choice, and `correct` says whether the choice was right.
-# Some trials are odd: on a few the mouse was already turning the wheel, and on
-# others it lost interest.
-
-# %%
-rt[:10].round(3), correct[:10]
-
-# %% [markdown]
-# Make:
-#
-# 1. `too_fast`: the response times below 0.15 s (faster than the mouse could
-#    have seen the stimulus)
-# 2. `n_correct`: the number of correct trials
-# 3. `mean_rt_correct`: the mean response time of the **correct** trials only
-# 4. `slow_errors`: the response times of trials that were **wrong** and slower
-#    than 1 s
-# 5. `rt_clean`: a **new** array in which every response time below 0.15 or
-#    above 5 s is replaced by `np.nan`. `rt` must not change. Then compare
-#    `rt.mean()` with `np.nanmean(rt_clean)`.
-
-# %% tags=["solution"]
-too_fast = rt[rt < 0.15]
-n_correct = correct.sum()
-mean_rt_correct = rt[correct].mean()
-slow_errors = rt[~correct & (rt > 1)]
-rt_clean = np.where((rt < 0.15) | (rt > 5), np.nan, rt)
-print(too_fast, n_correct, mean_rt_correct, slow_errors.round(2), sep="\n")
-print(rt.mean(), np.nanmean(rt_clean))
-
-# %% [markdown]
-# Masks work on channels too. `area` has one entry per channel, so a mask built
-# from it picks out **columns** of `lfp_uv`. Make:
-#
-# 6. `ssp_lfp`: the LFP of every site in primary somatosensory cortex
-#    (`"SSp-n"`), shape (5000, 128)
-# 7. `in_brain`: the LFP of every site **except** those above the brain
-#    (`"void"`), shape (5000, 378)
-# 8. `layer_5_somatosensory`: the LFP of the sites in layer 5 (`layer == "5"`)
+# 1. `layer_5_somatosensory`: the LFP of the sites in layer 5 (`layer == "5"`)
 #    of **either** somatosensory area, `"SSp-n"` or `"SSs"`. How many sites is
 #    that? (Hint: `np.isin`, or two comparisons joined with `|`.)
-# 9. `silent_trials`: for unit 0, the number of trials in which it fired **no
+# 2. `silent_trials`: for unit 0, the number of trials in which it fired **no
 #    spikes at all**. (Hint: `np.all` with an `axis`.)
 
 # %% tags=["solution"]
-ssp_lfp = lfp_uv[:, area == "SSp-n"]
-in_brain = lfp_uv[:, area != "void"]
 somatosensory = (area == "SSp-n") | (area == "SSs")  # or np.isin(area, ["SSp-n", "SSs"])
 layer_5_somatosensory = lfp_uv[:, somatosensory & (layer == "5")]
 silent_trials = np.all(spike_counts[0] == 0, axis=1).sum()
-print(ssp_lfp.shape, in_brain.shape, layer_5_somatosensory.shape, silent_trials)
+print(layer_5_somatosensory.shape, silent_trials)
 
 # %% [markdown]
-# ### 3b. Fancy indexing
+# ### 5g. Fancy indexing
 #
 # An integer array can index into a **lookup table**: every index is replaced
 # by the matching entry.
@@ -508,7 +698,7 @@ print(ssp_lfp.shape, in_brain.shape, layer_5_somatosensory.shape, silent_trials)
 # 1. `unit_channel` gives the channel on which each of the 481 neurons (units)
 #    was largest. Make `unit_area`: the brain area of each unit, using `area`
 #    as the lookup table. How many units are in `"SSp-n"`? How many are
-#    (suspiciously) on `"void"` sites, above the brain?
+#    in `"void"` sites, above the brain?
 
 # %% tags=["solution"]
 unit_area = area[unit_channel]
@@ -578,59 +768,7 @@ print(r.round(2))
 print(closest.round(2))
 
 # %% [markdown]
-# ### 3c. Vectorised versus loops
-#
-# The **line length** of a signal is the sum of the absolute differences between
-# consecutive samples. It is large when the signal is busy, and is a cheap
-# measure of activity in seizure detection.
-#
-# Write `line_length_loop(signals)` using `for` loops over the channels and the
-# samples, and `line_length_numpy(signals)` using no loop at all. Each takes an
-# array of shape (time, channel) and returns one value per channel. Check that
-# they agree on `first_2_s`, then time both with `%timeit`. How
-# many times faster is NumPy? (Hint for the NumPy version: `signals[1:] -
-# signals[:-1]` gives every difference at once, or use `np.diff`. See also the
-# Handbook's [Profiling and Timing
-# Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html).)
-
-# %%
-first_2_s = lfp[:1000] * uV_per_count  # the first 2 s, in microvolts
-
-
-def line_length_loop(signals):
-    # BEGIN SOLUTION
-    n_time, n_channels = signals.shape
-    result = np.zeros(n_channels)
-    for channel in range(n_channels):
-        total = 0.0
-        for t in range(1, n_time):
-            total += abs(signals[t, channel] - signals[t - 1, channel])
-        result[channel] = total
-    return result
-    # END SOLUTION
-
-
-def line_length_numpy(signals):
-    # BEGIN SOLUTION
-    return np.abs(signals[1:] - signals[:-1]).sum(axis=0)
-    # END SOLUTION
-
-
-# %% tags=["solution"]
-np.allclose(line_length_loop(first_2_s), line_length_numpy(first_2_s))
-
-# %% tags=["solution"]
-# %timeit -n 1 -r 3 line_length_loop(first_2_s)
-# %timeit -n 3 -r 3 line_length_numpy(first_2_s)
-
-# %% [markdown] tags=["answer"]
-# On a typical laptop the loop takes tens of milliseconds and NumPy under one:
-# roughly 100 times faster. The loop pays for Python work at every one of the
-# 384 000 samples (indexing, subtraction, `abs`); NumPy does each step once,
-# over the whole array, in compiled code.
-
-# %% [markdown]
-# ### 3d. Data statistics (after SPL Exercise 23)
+# ### 5h. Data statistics (after SPL Exercise 23)
 #
 # Time to put it together. `spike_unit` gives the unit number of each row of
 # `spike_counts`, the same numbering as in `unit_channel`.
@@ -656,12 +794,13 @@ spike_unit[:10]
 # 5. The unit numbers of the two units that fired the most spikes in total.
 #    (Hint: `argsort` and fancy indexing.)
 #
-# (Part 6 needs a plot, so it comes on Day 2.)
+# (Part 6, the population response on correct and wrong trials, is a stretch
+# exercise in Day 2's Matplotlib notebook.)
 
 # %% tags=["solution"]
 # 1.
-print(f"Correct: {rt[correct].mean():.2f} ± {rt[correct].std():.2f} s")
-print(f"Wrong:   {rt[~correct].mean():.2f} ± {rt[~correct].std():.2f} s")
+print(f"Correct: {rt[correct].mean():.2f} +/- {rt[correct].std():.2f} s")
+print(f"Wrong:   {rt[~correct].mean():.2f} +/- {rt[~correct].std():.2f} s")
 
 # %% [markdown] tags=["answer"]
 # Wrong trials are about three times slower on average, and far more variable.
@@ -694,89 +833,3 @@ print("Trials with a bin above 10:", np.flatnonzero(np.any(spike_counts > 10, ax
 # %% tags=["solution"]
 # 5. argsort sorts ascending, so the last two are the largest.
 print("Two busiest units:", spike_unit[spikes_per_trial.sum(axis=1).argsort()[-2:][::-1]])
-
-# %% [markdown]
-# ## 4. Stretch: crude integral approximations (SPL Exercise 24)
-#
-# Write a function `f(a, b, c)` that returns $a^b - c$. Form a 24 x 12 x 6 array
-# containing its values over the parameter ranges `[0, 1] x [0, 1] x [0, 1]`.
-#
-# Approximate the 3-D integral
-#
-# $$\int_0^1\int_0^1\int_0^1 (a^b - c)\, da\, db\, dc$$
-#
-# by the **mean** of that array. The exact result is $\ln 2 - \frac{1}{2} \approx
-# 0.1931$. What is your relative error?
-#
-# Hints: use element-wise operations and broadcasting. `np.ogrid[0:1:20j]` gives 20
-# points in the range [0, 1].
-
-# %%
-def f(a, b, c):
-    # BEGIN SOLUTION
-    return a**b - c
-    # END SOLUTION
-
-
-# %% tags=["solution"]
-a = np.linspace(0, 1, 24)
-b = np.linspace(0, 1, 12)
-c = np.linspace(0, 1, 6)
-samples = f(a[:, np.newaxis, np.newaxis], b[np.newaxis, :, np.newaxis], c[np.newaxis, np.newaxis, :])
-
-# Equivalent, using ogrid:
-# a, b, c = np.ogrid[0:1:24j, 0:1:12j, 0:1:6j]
-# samples = f(a, b, c)
-
-approx = samples.mean()
-exact = np.log(2) - 0.5
-print(samples.shape)
-print(f"Approximation: {approx:.4f}, exact: {exact:.4f}, relative error: {abs(approx - exact) / exact:.1%}")
-
-# %% [markdown] tags=["solution"]
-# The relative error is about 2%. With more points (try 240 x 120 x 60) it shrinks,
-# at the cost of 1000 times more memory: broadcasting builds the whole grid.
-
-# %% [markdown]
-# ## 5. Stretch: Markov chain (SPL Exercise 26)
-#
-# A Markov chain has a transition matrix `P` and a probability distribution `p`
-# over its states:
-#
-# 1. `0 <= P[i, j] <= 1` is the probability of going from state `i` to state `j`.
-# 2. Transition rule: $p_{new} = P^T p_{old}$.
-# 3. Normalisation: every row of `P` sums to 1, and `p.sum() == 1`.
-#
-# For 5 states:
-#
-# * Construct a random matrix and normalise each row so it is a transition matrix.
-# * Start from a random (normalised) probability distribution `p` and take 50
-#   steps, giving `p_50`.
-# * Compute the stationary distribution: the eigenvector of `P.T` with eigenvalue
-#   1 (numerically, the one closest to 1), giving `p_stationary`. Remember to
-#   normalise it.
-# * Check whether `p_50` and `p_stationary` are equal to within a tolerance of 1e-5.
-#
-# Toolbox: `rng.random`, `@`, `np.linalg.eig`, reductions, `abs`, `argmin`,
-# comparisons, `np.all`, `np.linalg.norm`. (One `for` loop for the 50 steps is fine.)
-
-# %% tags=["solution"]
-n_states = 5
-P = rng.random((n_states, n_states))
-P /= P.sum(axis=1)[:, np.newaxis]  # normalise rows
-
-p = rng.random(n_states)
-p /= p.sum()
-
-for _ in range(50):
-    p = P.T @ p
-p_50 = p
-
-w, v = np.linalg.eig(P.T)
-j_stationary = np.argmin(abs(w - 1.0))
-p_stationary = v[:, j_stationary].real
-p_stationary /= p_stationary.sum()
-
-print(p_50)
-print(p_stationary)
-print("Equal to 1e-5:", np.all(abs(p_50 - p_stationary) < 1e-5))

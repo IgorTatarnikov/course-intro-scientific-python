@@ -1,10 +1,10 @@
 # %% [markdown]
-# # Day 1 · pandas
+# # Day 2 · pandas
 #
-# **Block:** pandas (55 min, about 10 of them slides)
+# **Block:** pandas (60 min, about 12 of them slides)
 #
-# We stay with the recording from the NumPy block, and now look at its
-# **tables**, which pandas is made for:
+# We stay with yesterday's recording, and now look at its **tables**, which
+# pandas is made for:
 #
 # * **trials**: one row per trial of the task: when the stimulus appeared, its
 #   contrast (negative on the left, positive on the right, in %), the block's
@@ -17,8 +17,10 @@
 # 1. **Reading tabular data** (10 min): Reading Other Data, Inspecting Data, Writing Data
 # 2. **Selecting data** (15 min): Selection of Individual Values, Extent of
 #    Slicing, Selecting Indices, Practice with Selection, Boolean masks
-# 3. **Group by: split-apply-combine** (15 min), finishing with a grouping question of your own
-# 4. **Stretch:** Many Ways of Access, then merging and reshaping
+# 3. **Group by: split-apply-combine** (15 min): yesterday's psychometric curve
+#    in one line, then a grouping question of your own
+# 4. **Tidy data** (8 min): wide tables to long ones, ready for seaborn
+# 5. **Stretch:** Many Ways of Access, then merging
 #
 # Sections 1 to 3 follow the exercises of Software Carpentry's [Plotting and
 # Programming in Python](https://swcarpentry.github.io/python-novice-gapminder/),
@@ -30,6 +32,7 @@
 
 # %%
 import h5py
+import numpy as np
 import pandas as pd
 
 # %% [markdown]
@@ -257,6 +260,26 @@ by_block.unstack("probability_left").round(2)
 # Compare the 0.2 and 0.8 columns at contrast 0. Has the mouse learned the
 # blocks?
 #
+# Yesterday you computed the same curve with a mask and broadcasting. Here is
+# that NumPy version again, for the right blocks:
+
+# %%
+contrast = trials["contrast"].to_numpy()
+y = trials["chose_right"].to_numpy()
+right_block = trials["probability_left"].to_numpy() == 0.2
+levels = np.unique(contrast)
+at_level = contrast[:, np.newaxis] == levels
+frac_right_rb = (at_level[right_block] & y[right_block, np.newaxis]).sum(axis=0) / at_level[right_block].sum(axis=0)
+
+# %% [markdown]
+# Check that pandas agrees: select the 0.2 column of the unstacked table and
+# compare it with `frac_right_rb` using `np.allclose`. Which version would you
+# rather write, and which would you rather read in six months?
+
+# %% tags=["solution"]
+np.allclose(by_block.unstack("probability_left")[0.2], frac_right_rb)
+
+# %% [markdown]
 # ### Your own grouping question
 #
 # Ask and answer **one** question of your own that needs `groupby`, about
@@ -293,7 +316,65 @@ units.groupby("area").agg(
 # about one in ten passes the sorter's quality checks.
 
 # %% [markdown]
-# ## 4. Stretch
+# ## 4. Tidy data
+#
+# seaborn, which you meet after the break, wants **tidy** ("long") tables: one
+# row per observation and one column per variable. `trials` and `units` are
+# already tidy. The unstacked psychometric curve is **wide**: one column per
+# block, so the block is hidden in the column names instead of being a
+# variable.
+
+# %%
+psychometric_wide = by_block.unstack("probability_left")
+psychometric_wide
+
+# %% [markdown]
+# 1. Make `psychometric_long`, with the columns `contrast`, `probability_left`
+#    and `fraction_right`, one row per block and contrast (27 rows). (Hint:
+#    `reset_index()` turns the `contrast` index into a column, and `melt` with
+#    `id_vars="contrast"` does the rest. Look up `var_name` and `value_name`.)
+
+# %% tags=["solution"]
+psychometric_long = psychometric_wide.reset_index().melt(
+    id_vars="contrast", var_name="probability_left", value_name="fraction_right"
+)
+psychometric_long.head()
+
+# %% [markdown]
+# The spike counts make a wide table too. Averaged over trials, they give one
+# row per unit and **one column per time bin**:
+
+# %%
+with h5py.File("../data/ibl_session.h5") as f:
+    spike_counts = f["spike_counts/data"][:]
+    spike_unit = f["spike_counts/unit"][:]
+    bin_start = f["spike_counts/bin_start_s"][:]
+
+rates = pd.DataFrame(
+    spike_counts.mean(axis=1) / 0.05,  # spikes per second
+    index=pd.Index(spike_unit, name="unit"),
+    columns=(bin_start + 0.025).round(3),  # the centre of each bin
+)
+rates.iloc[:3, :6]
+
+# %% [markdown]
+# 2. Make `rates_long`, with the columns `unit`, `time_s` and `rate_Hz`: one row
+#    per unit **and** time bin. What are the shapes of `rates` and `rates_long`,
+#    and why?
+
+# %% tags=["solution"]
+rates_long = rates.reset_index().melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+print(rates.shape, rates_long.shape)
+rates_long.head()
+
+# %% [markdown] tags=["answer"]
+# `rates` is (51, 30): 51 units by 30 bins. `rates_long` is (1530, 3): one row
+# for each of the 51 × 30 unit-bin pairs, with the unit, the time and the rate
+# as columns. Long tables are longer, but every variable is a column you can
+# group by, filter on, or hand to seaborn.
+
+# %% [markdown]
+# ## 5. Stretch
 #
 # Work through any of these, in any order.
 
@@ -382,15 +463,3 @@ units_with_layer.groupby("layer")["unit"].count()
 #   The website is the first edition, so where it uses `DataFrame.append` (removed
 #   in pandas 2.0), use `pd.concat` instead.
 # * The [pandas_exercises](https://github.com/guipsamora/pandas_exercises) repository.
-#
-# A small taste of reshaping, which you need for seaborn on Day 2. The
-# **wide** table from the group-by section has one column per block; the
-# **long** table has one row per block and contrast:
-
-# %%
-psychometric_long = (
-    by_block.unstack("probability_left")
-    .reset_index()
-    .melt(id_vars="contrast", var_name="probability_left", value_name="fraction_right")
-)
-psychometric_long.head()

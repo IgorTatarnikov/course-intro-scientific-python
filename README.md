@@ -1,8 +1,8 @@
 # Introduction to Scientific Python
 
-A two-day course (3 hours a day) covering environments, NumPy, pandas, Matplotlib, seaborn, SciPy and scikit-image, with a short tour of xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
+A two-day course (3 hours a day). Day 1 covers environments, NumPy, SciPy and scikit-learn; Day 2 covers pandas, Matplotlib and seaborn, ending with a capstone figure and pointers to scikit-image, xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
 
-The exercises follow one real experiment from start to finish: a Neuropixels recording from a mouse doing a visual decision task, from the [International Brain Laboratory](https://www.internationalbrainlab.com/) via the [DANDI archive](https://dandiarchive.org/dandiset/000409). Students index its voltage traces by time and recording site, mask channels by brain area, summarise its trials and neurons with pandas, plot it, fit the mouse's psychometric curve, filter mains hum out of it, and treat it as labelled and as bigger-than-memory arrays. Only scikit-image and napari, which need images, switch to a microscopy image.
+The exercises follow one real experiment from start to finish: a Neuropixels recording from a mouse doing a visual decision task, from the [International Brain Laboratory](https://www.internationalbrainlab.com/) via the [DANDI archive](https://dandiarchive.org/dandiset/000409). Students index its voltage traces by time and recording site, mask channels by brain area, compute the mouse's psychometric curve without a loop, filter mains hum out of the LFP, predict the mouse's choices with a logistic regression, summarise its trials and neurons with pandas, and finally plot all of it in one figure.
 
 ## For learners
 
@@ -22,33 +22,31 @@ Do this **before Day 1**:
 
 4. On the day, run `jupyter lab` from the repository folder and open the notebooks in `notebooks/`.
 
-napari opens a desktop window, so please use your own laptop rather than JupyterHub or a remote server.
-
 ## Schedule
 
 | Day 1 | min | Day 2 | min |
 |---|---|---|---|
-| Welcome, setup check and help | 10 | Matplotlib | 45 |
-| Packages and environments | 30 | seaborn | 15 |
-| NumPy | 75 | SciPy | 25 |
+| Welcome, setup check and help | 10 | Recap | 5 |
+| Packages and environments | 25 | pandas | 60 |
+| NumPy | 65 | Matplotlib | 45 |
 | *Break* | 10 | *Break* | 10 |
-| pandas | 55 | scikit-image: counting nuclei | 45 |
-| Wrap-up | 5 | Whirlwind tour: xarray, dask, napari | 35 |
-| | | Wrap-up | 5 |
+| SciPy | 25 | seaborn | 25 |
+| scikit-learn | 35 | Capstone: one figure from two days | 15 |
+| Wrap-up | 5 | Where to go next (slides only) and wrap-up | 15 |
 
 | Notebook | Block | Main sources |
 |---|---|---|
 | `day1_01_getting_help` | Setup and help | SPL *Getting help* |
 | `day1_02_environments` | Environments (terminal work) | conda and uv docs |
-| `day1_03_numpy` | NumPy | An IBL Neuropixels recording (DANDI 000409), plus SPL Ex. 22–24 and 26 |
-| `day1_04_pandas` | pandas | SWC gapminder episodes 7 and 8, on the IBL trials and units tables |
-| `day2_01_matplotlib` | Matplotlib | After SPL *Simple plot*, Ex. 28, 31 and 35, on the recording |
-| `day2_02_seaborn` | seaborn | Live demo on the trials and units, after PDSH 4.14 |
-| `day2_03_scipy` | SciPy | After SPL Ex. 39, 41 and 42, on the recording (stretch: Ex. 40) |
-| `day2_04_scikit_image` | scikit-image | Nuclei segmentation (stretch: SPL coins exercises) |
-| `day2_05_xarray`, `day2_06_dask`, `day2_07_napari` | Whirlwind tour | Each project's tutorial; xarray and dask on the recording |
+| `day1_03_numpy` | NumPy | An IBL Neuropixels recording (DANDI 000409), plus SPL Ex. 22 and 23 |
+| `day1_04_scipy` | SciPy: filtering | After SPL Ex. 42, on the LFP (stretch: Ex. 40 and 41) |
+| `day1_05_sklearn` | scikit-learn | Logistic regression of the mouse's choices; decoding them from spike counts (stretch) |
+| `day2_01_pandas` | pandas | SWC gapminder episodes 7 and 8, on the IBL trials and units tables |
+| `day2_02_matplotlib` | Matplotlib | After SPL *Simple plot*, Ex. 28, 31 and 35, on the recording |
+| `day2_03_seaborn` | seaborn | Live demo on the trials and units, after PDSH 4.14 |
+| `day2_04_capstone` | Capstone | One two-panel figure from both days' results |
 
-Compared with the original three-day outline in `plan.md`, the two-day version moves these exercises to **stretch** (they are still in the notebooks): NumPy Ex. 24, pandas *Many Ways of Access*, the Matplotlib annotation step (now optional), SciPy Ex. 40 and 41, and the SPL coins exercises. The environments comparison is now a debrief led by the instructor, and the four "one slide each" packages share one slide.
+Each block has a core that most learners should finish in the time given, followed by stretch exercises for those who finish early. Each notebook recomputes what it needs from earlier blocks in its first cells, so a learner who did not finish one block can still start the next. scikit-image, xarray, dask and napari appear only on the "where to go next" slides, with code that is shown but not run, so they are not in the course environment.
 
 ## Repository layout
 
@@ -72,14 +70,14 @@ Edit the files in `source/`, never the generated `.ipynb` files. In a source fil
 - `# %% tags=["solution"]` marks a code cell as a solution. The exercise version gets an empty `# Your code here` cell. A markdown cell tagged `solution` (an explanation) is dropped from the exercise version.
 - `# %% [markdown] tags=["answer"]` marks the answer to a question. The exercise version shows *Your answer here.*
 - `# BEGIN SOLUTION` / `# END SOLUTION` inside a cell blanks just that part, for example a function body.
-- `tags=["raises-exception"]` marks a cell that is meant to fail. `tags=["no-execute"]` marks a cell the build skips (napari).
+- `tags=["raises-exception"]` marks a cell that is meant to fail. `tags=["no-execute"]` marks a cell the build skips (for example one that opens a window).
 
 Then rebuild, inside the course environment plus `jupytext`:
 
 ```sh
 pip install jupytext          # once; not part of the learners' environment
 python scripts/build_notebooks.py           # build and execute everything
-python scripts/build_notebooks.py day2_04   # just one notebook
+python scripts/build_notebooks.py day1_05   # just one notebook
 ```
 
 The build executes every solution notebook **and** every exercise notebook, so it fails if a provided cell depends on a solution the learner hasn't written yet. It also fails if any solution line leaks into an exercise notebook, or if a solution marker is malformed.
@@ -108,5 +106,3 @@ Some slides run code at render time and read from `data/`. CI installs `requirem
   - `ibl_session.h5`: a 1.9 MB slice of one session of the International Brain Laboratory's Brain Wide Map, [DANDI:000409](https://doi.org/10.48324/dandi.000409/0.260309.1324) (CC BY 4.0). `scripts/fetch_data.py` rebuilds it from DANDI.
   - `moonlanding.png` (Day 2 slides only): from SPL (CC BY 4.0)
   - gapminder CSVs (slides only): from Software Carpentry (CC BY 4.0)
-  - `human_mitosis.png`: from `skimage.data`, CC0, courtesy of David Root, from Moffat *et al.*, *Cell* 2006
-  - Hubble Deep Field (Day 2 slides only): loaded from `skimage.data`, NASA, public domain

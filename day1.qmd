@@ -1,5 +1,5 @@
 ---
-title: "Day 1: Environments, NumPy and pandas"
+title: "Day 1: Environments, NumPy, SciPy and scikit-learn"
 subtitle: Introduction to Scientific Python
 author: SWC/GCNU Neuroinformatics Unit
 date: today
@@ -11,22 +11,26 @@ date: today
 
 | Day | Before the break | After the break |
 |-----|------------------|-----------------|
-| **1** | Setup and help · packages and environments · **NumPy** | **pandas** |
-| 2 | SciPy · Matplotlib | scikit-image · xarray, dask and napari |
+| **1** | Setup and help · packages and environments · **NumPy** | **SciPy** · **scikit-learn** |
+| 2 | pandas · Matplotlib | seaborn · capstone · where to go next |
 
 <br>
 
+:::{.incremental}
 * Two days of 3 hours each
-* Today: from arrays to tables
-* Tomorrow: numerical methods and plotting
+* Today: arrays, and what you compute with them
+* Tomorrow: tables, and figures of them
+:::
 
 ## How the exercises work
 
+:::{.incremental}
 * Notebooks live in `notebooks/`, numbered by day and block
 * Cells that say `# Your code here` or *Your answer here* are for you
 * **Try first**, then the docs or a search engine, then an LLM (chat only) if you are stuck
 * **Stretch** exercises are for anyone who finishes early
     * Skipping them is fine
+:::
 
 ## Reading a traceback
 
@@ -36,8 +40,11 @@ date: today
 * Look for the last line that is *your* code
 :::
 
+. . .
+
 ```{python}
 #| error: true
+#| output-location: fragment
 import numpy as np
 
 n_points = 100 / 8
@@ -48,6 +55,7 @@ x = np.linspace(0, 1, n_points)
 
 ```{python}
 #| error: true
+#| output-location: fragment
 def divide_0(x):
     return x / 0
 
@@ -57,8 +65,10 @@ def call_func(x):
 z = call_func(10)
 ```
 
+:::{.incremental}
 * Each block is one function call: the bottom one is where it broke
 * Work upwards to find how you got there
+:::
 
 ::: {.source-note}
 Julia Evans, [Debugging manifesto](https://wizardzines.com/images/debugging-manifesto.pdf).
@@ -133,30 +143,42 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
 ## What is a package?
 
+:::{.incremental}
 * Collection of modules (Python files) that provide specific functionality
 * Can be installed from the Python Package Index (PyPI) or conda-forge
 * Dependencies are solved automatically by package managers (pip, conda, uv)
 * One of the best and worst things about Python
     * Best: huge ecosystem of packages for almost anything
     * Worst: packages go out of date, are abandoned, or conflict with each other
+:::
+
+## Package managers
+:::{.incremental}
+* `pip` installs packages from PyPI, the official Python package index
+* `conda` installs packages from conda or conda-forge, a community-maintained channel
+* `uv` installs packages from PyPI, drop in replacement for `pip`
+:::
 
 ## What is an environment?
 
+:::{.incremental}
 * An environment is a collection of packages and an interpreter
 * Isolated from other environments
     * Allows multiple versions of the same package to coexist
 * Can be exported and shared or recreated
+:::
 
 ## Why bother?
 
+:::{.incremental}
 * **Dependency conflicts**
     * Project A needs `numpy<2`, project B needs `numpy>=2.3`
     * One shared Python means one of them breaks
     * Upgrading for one project silently changes the other
 * **Reproducibility**
-    * "Works on my machine" is not a methods section
     * Six months later you need the *same* versions
     * A colleague needs to rebuild your setup from a file
+:::
 
 ## Without environments
 
@@ -168,20 +190,24 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
 ## Working with environments
 
-* **Project-based**: one environment per project
+:::{.incremental}
+* **Project-based**: environments are tightly coupled to a project
     * Typically stored in the project folder (`./.venv`)
     * Managed with `venv` + `pip`, or `uv`
-* **Task-based**: one environment per task (e.g., data analysis, image processing)
+* **Global or task-based**: environments exists globally, easy to share across projects
     * Typically stored in a central location (`~/miniforge3/envs/`)
     * Managed with `conda` or `pixi`
+:::
 
 ## conda and conda-forge
 
+:::{.incremental}
 * **conda** installs packages *and* their non-Python dependencies
     * C libraries, Qt, CUDA, ...
 * **conda-forge** is the community channel where almost everything scientific lives
 * Install conda through **Miniforge**, which uses conda-forge by default
 * The course environment `scientific-python` is a conda environment
+:::
 
 ## Creating an environment
 
@@ -193,18 +219,12 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 conda create -n myenv python=3.13
 ```
 
-### Using `venv`
-
-```bash
-python -m venv .venv
-```
-
 ### Using `uv`
 
 ```bash
 uv init myproject     # new project folder with a pyproject.toml
 cd myproject
-uv venv               # creates .venv
+uv venv               # this is optional, uv will create a .venv automatically
 ```
 
 :::
@@ -220,14 +240,6 @@ conda activate myenv
 conda deactivate
 ```
 
-### Using `venv`
-
-```bash
-source .venv/bin/activate  # Linux/macOS
-.venv\Scripts\activate     # Windows
-deactivate
-```
-
 ### Using `uv`
 
 ```bash
@@ -235,6 +247,8 @@ uv run python script.py    # no activation needed
 ```
 
 :::
+
+. . .
 
 * Check which Python you are using: `which python` (macOS/Linux) or `where python` (Windows)
 
@@ -265,8 +279,10 @@ uv add napari==0.9.1
 
 :::
 
+:::{.incremental}
 * Note the version syntax: `=` for conda, `==` for pip and uv
 * Install from the **terminal**, not from inside Python, and activate the environment first
+:::
 
 ## Updating and listing packages
 
@@ -326,12 +342,14 @@ uv remove numpy pandas matplotlib
 
 ## Terminal tips
 
+:::{.incremental}
 * Windows: use the **Miniforge Prompt**; macOS and Linux: any terminal
 * Arguments are separated by spaces; named ones start with `-` or `--`
 * Help: `-h`, `--help`, or `man <command>`
 * `Tab` completes commands and file names
 * `Up` and `Down` cycle through your command history
 * `Ctrl+C` cancels a running command; `q` quits a multi-page output
+:::
 
 ## Live coding: a throwaway environment {.live-coding}
 
@@ -404,26 +422,19 @@ uv sync     # rebuild .venv from pyproject.toml and uv.lock
 
 :::
 
+. . .
+
 * Commit the file to your repository with your code
 
 ## Lockfiles
 
+:::{.incremental}
 * An environment file says what you **asked for**: `numpy=2.5`
 * A **lockfile** records the exact version of **every** package, dependencies included
     * Rebuilds the same environment, months later, on another machine
-* `uv` and `pixi` write one automatically (`uv.lock`, `pixi.lock`)
-* `conda` needs an extra tool (`conda-lock`)
-
-## Which tool?
-
-| | Environment in | Describe with | Lockfile | Non-Python deps |
-|---|---|---|---|---|
-| **venv + pip** | `.venv/` | `requirements.txt` | no | no |
-| **uv** | `.venv/` | `pyproject.toml` | `uv.lock` | no |
-| **conda** | central `envs/` | `environment.yml` | via conda-lock | **yes** |
-| **pixi** | `.pixi/` | `pixi.toml` | `pixi.lock` | **yes** |
-
-* No single right answer: pick one per project and write it down
+* `uv` writes one automatically (`uv.lock`, `pixi.lock`)
+* `conda` needs an extra tool (`conda-lock`) (sometimes)
+:::
 
 ## Your turn {.exercise-slide}
 
@@ -444,46 +455,39 @@ Leave the course environment `scientific-python` alone: only work on the throwaw
 ## The scientific Python ecosystem
 
 ::: {.stack}
-::: {.layer-domain}
+::: {.layer-domain .fragment fragment-index=4}
 **Domain packages:** scikit-image · scikit-learn · napari · MNE · BrainGlobe · astropy · …
 :::
-::: {.layer-tools}
+::: {.layer-tools .fragment fragment-index=3}
 **Data and plotting:** pandas · xarray · dask · Matplotlib · seaborn
 :::
-::: {.layer-core}
+::: {.layer-core .fragment fragment-index=2}
 **Core numerics:** NumPy (arrays) · SciPy (algorithms)
 :::
-::: {.layer-base}
-**Interactive environments:** IPython · Jupyter · VS Code &nbsp;&nbsp;|&nbsp;&nbsp; **Python** itself
+::: {.layer-base .fragment fragment-index=1}
+**Interactive environments:** IPython · Jupyter &nbsp;&nbsp;|&nbsp;&nbsp; **Python** itself
 :::
 :::
 
 <br>
 
+::: {.fragment fragment-index=5}
 * Almost everything above NumPy **takes and returns NumPy arrays**
+:::
 
 ::: {.source-note}
 After SPL, [Python scientific computing ecosystem](https://lectures.scientific-python.org/intro/intro.html).
 :::
 
-## Arrays everywhere
-
-![](img/python-ecosystem.png){width="100%" fig-alt="Logos of array libraries (JAX, xarray, dask, CuPy, NumPy, MXNet, PyTorch, TensorFlow), each above the packages built on it"}
-
-* Each column: an array library, and the packages built on it
-* NumPy's way of indexing and broadcasting carries over to all of them
-
-::: {.source-note}
-Aaron Meurer, [Python Array API Standard](https://www.youtube.com/watch?v=16rB-fosAWw), SciPy 2023.
-:::
-
 ## What is an array?
 
+:::{.incremental}
 * A grid of values, all of the **same type**
 * Stored in one **block of memory**
     * Fast: operations run in compiled code, not Python
 * Has a **shape**: how many values along each axis
-    * 1-D: a time series, 2-D: an image or a table, 3-D: a volume or a movie
+    * 1-D: a time series, 2-D: an image or a table, 3-D: a volume
+:::
 
 ## Lists versus arrays
 
@@ -514,18 +518,28 @@ arr * 2
 ## Creating arrays
 
 ```{python}
+#| output-location: fragment
 np.arange(6)                 # like range()
 ```
 
+. . .
+
 ```{python}
+#| output-location: fragment
 np.linspace(0, 1, 5)         # 5 evenly spaced points, end included
 ```
 
+. . .
+
 ```{python}
+#| output-location: fragment
 np.zeros((2, 3))             # also np.ones, np.full
 ```
 
+. . .
+
 ```{python}
+#| output-location: fragment
 rng = np.random.default_rng(seed=0)
 rng.random((2, 3))           # uniform in [0, 1)
 ```
@@ -533,50 +547,132 @@ rng.random((2, 3))           # uniform in [0, 1)
 ## Shape, dimensions and dtype
 
 ```{python}
+#| output-location: fragment
 a = np.arange(12).reshape(3, 4)
 a
 ```
 
+::: {.fragment}
+* `reshape` gives the same values a new shape
+:::
+
+. . .
+
+:::: {.columns}
+::: {.column width="50%"}
 ```{python}
-a.shape, a.ndim, a.size, a.dtype
+#| output-location: fragment
+a.shape
 ```
 
-* `reshape` gives the same values a new shape
+::: {.fragment}
 * `shape` is a tuple: `(rows, columns)` for 2-D
+:::
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+a.ndim
+```
+:::
+:::
+::: {.column width="50%"}
+::: {.fragment}
+```{python}
+#| output-location: fragment
+a.size
+```
+:::
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+a.dtype
+```
+:::
+:::
+::::
 
 ## dtypes
 
+:::{.incremental}
 * Every element has the same **dtype**: `int64`, `float64`, `uint8`, `bool`, ...
 * NumPy picks one for you, or you choose with `dtype=`
 * Convert with `.astype()`
+:::
 
+. . .
+
+:::: {.columns}
+::: {.column width="50%"}
 ```{python}
-np.array([1, 2, 3]).dtype, np.array([1, 2, 3.5]).dtype
+#| output-location: fragment
+np.array([1, 2, 3]).dtype
 ```
+:::
+::: {.column width="50%"}
+::: {.fragment}
+```{python}
+#| output-location: fragment
+np.array([1, 2, 3.5]).dtype
+```
+:::
+:::
+::::
+
+. . .
 
 * Small types wrap around silently. Images are often `uint8` (0 to 255):
 
 ```{python}
+#| output-location: fragment
 np.array([200, 250], dtype=np.uint8) + 100
 ```
 
 ## Indexing and slicing
 
+:::{.incremental}
 * `start:stop:step`, stop **excluded**, counting from 0
 * Negative indices count from the end
 * In 2-D: `a[row, column]`, and `:` means "all"
+:::
 
+. . .
+
+:::: {.columns}
+::: {.column width="40%"}
 ```{python}
 a
 ```
-
+:::
+::: {.column width="60%"}
 ```{python}
-a[1, 2], a[-1], a[:, 1]
+#| output-location: fragment
+a[1, 2]
 ```
 
+::: {.fragment}
 ```{python}
+#| output-location: fragment
+a[-1]
+```
+:::
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+a[:, 1]
+```
+:::
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
 a[:2, 1:3]
 ```
+:::
+:::
+::::
 
 ## Live coding: creating and slicing arrays {.live-coding}
 
@@ -639,6 +735,8 @@ a
 
 :::
 
+. . .
+
 * Check with `np.shares_memory(a, b)`
 
 ## In place, or a new array?
@@ -667,47 +765,101 @@ c = np.clip(a, 0, 10)
 
 :::
 
+. . .
+
 * Most NumPy **functions** return a new array; **assignment into** `a[...]` and `+=` change it in place
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing, views and in-place changes**
+Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing**
 
 * A real recording: a Neuropixels probe in a mouse brain [@ibl_bwm_dandi]
 * Fetch time windows from chosen channels, and trials from 3-D spike counts
-* Change part of a recording, with and without changing the original
-* Fix a function that changes its input by accident
-* Fix two dtype problems in the raw `int16` data
 
-**15 minutes**
+**10 minutes**. **Stretch** (section 5): views and copies, a function that changes its input by accident, `int16` pitfalls
 
 ## Universal functions (ufuncs)
 
+:::{.incremental}
 * Act **element by element**, in compiled code
 * Arithmetic: `+`, `-`, `*`, `/`, `**`
 * Maths: `np.sqrt`, `np.exp`, `np.log`, `np.sin`, `np.abs`, ...
 * Comparisons: `<`, `==`, ... give `bool` arrays
+:::
+
+. . .
 
 ```{python}
+#| output-location: fragment
 x = np.array([1.0, 4.0, 9.0])
-np.sqrt(x), x * 2 + 1, x > 3
+np.sqrt(x)
 ```
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.fragment}
+```{python}
+#| output-location: fragment
+x * 2 + 1
+```
+:::
+:::
+::: {.column width="50%"}
+::: {.fragment}
+```{python}
+#| output-location: fragment
+x > 3
+```
+:::
+:::
+::::
 
 ## Aggregations and `axis`
 
+:::: {.columns}
+::: {.column width="40%"}
 ```{python}
+#| output-location: fragment
 m = np.arange(6).reshape(2, 3)
 m
 ```
 
+::: {.fragment}
 ```{python}
-m.sum(), m.sum(axis=0), m.sum(axis=1)
+#| output-location: fragment
+m.sum()
+```
+:::
+:::
+::: {.column width="60%"}
+::: {.fragment}
+```{python}
+#| output-location: fragment
+m.sum(axis=0)
 ```
 
+::: {.fragment}
 * `axis=0` collapses the **rows**: one result per column
+:::
+:::
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+m.sum(axis=1)
+```
+
+::: {.fragment}
 * `axis=1` collapses the **columns**: one result per row
+:::
+:::
+:::
+::::
+
+:::{.incremental}
 * Also `mean`, `std`, `min`, `max`, `argmin`, `argmax`, `any`, `all`, `cumsum`
 * `np.nanmean` and friends ignore missing values (`NaN`)
+:::
 
 ## Live coding: aggregations along an axis {.live-coding}
 
@@ -739,55 +891,78 @@ scores / 100              # int -> float
 
 Arrays of different shapes combine by **stretching** axes of size 1.
 
+. . .
+
 **Rules**, comparing shapes from the right:
 
+:::{.incremental}
 1. Pad the shorter shape with 1s on the left
 2. Two sizes match if they are equal, or one of them is 1
 3. Size-1 axes are stretched to fit
+:::
 
 <br>
 
+:::{.incremental}
 * `(3, 1)` with `(4,)` → `(3, 4)` ✓
 * `(3, 2)` with `(3,)` → ✗ error
+:::
 
 ## Broadcasting in practice
 
 ```{python}
+#| output-location: fragment
 col = np.arange(3)[:, np.newaxis]  # (3, 1)
 row = np.arange(4)                 # (4,)
 col * 10 + row                     # (3, 4)
 ```
 
+:::{.incremental}
 * `np.newaxis` (or `None`) adds an axis of size 1
-* Centre every column of a table at once: `X - X.mean(axis=0)`
-* Scale every row: `X / X.sum(axis=1, keepdims=True)`
+:::
 
 ## Your turn {.exercise-slide}
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 2: aggregations and broadcasting**
 
 * Summarise spike counts (unit × trial × bin) along one axis, or several
-* Distances between recording sites, re-referencing and baseline correction by broadcasting, no loops
+* Re-referencing and baseline correction by broadcasting
 * Fix a broadcasting error
+* Build the table that scikit-learn needs this afternoon
 
-**12 minutes**
+**12 minutes**. **Stretch:** distances between recording sites
 
 ## Boolean masks
 
 * A comparison gives a `bool` array: a **mask**
+
+```{python}
+#| output-location: fragment
+x = np.array([3, -8, 1, 9, -4])
+mask = x < 0
+mask
+```
+
+. . .
+
 * Index with the mask to **fetch** matching values (a copy)
+
+```{python}
+#| output-location: fragment
+x[mask]
+```
+
+. . .
+
 * Assign through the mask to **change** them in place
 
 ```{python}
-x = np.array([3, -8, 1, 9, -4])
-mask = x < 0
-mask, x[mask]
-```
-
-```{python}
+#| output-location: fragment
 x[mask] = 0
 x
 ```
+
+. . .
 
 * Combine with `&`, `|`, `~` (not `and`/`or`), with brackets around each comparison
 
@@ -822,20 +997,31 @@ week = temps.reshape(2, 7)
 
 ## Fancy indexing
 
+:::{.incremental}
 * Index with **arrays of integers** to pick any elements, in any order
 * Always returns a **copy**; assigning through it changes the original
+:::
+
+. . .
 
 ```{python}
+#| output-location: fragment
 x = np.arange(10, 20)
 x[[0, 2, 2, -1]]
 ```
 
+. . .
+
 ```{python}
+#| output-location: fragment
 M = np.arange(9).reshape(3, 3)
 M[[0, 1, 2], [2, 1, 0]]   # pairs (0,2) (1,1) (2,0)
 ```
 
+. . .
+
 ```{python}
+#| output-location: fragment
 M[[0, 2]]                 # rows 0 and 2
 ```
 
@@ -868,7 +1054,9 @@ def sum_of_squares_numpy(values):
 
 :::
 
-* **Measure before optimising**: `%timeit` for one line, `%%timeit` for a whole cell
+. . .
+
+* **Measure before optimising**: `%timeit` for one line, `%%timeit` for a whole cell in Jupyter or IPython
 
 ::: {.source-note}
 PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html). Timings measured on an Apple-silicon laptop; yours will differ.
@@ -876,201 +1064,302 @@ PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHan
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks, fancy indexing and vectorising**
+Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks and vectorising**
 
 * Response times: select trials by condition, and replace outliers with `NaN`
-* Select channels by brain area and layer with masks
-* Fancy indexing: each unit's brain area, reordering trials, colouring channels
+* Select channels by brain area with masks
 * Time a loop against NumPy on the LFP
-* **Data statistics** (after SPL Ex. 23): response times, peak times, busiest units, **no for-loops**
+* The mouse's **psychometric curve**, block by block, **without a loop**
 
-**20 minutes**. **Stretch:** a 3-D integral by broadcasting (SPL Ex. 24); Markov chain (SPL Ex. 26)
+**15 minutes**. **Stretch:** fancy indexing, data statistics (after SPL Ex. 23)
 
-Background reading: PDSH chapter 2 [@pdsh]
+## Checking your work with a plot
+
+:::: {.columns}
+::: {.column width="55%"}
+```{python}
+#| output-location: fragment
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 10, 50)
+
+fig, ax = plt.subplots(figsize=(5, 3))
+ax.plot(x, np.sin(x), "o-", label="sine")
+ax.plot(x, np.cos(x), label="cosine")
+ax.set_xlabel("x")
+ax.set_ylabel("value")
+ax.legend();
+```
+:::
+::: {.column width="45%"}
+:::{.incremental}
+* A column of numbers is hard to judge; a plot is easy
+* `fig, ax = plt.subplots()`: a figure with one set of axes
+* `ax.plot(x, y)` draws a line; `"o-"` adds markers
+* Labels and a legend, and that's all for today
+* Tomorrow: Matplotlib properly
+:::
+:::
+::::
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with a plot**
+
+* Plot the psychometric curve in each kind of block
+* Does the picture agree with what you concluded from the numbers?
+
+**5 minutes**
+
 
 ## Break {background-color="#1E1E1E"}
 
 10 minutes
 
-# pandas {background-color="#03A062"}
+# SciPy {background-color="#03A062"}
 
-![](img/pandas_logo.svg){height="160px" fig-alt="pandas logo"}
+## What lives where
 
-## What is pandas?
+| Submodule | For |
+|---|---|
+| `scipy.signal` | Filtering, spectra, peak finding |
+| `scipy.fft` | Fourier transforms |
+| `scipy.stats` | Distributions, statistical tests |
+| `scipy.optimize` | Fitting (`curve_fit`), minimising, root finding |
+| `scipy.ndimage` | N-D image filters, morphology, measurements |
 
-* Tables of data, built on NumPy
-* **DataFrame**: a table of named columns sharing one row **index**
-    * Each column is a NumPy array with its own dtype
-* **Series**: one column on its own, with the index
-* Reads and writes CSV, Excel, Parquet, SQL, ...
+:::{.incremental}
+* `import scipy as sp`, then `sp.signal.butter`, `sp.stats.ttest_ind`, ...
+* Also `interpolate`, `integrate`, `linalg`, `sparse`, `spatial`
+* **Check SciPy before writing an algorithm yourself**
+:::
 
-## Reading a CSV file
+## Fourier transforms
 
-```{python}
-import pandas as pd
+:::{.incremental}
+* Any signal is a sum of waves of different frequencies
+* The **spectrum** shows how much of each frequency there is
+* Periodic noise shows up as isolated peaks
+    * Remove them, then transform back
+* `sp.fft` has the forward and inverse transforms, in 1-D, 2-D and N-D
+:::
 
-data = pd.read_csv("data/gapminder_gdp_europe.csv", index_col="country")
-data.iloc[:3, :4].round()
-```
+## Live coding: removing mains hum {.live-coding}
 
-* `index_col`: the column that becomes the row labels
-* `pd.read_excel`, `data.to_csv(...)` for other formats and for writing
-
-## Inspecting a DataFrame
-
-* `data.head()`: the first few rows
-* `data.info()`: columns, dtypes, missing values
-* `data.describe()`: summary statistics per column
-* `data.shape`, `data.columns`, `data.index`
-* `data.T`: rows and columns swapped
-
-## Live coding: gapminder {.live-coding}
-
-* Read the European GDP table
-* Inspect it: `head`, `info`, `describe`
-* Look at the index and the columns
-* Get one column as a Series
+* A slow 3 Hz signal plus 50 Hz hum and noise
+* Its spectrum: where is the hum?
+* Zero the hum, transform back, compare
 
 ::: {.notes}
 ```python
-import pandas as pd
+import scipy as sp
 
-data = pd.read_csv("data/gapminder_gdp_europe.csv")
-data.head()                        # country is just a column
+fs = 500                                     # samples per second
+t = np.arange(0, 2, 1 / fs)
+rng = np.random.default_rng(0)
+clean = np.sin(2 * np.pi * 3 * t)
+recorded = clean + 0.8 * np.sin(2 * np.pi * 50 * t) + rng.normal(0, 0.2, t.size)
 
-data = pd.read_csv("data/gapminder_gdp_europe.csv", index_col="country")
-data.head()
-data.info()
-data.describe()
-data.shape
-data.columns
-data.index
+spectrum = sp.fft.rfft(recorded)
+freqs = sp.fft.rfftfreq(t.size, d=1 / fs)
+fig, ax = plt.subplots()
+ax.plot(freqs, np.abs(spectrum))
+ax.set_xlabel("frequency (Hz)")             # peaks at 3 and 50
 
-data["gdpPercap_2007"]             # a Series
-type(data["gdpPercap_2007"])
-data["gdpPercap_2007"].max()
-data["gdpPercap_2007"].sort_values().tail(3)   # sorted, labels kept
-data.T.head()
+spectrum[np.abs(freqs - 50) < 2] = 0        # a mask on the frequencies
+filtered = sp.fft.irfft(spectrum, n=t.size)
+
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.plot(t, recorded, alpha=0.4, label="recorded")
+ax.plot(t, filtered, label="hum removed")
+ax.legend()
 ```
 :::
-
-## Selecting with `iloc` and `loc`
-
-::: {.panel-tabset}
-
-### `iloc`: by position
-
-```{python}
-data.iloc[0:2, 0:2].round()
-```
-
-* End **excluded**, as in NumPy
-
-### `loc`: by label
-
-```{python}
-data.loc["Albania":"Austria", "gdpPercap_1952":"gdpPercap_1957"].round()
-```
-
-* End **included**
-
-:::
-
-* `data["gdpPercap_2007"]` is the shortcut for one column
-* `:` means "all rows" or "all columns"
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day1_04_pandas.ipynb]{.notebook}. The exercises follow the Software Carpentry gapminder lesson [@swc_gapminder], on the recording's trials and units tables.
+Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 1: filtering with the FFT** (after SPL Ex. 42)
 
-1. **Reading tabular data** (10 min): read tables from the HDF5 file, inspect them, write and read back a CSV
-2. **Selecting data** (15 min): individual values, slices, `idxmin`/`idxmax`, selection practice
+* The same idea on real data: find the **60 Hz** mains hum (US recording) and its harmonics in the LFP's spectrum, and remove them
 
-## Boolean masks
+**8 minutes**
 
-* The same idea as NumPy masks, but rows keep their labels
+## Filtering with `scipy.signal`
 
+:::: {.columns}
+::: {.column width="55%"}
 ```{python}
-rich = data["gdpPercap_2007"] > 40000
-data.loc[rich, ["gdpPercap_1952", "gdpPercap_2007"]].round()
-```
+#| output-location: fragment
+import scipy as sp
 
-* Combine conditions with `&`, `|` and `~`, with brackets around each comparison
-* `rich.sum()` counts the matching rows; `data[rich]` keeps them
+fs = 500
+t = np.arange(0, 2, 1 / fs)
+rng = np.random.default_rng(0)
+noisy = np.sin(2 * np.pi * 3 * t) + rng.normal(0, 0.5, t.size)
 
-## Group by: split, apply, combine
+sos = sp.signal.butter(4, 10, btype="lowpass",
+                       fs=fs, output="sos")
+smooth = sp.signal.sosfiltfilt(sos, noisy)
 
-* **Split** rows into groups by the values in one column
-* **Apply** a function to each group: `mean`, `count`, `idxmax`, ...
-* **Combine** the results into a table indexed by group
-
-```{python}
-all_countries = pd.read_csv("data/gapminder_all.csv", index_col="country")
-all_countries.groupby("continent")["lifeExp_2007"].mean().round(1)
-```
-
-## Live coding: masks and group by {.live-coding}
-
-* Select countries by a condition on one column
-* Add a new column computed from others
-* Group by continent and summarise
-* Several summaries at once with `.agg`
-
-::: {.notes}
-```python
-all_countries = pd.read_csv("data/gapminder_all.csv", index_col="country")
-all_countries.head()
-
-long_lived = all_countries["lifeExp_2007"] > 80
-long_lived.sum()
-all_countries.loc[long_lived, ["continent", "lifeExp_2007"]]
-
-all_countries["lifeExp_gain"] = all_countries["lifeExp_2007"] - all_countries["lifeExp_1952"]
-all_countries["lifeExp_gain"].sort_values().tail()
-
-grouped = all_countries.groupby("continent")
-grouped["lifeExp_2007"].mean()
-grouped["lifeExp_2007"].agg(["count", "median", "max"])
-grouped["gdpPercap_2007"].idxmax()     # richest country per continent
-grouped["lifeExp_gain"].median().sort_values()
+fig, ax = plt.subplots(figsize=(5, 2.5))
+ax.plot(t, noisy, color="lightgrey")
+ax.plot(t, smooth);
 ```
 :::
+::: {.column width="45%"}
+:::{.incremental}
+* **Design** a filter: `butter`, `iirnotch`, ... (cut-offs in Hz with `fs=`)
+* **Apply** it: `sosfiltfilt` (or `filtfilt` for `b, a`)
+* `filtfilt` runs forwards then backwards: **no delay**
+* `axis=` filters every channel at once
+:::
+:::
+::::
 
-## Several summaries at once
+## Your turn {.exercise-slide}
 
-```{python}
-all_countries.groupby("continent")["lifeExp_2007"].agg(["count", "median", "max"]).round(1)
-```
+Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 2: filtering with `scipy.signal`**
 
-* `.agg` takes a list of function names
-* `.sort_values()` to order the result
-* `.idxmax()` per group gives the label of the largest row
+* A 60 Hz notch filter: what does it remove that the FFT version did not?
+* A 1-30 Hz band-pass filter on one channel, then on all 384, with no loop
+
+**8 minutes**. **Stretch:** a smoother spectrum with `welch`, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)
 
 ::: {.source-note}
-Beyond today: missing data, `merge`/`join` and reshaping with `melt` are stretch material in the notebook (PDSH chapter 3).
+Exercises adapted from Scientific Python Lectures [@spl].
+:::
+
+# scikit-learn {background-color="#03A062"}
+
+## What is scikit-learn?
+
+:::{.incremental}
+* Machine learning in Python, built on NumPy and SciPy
+* **Supervised**: learn to predict `y` from `X` (classification, regression)
+* **Unsupervised**: find structure in `X` alone (clustering, dimensionality reduction)
+* Every model has the **same interface**: learn it once
+:::
+
+## `X` and `y`
+
+:::{.incremental}
+* `X`: a 2-D array, **one row per sample**, **one column per feature**
+    * Here: one row per trial; contrast and block as the features
+* `y`: a 1-D array, one answer per sample
+    * Here: did the mouse choose right?
+* `X` must be 2-D even with one feature: `X[:, :1]`, not `X[:, 0]`
+:::
+
+## The estimator pattern
+
+:::: {.columns}
+::: {.column width="55%"}
+```{python}
+#| output-location: fragment
+from sklearn.linear_model import LogisticRegression
+
+rng = np.random.default_rng(0)
+hours = rng.uniform(0, 10, size=(100, 1))     # X: 100 x 1
+passed = hours[:, 0] + rng.normal(0, 2, 100) > 5   # y
+
+model = LogisticRegression()
+model.fit(hours, passed)
+model.predict([[2.0], [8.0]])
+```
+
+::: {.fragment}
+```{python}
+#| output-location: fragment
+model.predict_proba([[2.0], [8.0]]).round(2)
+```
+:::
+:::
+::: {.column width="45%"}
+:::{.incremental}
+* **Make** the model, with its settings
+* **`fit(X, y)`** learns from the data
+* **`predict(X)`** for new samples
+* **`predict_proba(X)`**: one column per class, in the order of `model.classes_`
+* Learned values end in `_`: `model.coef_`
+:::
+:::
+::::
+
+## Train and test
+
+:::{.incremental}
+* A model scored on the data it learned from looks better than it is
+* Hold some samples back: **fit** on the training set, **score** on the test set
+* Compare with a **baseline**, such as always guessing the most common answer
+* **Cross-validation** repeats the split several ways: `cross_val_score`
+:::
+
+. . .
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=0)
+model.fit(X_train, y_train)
+model.score(X_test, y_test)          # fraction correct
+```
+
+## Live coding: hours of study {.live-coding}
+
+* The pass/fail data from the slide: split, fit, score
+* Compare with the baseline
+* `coef_`, then `predict_proba` on a grid, plotted over the data
+
+::: {.notes}
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+rng = np.random.default_rng(0)
+hours = rng.uniform(0, 10, size=(100, 1))
+passed = hours[:, 0] + rng.normal(0, 2, 100) > 5
+hours.shape, passed.shape
+
+h_train, h_test, p_train, p_test = train_test_split(hours, passed, test_size=0.25, random_state=0)
+model = LogisticRegression().fit(h_train, p_train)
+model.score(h_train, p_train), model.score(h_test, p_test)
+max(p_test.mean(), 1 - p_test.mean())      # baseline
+
+model.coef_, model.intercept_, model.classes_
+grid = np.linspace(0, 10, 101)[:, np.newaxis]   # 2-D!
+fig, ax = plt.subplots()
+ax.plot(hours[:, 0], passed, "o", alpha=0.4)
+ax.plot(grid[:, 0], model.predict_proba(grid)[:, 1])
+```
 :::
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day1_04_pandas.ipynb]{.notebook}
+Open [notebooks/day1_05_sklearn.ipynb]{.notebook}
 
-1. **Boolean masks** (5 min): the end of section 2, on the units, combining text and number conditions
-2. **Group by** (15 min): the mouse's psychometric curve, block by block, then **one grouping question of your own**
+1. **Fit a model** (10 min): predict the mouse's choice from contrast and block; score it on held-out trials against a baseline
+2. **Look inside** (10 min): what do the coefficients say about the mouse? Plot the model's curves over this morning's psychometric curve
 
-**Stretch:** Many Ways of Access; merging units with electrodes, and reshaping (PDSH)
+**Stretch:** a better feature, whether the block helps (cross-validation), decoding the choice from the neurons
+
+::: {.source-note}
+[scikit-learn user guide](https://scikit-learn.org/stable/user_guide.html); SPL, [scikit-learn: machine learning in Python](https://lectures.scientific-python.org/packages/scikit-learn/index.html).
+:::
 
 ## Wrap-up
 
+:::{.incremental}
 * **Environments:** one per project, described by a committed file
     * `environment.yml`, or `pyproject.toml` + `uv.lock`
 * **Arrays:** one dtype, a shape, and views versus copies
-* **In place or not:** `a[...] = ` and `+=` change the array; functions return new ones
-* **Vectorise:** ufuncs, aggregations along axes, broadcasting, masks
-* **Tables:** `read_csv`, `iloc` versus `loc`, masks, `groupby`
-* **Tomorrow:** plotting with Matplotlib and seaborn, then SciPy and image analysis
+* **Vectorise, don't loop:** ufuncs, aggregations along axes, broadcasting, masks
+* **SciPy:** check it before writing an algorithm; filters take an `axis`
+* **scikit-learn:** `X` is samples × features; `fit`, then score on held-out data against a baseline
+* **Tomorrow:** tables with pandas, then figures with Matplotlib and seaborn
+:::
 
 ::: {.source-note}
-Exercises adapted from Scientific Python Lectures [@spl] and the Software Carpentry gapminder lesson [@swc_gapminder], both CC BY 4.0. Further reading in the Python Data Science Handbook [@pdsh].
+Exercises adapted from Scientific Python Lectures [@spl] (CC BY 4.0). Further reading in the Python Data Science Handbook [@pdsh].
 :::
 
 ## References {.smaller}

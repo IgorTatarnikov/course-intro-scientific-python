@@ -23,7 +23,7 @@ in one of two ways:
 
   In the exercise notebook the block becomes ``...  # your code here``.
 
-Cells tagged ``no-execute`` (for example napari, which opens a window) are kept
+Cells tagged ``no-execute`` (for example one that opens a desktop window) are kept
 in both notebooks but skipped when the build executes them.
 
 Usage, from the repository root, inside the course environment plus jupytext::

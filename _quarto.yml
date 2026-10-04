@@ -1,7 +1,7 @@
 project:
   type: default
   output-dir: build
-  # Only the slide decks are rendered; notebooks, source/ and plan.md are not.
+  # Only the slide decks are rendered; notebooks, source/ are not.
   render:
     - index.qmd
     - day1.qmd
@@ -30,15 +30,9 @@ format:
     code-overflow: wrap
     highlight-style: atom-one
     css: styles.css
-    footer: "Introduction to Scientific Python"
+    footer: "Introduction to Scientific Python (https://neuroinformatics.dev/course-intro-scientific-python)"
     from: markdown+emoji   # enable emoji support
     mermaid:
       theme: neutral
       fontFamily: arial
       curve: linear
-    title-slide-attributes:
-      data-background-color: "#000000"
-      data-background-image: "img/swc-building.jpg"
-      data-background-size: "cover"
-      data-background-position: "center"
-      data-background-opacity: "0.6"

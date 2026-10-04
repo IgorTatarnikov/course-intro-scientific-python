@@ -15,7 +15,8 @@
 # follow [Scientific Python Lectures, Matplotlib:
 # plotting](https://lectures.scientific-python.org/intro/matplotlib/index.html)
 # (CC BY 4.0), which builds the same figures from sines and random numbers. We
-# use the object-oriented style (`fig, ax = plt.subplots()`) throughout; SPL
+# use the object-oriented style (`fig, ax = plt.subplots()`, as you did
+# yesterday to check your results) throughout; SPL
 # mostly uses the `plt.` functions, and the [Matplotlib
 # docs](https://matplotlib.org/stable/users/explain/figure/api_interfaces.html)
 # explain the difference.
@@ -300,7 +301,7 @@ ax.set_ylabel("unit, deepest first");
 # %% [markdown]
 # ## 4. Stretch
 #
-# ### The population response (part 6 of Day 1's data statistics)
+# ### The population response (part 6 of the data statistics in Day 1's NumPy)
 #
 # Plot the mean firing rate of all 51 units (in spikes per second: divide the
 # mean count by the 0.05 s bin width) against time from the stimulus, once for

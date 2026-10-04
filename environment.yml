@@ -13,16 +13,10 @@ dependencies:
   - python=3.12
   - numpy=2.5
   - scipy=1.18
+  - scikit-learn=1.9
   - pandas=2.3
   - matplotlib=3.11
   - seaborn=0.13
-  - scikit-image=0.26
-  - xarray=2026.9
-  - netcdf4=1.7
   - h5py=3.16
-  - dask=2026.8
-  - napari=0.9
-  - pyqt=5.15
   - jupyterlab=4.6
   - ipykernel=6.31
-  - pooch=1.9

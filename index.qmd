@@ -1,24 +1,25 @@
 ---
 title: Introduction to Scientific Python
-subtitle: Two days, from NumPy arrays to image analysis
+subtitle: Igor Tatarnikov
 author: SWC/GCNU Neuroinformatics Unit
-date: today
+date: 2026-10-05 & 2026-10-06
 ---
 
 ## The two days
 
 | Day | Topics | Slides |
 |-----|--------|--------|
-| 1 | Setup and help · packages and environments · NumPy · pandas | [Day 1](day1.html) |
-| 2 | Matplotlib · seaborn · SciPy · scikit-image · xarray, dask and napari | [Day 2](day2.html) |
+| 1 | Setup and help · packages and environments · NumPy · SciPy · scikit-learn | [Day 1](day1.html) |
+| 2 | pandas · Matplotlib · seaborn · capstone · where to go next | [Day 2](day2.html) |
 
 Each day runs **3 hours**, with a 10-minute break. Every block starts with a few minutes of slides, then exercises.
 
-## Before Day 1
+## Setup
 
 1. Install [Miniforge](https://conda-forge.org/download/), which gives you `conda` with conda-forge as the default channel.
-2. Get the course materials: `git clone` the course repository, or download it as a ZIP.
-3. In a terminal, from the course folder:
+2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv).
+3. Get the course materials: `git clone` the course repository, or [download](https://github.com/IgorTatarnikov/course-intro-scientific-python/archive/main.zip) it as a ZIP.
+4. In a terminal, from the extracted or cloned course folder:
 
 ```bash
 conda env create -f environment.yml
@@ -26,9 +27,7 @@ conda activate scientific-python
 python check_setup.py
 ```
 
-Every line should say `OK`. If not, send the output to the instructors **before** Day 1.
-
-**Bring your own laptop:** napari (end of Day 2) opens a desktop window, so it will not work on JupyterHub or a remote server.
+Every line should say `OK`.
 
 ## How the exercises work
 
@@ -37,7 +36,7 @@ Every line should say `OK`. If not, send the output to the instructors **before*
 **In the repository**
 
 - `notebooks/`: the exercises
-- `solutions/`: worked solutions, released after each block
+- `solutions/`: worked solutions
 - `data/`: every dataset we use, so nothing downloads during class
 :::
 ::: {.column width="50%"}

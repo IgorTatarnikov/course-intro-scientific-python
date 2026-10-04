@@ -1,13 +1,17 @@
 # %% [markdown]
 # # Day 2 · seaborn
 #
-# **Block:** seaborn (15 min)
+# **Block:** seaborn (25 min)
 #
-# The first part is a **live demo**: follow along, run the cells and change
-# things. The demo mirrors the Python Data Science Handbook's [Visualization
-# with Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
-# but uses the trials and units tables of our recording from Day 1. Then make
-# **one plot of your own**.
+# The first part is a **live demo** (10 min): follow along, run the cells and
+# change things. The demo mirrors the Python Data Science Handbook's
+# [Visualization with
+# Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
+# but uses the tidy tables you made in the pandas block. Then it is your turn:
+#
+# 1. **The psychometric curve** (5 min), straight from the trials table, with
+#    confidence intervals
+# 2. **One plot of your own** (10 min)
 #
 # The [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) and
 # [example gallery](https://seaborn.pydata.org/examples/index.html) are the best
@@ -24,7 +28,7 @@ sns.set_theme(style="whitegrid")
 
 
 def read_table(group):
-    """Read one group of ../data/ibl_session.h5 into a DataFrame (as on Day 1)."""
+    """Read one group of ../data/ibl_session.h5 into a DataFrame (as in the pandas block)."""
     with h5py.File("../data/ibl_session.h5") as f:
         columns = {}
         for name, values in f[group].items():
@@ -40,13 +44,11 @@ units = read_table("units")
 trials["chose_right"] = trials["choice"] == 1
 
 # %% [markdown]
-# ## Tidy ("long") data
-#
-# seaborn wants **one row per observation** and **one column per variable**.
-# `trials` (one row per trial) and `units` (one row per unit) are already tidy.
-# The spike counts are not: averaged over trials they make a "wide" table, one
-# row per unit and **one column per time bin**. `melt` turns it long, one row
-# per unit *and* time bin:
+# seaborn wants **tidy** tables: one row per observation and one column per
+# variable. `trials` and `units` already are. The cell below rebuilds
+# `rates_long` from part 4 of the pandas block (the mean firing rate of each
+# unit in each time bin, one row per unit and bin), and adds each unit's brain
+# area to it with `merge`.
 
 # %%
 with h5py.File("../data/ibl_session.h5") as f:
@@ -59,15 +61,9 @@ rates = pd.DataFrame(
     index=pd.Index(spike_unit, name="unit"),
     columns=(bin_start + 0.025).round(3),  # the centre of each bin
 )
-rates.iloc[:3, :6]
-
-# %%
 rates_long = rates.reset_index().melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
 rates_long = rates_long.merge(units[["unit", "area"]], on="unit")  # add each unit's area
 rates_long.head()
-
-# %%
-rates.shape, rates_long.shape
 
 # %% [markdown]
 # ## Demo
@@ -97,25 +93,9 @@ g.set(xscale="log", xlabel="Spike amplitude (µV, log scale)", ylabel="Height ab
 #
 # ### Averages, with uncertainty: `lineplot`
 #
-# Many trials share each contrast. seaborn **aggregates** them (mean by
-# default) and shades a 95% confidence interval. The mean of `chose_right` is
-# the fraction of rightward choices: the psychometric curve from Day 1, now with
-# error bands.
-#
-# Watch out: `probability_left` is a number, so as a `hue` seaborn would give it
-# a *continuous* colour scale, which makes the three blocks hard to tell apart.
-# Converting it to a string makes it a category with distinct colours.
-
-# %%
-trials["block"] = trials["probability_left"].astype(str)
-
-fig, ax = plt.subplots(figsize=(7, 4))
-sns.lineplot(data=trials, x="contrast", y="chose_right", hue="block", marker="o", ax=ax)
-ax.set(xlabel="Contrast (%; negative = left)", ylabel="Fraction of rightward choices");
-
-# %% [markdown]
-# The same works for the long spike-count table: one line per area, each the
-# mean over its units, with a band across units.
+# Many units share each time bin. seaborn **aggregates** them (mean by default)
+# and shades a 95% confidence interval: here one line per area, each the mean
+# over its units, with a band across units.
 
 # %%
 fig, ax = plt.subplots(figsize=(7, 4))
@@ -181,7 +161,37 @@ sns.lmplot(data=quick, x="strength", y="log_rt", x_jitter=1, scatter_kws={"alpha
 # with `g.figure` and `g.axes`. Customise and save it with the Matplotlib from
 # the previous block.
 #
-# ## Your turn: one plot of your own
+# ## Your turn
+#
+# ### 1. The psychometric curve, with confidence intervals
+#
+# The mean of `chose_right` at each contrast is the psychometric curve, so
+# `sns.lineplot` can draw it straight from `trials`, with no `groupby`: it
+# aggregates the trials at each contrast itself and adds a confidence interval.
+#
+# 1. Plot `chose_right` against `contrast`, one line per block (`hue=`), with a
+#    marker at each contrast. Label the axes.
+# 2. Watch out: `probability_left` is a number, so as a `hue` seaborn gives it a
+#    *continuous* colour scale, and the three blocks are hard to tell apart. Make
+#    a `block` column that holds it as a string, so it becomes a category with
+#    distinct colours, and plot again.
+# 3. Where are the confidence intervals widest, and why?
+
+# %% tags=["solution"]
+trials["block"] = trials["probability_left"].astype(str)
+
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.lineplot(data=trials, x="contrast", y="chose_right", hue="block", marker="o", ax=ax)
+ax.set(xlabel="Contrast (%; negative = left)", ylabel="Fraction of rightward choices");
+
+# %% [markdown] tags=["answer"]
+# Widest in the 0.5 block, which has only 10 trials at each contrast, and at
+# the contrasts that are rare in a block, such as -100% in right blocks (5
+# trials). The interval shrinks with the number of trials behind each point,
+# which the plain curve from the NumPy block did not show.
+
+# %% [markdown]
+# ### 2. One plot of your own
 #
 # Use `trials`, `units` or `rates_long` to make one seaborn plot that answers a
 # question **you** find interesting. Give it proper axis labels and save it to a

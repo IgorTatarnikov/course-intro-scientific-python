@@ -47,14 +47,6 @@ def fetch_gapminder() -> None:
             (DATA / Path(member).name).write_bytes(archive.read(member))
 
 
-def fetch_images() -> None:
-    """Dividing human cells (scikit-image, CC0)."""
-    import skimage.data
-    import skimage.io
-
-    skimage.io.imsave(DATA / "human_mitosis.png", skimage.data.human_mitosis())
-
-
 IBL_DANDISET = "000409"
 IBL_VERSION = "0.260309.1324"
 IBL_RAW = "99911f99-85d0-4f2d-bf3e-0cd15bee5bf7"  # sub-NYU-46 ..._desc-raw_ecephys.nwb (51 GB)
@@ -219,6 +211,5 @@ if __name__ == "__main__":
     DATA.mkdir(exist_ok=True)
     fetch_spl()
     fetch_gapminder()
-    fetch_images()
     fetch_ibl_session()
     print("Done:", sorted(p.name for p in DATA.iterdir()))

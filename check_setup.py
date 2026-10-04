@@ -16,21 +16,16 @@ from pathlib import Path
 PACKAGES = [
     ("numpy", "numpy"),
     ("scipy", "scipy"),
+    ("scikit-learn", "sklearn"),
     ("pandas", "pandas"),
     ("matplotlib", "matplotlib"),
     ("seaborn", "seaborn"),
-    ("scikit-image", "skimage"),
-    ("xarray", "xarray"),
-    ("netCDF4", "netCDF4"),
     ("h5py", "h5py"),
-    ("dask", "dask"),
-    ("napari", "napari"),
     ("jupyterlab", "jupyterlab"),
 ]
 
 DATA_FILES = [
     "ibl_session.h5",
-    "human_mitosis.png",
     "moonlanding.png",
     "gapminder_gdp_europe.csv",
     "gapminder_all.csv",
@@ -61,18 +56,6 @@ def check_data() -> bool:
     return ok
 
 
-def check_napari() -> bool:
-    """napari needs a working Qt backend to open a window."""
-    try:
-        from qtpy import QtCore  # noqa: F401
-
-        print("  OK       Qt backend for napari")
-        return True
-    except Exception as err:  # Qt failures raise a variety of error types
-        print(f"  FAILED   Qt backend for napari: {err}")
-        return False
-
-
 if __name__ == "__main__":
     print(f"Python {sys.version.split()[0]} at {sys.executable}\n")
     if sys.version_info < (3, 11):
@@ -81,8 +64,6 @@ if __name__ == "__main__":
     results = [check_packages()]
     print("\nData files:")
     results.append(check_data())
-    print("\nnapari:")
-    results.append(check_napari())
 
     if all(results):
         print("\nAll good: you are ready for the course.")

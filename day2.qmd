@@ -1,5 +1,5 @@
 ---
-title: "Day 2: Plotting, SciPy and images"
+title: "Day 2: pandas and plotting"
 subtitle: Introduction to Scientific Python
 author: SWC/GCNU Neuroinformatics Unit
 date: today
@@ -18,14 +18,256 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 | Before the break | After the break |
 |------------------|-----------------|
-| **Matplotlib** (45 min) | **scikit-image**: count nuclei (45 min) |
-| **seaborn** (15 min) | **Whirlwind tour**: xarray, dask, napari (35 min) |
-| **SciPy** (25 min) | Wrap-up |
+| **pandas** (60 min) | **seaborn** (25 min) |
+| **Matplotlib** (45 min) | **Capstone**: one figure from two days (15 min) |
+| | Where to go next · wrap-up |
 
 <br>
 
-* Yesterday: arrays and tables
-* Today: **look** at them, run SciPy's algorithms on them, and segment a microscopy image
+:::{.incremental}
+* Yesterday: arrays, filtering them with SciPy, and a model with scikit-learn
+* Today: **tables** of the same recording, then **figures** of everything
+:::
+
+## Yesterday in one slide
+
+:::{.incremental}
+* **Arrays:** one dtype, a shape; index, slice and mask them
+* **Vectorise:** aggregations along an `axis`, broadcasting, no Python loops
+* **SciPy:** `sp.fft` and `sp.signal` filtered the mains hum out of the LFP
+* **scikit-learn:** `X` (trials × features) and `y`; `fit`, then `score` on held-out trials
+* **Psychometric curve:** masks and broadcasting; today it takes one `groupby` line
+:::
+
+# pandas {background-color="#03A062"}
+
+![](img/pandas_logo.svg){height="160px" fig-alt="pandas logo"}
+
+```{python}
+#| echo: false
+wide = pd.read_csv("data/gapminder_all.csv")
+gapminder = pd.wide_to_long(
+    wide, stubnames=["gdpPercap", "lifeExp", "pop"], i="country", j="year", sep="_"
+).reset_index()
+```
+
+## What is pandas?
+
+:::{.incremental}
+* Tables of data, built on NumPy
+* **DataFrame**: a table of named columns sharing one row **index**
+    * Each column is a NumPy array with its own dtype
+* **Series**: one column on its own, with the index
+* Reads and writes CSV, Excel, Parquet, SQL, ...
+:::
+
+## Reading a CSV file
+
+```{python}
+#| output-location: fragment
+import pandas as pd
+
+data = pd.read_csv("data/gapminder_gdp_europe.csv", index_col="country")
+data.iloc[:3, :4].round()
+```
+
+:::{.incremental}
+* `index_col`: the column that becomes the row labels
+* `pd.read_excel`, `data.to_csv(...)` for other formats and for writing
+:::
+
+## Inspecting a DataFrame
+
+:::{.incremental}
+* `data.head()`: the first few rows
+* `data.info()`: columns, dtypes, missing values
+* `data.describe()`: summary statistics per column
+* `data.shape`, `data.columns`, `data.index`
+* `data.T`: rows and columns swapped
+:::
+
+## Live coding: gapminder {.live-coding}
+
+* Read the European GDP table
+* Inspect it: `head`, `info`, `describe`
+* Look at the index and the columns
+* Get one column as a Series
+
+::: {.notes}
+```python
+import pandas as pd
+
+data = pd.read_csv("data/gapminder_gdp_europe.csv")
+data.head()                        # country is just a column
+
+data = pd.read_csv("data/gapminder_gdp_europe.csv", index_col="country")
+data.head()
+data.info()
+data.describe()
+data.shape
+data.columns
+data.index
+
+data["gdpPercap_2007"]             # a Series
+type(data["gdpPercap_2007"])
+data["gdpPercap_2007"].max()
+data["gdpPercap_2007"].sort_values().tail(3)   # sorted, labels kept
+data.T.head()
+```
+:::
+
+## Selecting with `iloc` and `loc`
+
+::: {.panel-tabset}
+
+### `iloc`: by position
+
+```{python}
+data.iloc[0:2, 0:2].round()
+```
+
+* End **excluded**, as in NumPy
+
+### `loc`: by label
+
+```{python}
+data.loc["Albania":"Austria", "gdpPercap_1952":"gdpPercap_1957"].round()
+```
+
+* End **included**
+
+:::
+
+:::{.incremental}
+* `data["gdpPercap_2007"]` is the shortcut for one column
+* `:` means "all rows" or "all columns"
+:::
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_01_pandas.ipynb]{.notebook}. The exercises follow the Software Carpentry gapminder lesson [@swc_gapminder], on the recording's trials and units tables.
+
+1. **Reading tabular data** (10 min): read tables from the HDF5 file, inspect them, write and read back a CSV
+2. **Selecting data** (15 min): individual values, slices, `idxmin`/`idxmax`, selection practice
+
+## Boolean masks
+
+* The same idea as NumPy masks, but rows keep their labels
+
+```{python}
+#| output-location: fragment
+rich = data["gdpPercap_2007"] > 40000
+data.loc[rich, ["gdpPercap_1952", "gdpPercap_2007"]].round()
+```
+
+:::{.incremental}
+* Combine conditions with `&`, `|` and `~`, with brackets around each comparison
+* `rich.sum()` counts the matching rows; `data[rich]` keeps them
+:::
+
+## Group by: split, apply, combine
+
+:::{.incremental}
+* **Split** rows into groups by the values in one column
+* **Apply** a function to each group: `mean`, `count`, `idxmax`, ...
+* **Combine** the results into a table indexed by group
+:::
+
+. . .
+
+```{python}
+#| output-location: fragment
+all_countries = pd.read_csv("data/gapminder_all.csv", index_col="country")
+all_countries.groupby("continent")["lifeExp_2007"].mean().round(1)
+```
+
+## Live coding: masks and group by {.live-coding}
+
+* Select countries by a condition on one column
+* Add a new column computed from others
+* Group by continent and summarise
+* Several summaries at once with `.agg`
+
+::: {.notes}
+```python
+all_countries = pd.read_csv("data/gapminder_all.csv", index_col="country")
+all_countries.head()
+
+long_lived = all_countries["lifeExp_2007"] > 80
+long_lived.sum()
+all_countries.loc[long_lived, ["continent", "lifeExp_2007"]]
+
+all_countries["lifeExp_gain"] = all_countries["lifeExp_2007"] - all_countries["lifeExp_1952"]
+all_countries["lifeExp_gain"].sort_values().tail()
+
+grouped = all_countries.groupby("continent")
+grouped["lifeExp_2007"].mean()
+grouped["lifeExp_2007"].agg(["count", "median", "max"])
+grouped["gdpPercap_2007"].idxmax()     # richest country per continent
+grouped["lifeExp_gain"].median().sort_values()
+```
+:::
+
+## Several summaries at once
+
+```{python}
+#| output-location: fragment
+all_countries.groupby("continent")["lifeExp_2007"].agg(["count", "median", "max"]).round(1)
+```
+
+:::{.incremental}
+* `.agg` takes a list of function names
+* `.sort_values()` to order the result
+* `.idxmax()` per group gives the label of the largest row
+:::
+
+::: {.source-note}
+Beyond today: missing data and `merge`/`join` are stretch material in the notebook (PDSH chapter 3).
+:::
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_01_pandas.ipynb]{.notebook}
+
+1. **Boolean masks** (5 min): the end of section 2, on the units, combining text and number conditions
+2. **Group by** (15 min): yesterday's psychometric curve in one line, checked against your NumPy version, then **one grouping question of your own**
+
+## Tidy ("long") data
+
+::: {.panel-tabset}
+
+### Wide
+
+```{python}
+wide.iloc[:3, :5].round()
+```
+
+* One column per measurement **and** year
+
+### Long
+
+```{python}
+gapminder[["country", "year", "lifeExp", "pop"]].head(3)
+```
+
+* One row per observation, one column per variable
+* `melt` (or `pd.wide_to_long`) converts; `pivot` goes back
+
+:::
+
+. . .
+
+* seaborn, after the break, wants long tables
+
+## Your turn {.exercise-slide}
+
+Open [notebooks/day2_01_pandas.ipynb]{.notebook}, **Part 4: tidy data**
+
+* Melt the psychometric curve, one column per block, into a long table
+* Melt the firing rates, one column per time bin, into one row per unit and bin
+
+**8 minutes**. **Stretch:** Many Ways of Access; merging units with electrodes (PDSH)
+
 
 # Matplotlib {background-color="#03A062"}
 
@@ -34,6 +276,7 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 :::: {.columns}
 ::: {.column width="50%"}
 ```{python}
+#| output-location: fragment
 t = np.linspace(0, 10, 200)
 env = np.exp(-t / 3)
 
@@ -47,9 +290,11 @@ ax.legend();
 ```
 :::
 ::: {.column width="50%"}
+:::{.incremental}
 * **Figure**: the whole canvas, saved to a file
 * **Axes**: one plot area; a figure can hold many
 * **Artists**: everything drawn (lines, text, ticks), each with properties you can change
+:::
 :::
 ::::
 
@@ -64,7 +309,7 @@ plt.plot(x, y)
 plt.xlabel("time (s)")
 ```
 :::
-::: {.column width="50%"}
+::: {.column width="50%" .fragment}
 **Object-oriented style**: says which axes
 
 ```python
@@ -77,8 +322,10 @@ ax.set_xlabel("time (s)")
 
 <br>
 
-* We use `fig, ax` throughout: it scales to many panels and works inside functions
+:::{.incremental}
+* You used `fig, ax` yesterday; we use it throughout: it scales to many panels and works inside functions
 * Most `plt.xlabel(...)` calls become `ax.set_xlabel(...)`
+:::
 
 ::: {.source-note}
 Matplotlib docs, [the two interfaces](https://matplotlib.org/stable/users/explain/figure/api_interfaces.html).
@@ -91,8 +338,10 @@ fig.savefig("figure.pdf")                                # vector: line plots, f
 fig.savefig("figure.png", dpi=300, bbox_inches="tight")  # raster: images, slides
 ```
 
+:::{.incremental}
 * The extension picks the format
 * `bbox_inches="tight"` trims the white border
+:::
 
 ## Live coding: a first figure {.live-coding}
 
@@ -131,9 +380,9 @@ plt.xlabel("time (s)")
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
+Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 
-* Build a figure of two LFP traces step by step, from Day 1's recording [@ibl_bwm_dandi]
+* Build a figure of two LFP traces step by step, from the recording [@ibl_bwm_dandi]
 * Colours, limits, ticks at the stimuli, spines, legend, then save it
 * Step 7 (annotations) is optional
 
@@ -149,6 +398,8 @@ Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 | `ax.errorbar(x, y, yerr=...)` | Means with error bars |
 | `ax.imshow(array)` | Images and 2-D arrays |
 
+. . .
+
 * Several panels: `fig, axes = plt.subplots(1, 3)`, then `axes[0].plot(...)`
 
 ## Images and colormaps
@@ -156,6 +407,7 @@ Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 :::: {.columns}
 ::: {.column width="50%"}
 ```{python}
+#| output-location: fragment
 moon = plt.imread("data/moonlanding.png")
 
 fig, axes = plt.subplots(1, 2,
@@ -167,9 +419,11 @@ for ax in axes:
 ```
 :::
 ::: {.column width="50%"}
+:::{.incremental}
 * A 2-D grey image has no colour: `imshow` maps values through a **colormap**
 * Perceptually uniform maps (`viridis`, `gray`); diverging maps (`RdBu_r`) only for data centred on zero
 * `fig.colorbar(im, ax=ax)` shows the mapping
+:::
 :::
 ::::
 
@@ -207,45 +461,18 @@ ax.imshow(moon[100:250, 50:300], cmap="magma")   # a crop, another colormap
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Parts 2 and 3**
+Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Parts 2 and 3**
 
 * **Scatter and imshow** (after SPL Ex. 28 and 31): the units along the probe, and the whole LFP as an image
 * **Spike counts as an image**: normalise, crop and sort by depth
 
-**17 minutes**. **Stretch:** the population response (Day 1's data statistics, part 6), `subplot_mosaic` layouts, the LFP's envelope, more plot types
+**17 minutes**. **Stretch:** the population response (part 6 of the data statistics in Day 1's NumPy), `subplot_mosaic` layouts, the LFP's envelope, more plot types
+
+## Break {background-color="#1E1E1E"}
+
+10 minutes
 
 # seaborn {background-color="#03A062"}
-
-```{python}
-#| echo: false
-wide = pd.read_csv("data/gapminder_all.csv")
-gapminder = pd.wide_to_long(
-    wide, stubnames=["gdpPercap", "lifeExp", "pop"], i="country", j="year", sep="_"
-).reset_index()
-```
-
-## Tidy ("long") data
-
-::: {.panel-tabset}
-
-### Wide
-
-```{python}
-wide.iloc[:3, :5].round()
-```
-
-* One column per measurement **and** year
-
-### Long
-
-```{python}
-gapminder[["country", "year", "lifeExp", "pop"]].head(3)
-```
-
-* One row per observation, one column per variable
-* `pd.wide_to_long` or `melt` converts
-
-:::
 
 ## Statistical plots from DataFrames
 
@@ -264,10 +491,12 @@ sns.relplot(
 ).set(xscale="log")
 ```
 
+::: {.incremental}
 * Each argument maps a **column** to a visual property
 * Legends, colours and sizes come for free
 :::
-::: {.column width="50%"}
+:::
+::: {.column width="50%" .fragment fragment-index=1}
 ```{python}
 #| echo: false
 #| fig-width: 6
@@ -287,27 +516,27 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 ## When to reach for seaborn
 
+:::{.incremental}
 * **seaborn:** a tidy DataFrame; colour, size or panels by category; means with confidence intervals; distributions
 * **Plain Matplotlib:** arrays and images, custom layouts, unusual plot types
 * seaborn draws **with** Matplotlib: `ax=`, `fig.savefig` and the last block still apply
+:::
 
 ## Live coding: the seaborn tour {.live-coding}
 
-* Back to the recording: trials and units are already tidy; melt spike counts from wide to long
+* Back to the recording: `trials`, `units`, and `rates_long` from the pandas block
 * `relplot`: units by depth, amplitude, area and firing rate
-* `lineplot`: the psychometric curve per block, with confidence bands
+* `lineplot`: firing rate over time per brain area, with confidence bands
 * Distributions with `histplot` and `boxplot`, and one panel per brain area
 
 ::: {.notes}
-Follow the Demo section of `day2_02_seaborn.ipynb`, which loads `trials`, `units` and `rates_long` in its first cells.
+Follow the Demo section of `day2_03_seaborn.ipynb`, which loads `trials`, `units` and `rates_long` in its first cells.
 
 ```python
 g = sns.relplot(data=units, x="amplitude_uV", y="depth_um", hue="area",
                 size="firing_rate_Hz", sizes=(5, 300), alpha=0.6)
 g.set(xscale="log")
 
-trials["block"] = trials["probability_left"].astype(str)   # a category, not a number
-sns.lineplot(data=trials, x="contrast", y="chose_right", hue="block", marker="o")
 sns.lineplot(data=rates_long, x="time_s", y="rate_Hz", hue="area")
 
 sns.histplot(data=units[units["spike_width_ms"] > 0], x="spike_width_ms",
@@ -321,456 +550,136 @@ sns.displot(data=units, x="firing_rate_Hz", col="area", col_wrap=4, height=2.5)
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_02_seaborn.ipynb]{.notebook}, **Your turn: one plot of your own**
+Open [notebooks/day2_03_seaborn.ipynb]{.notebook}, **Your turn**
 
-* Ask a question of the trials or units and answer it with one plot
-* Proper axis labels, then save it
+1. **The psychometric curve** (5 min) straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
+2. **One plot of your own** (10 min): ask a question of the trials or units and answer it with one plot; proper axis labels, then save it
 
-**5 minutes**. The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
+The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
 
-# SciPy {background-color="#03A062"}
+# Capstone {background-color="#03A062"}
 
-## What lives where
+## One figure from two days
 
-| Submodule | For |
-|---|---|
-| `scipy.optimize` | Fitting (`curve_fit`), minimising, root finding |
-| `scipy.stats` | Distributions, statistical tests |
-| `scipy.signal` | Filtering, spectra, peak finding |
-| `scipy.fft` | Fourier transforms |
-| `scipy.ndimage` | N-D image filters, morphology, measurements |
-
-* `import scipy as sp`, then `sp.optimize.curve_fit`, `sp.stats.ttest_ind`, ...
-* Also `interpolate`, `integrate`, `linalg`, `sparse`, `spatial`
-
-## Fitting a model
-
-:::: {.columns}
-::: {.column width="55%"}
-```{python}
-import scipy as sp
-
-def model(t, amplitude, rate):
-    return amplitude * np.exp(-rate * t)
-
-t = np.linspace(0, 5, 40)
-rng = np.random.default_rng(1)
-noise = rng.normal(0, 0.1, t.size)
-y = model(t, 3.0, 1.2) + noise
-
-params, cov = sp.optimize.curve_fit(
-    model, t, y, p0=[1, 1]
-)
-errors = np.sqrt(np.diag(cov))
-params.round(2), errors.round(2)
-```
+:::{.incremental}
+* **A.** The psychometric curve per block: data from pandas, model curves from scikit-learn
+* **B.** The LFP before and after a band-pass filter from SciPy
+* Same colour for the same block, units on every axis, a legend in words
+* Panel letters, no top or right spines, saved as PDF
 :::
-::: {.column width="45%"}
-* The model's first argument is `x`; the rest are the parameters to fit
-* `p0`: a starting guess
-* Standard errors: the square root of the covariance's diagonal
-:::
-::::
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 1: curve fitting** (after SPL Ex. 39)
+Open [notebooks/day2_04_capstone.ipynb]{.notebook}
 
-* Fit the mouse's psychometric curve in each kind of block
-* Is the bias different between blocks, within the fit's uncertainty?
+* The first cells recompute everything you need, whatever you finished yesterday
+* Build the figure step by step, as in the Matplotlib block, then save it
 
-**8 minutes**
+**15 minutes**. **Extra:** a third panel with the spectrum before and after a 60 Hz notch
 
-## Fourier transforms
+# Where to go next {background-color="#03A062"}
 
-* Any signal is a sum of waves of different frequencies
-* The **spectrum** shows how much of each frequency there is
-* Periodic noise shows up as isolated peaks
-    * Remove them, then transform back
-* `sp.fft` has the forward and inverse transforms, in 1-D, 2-D and N-D
+## scikit-image: images are arrays
 
-## Live coding: removing mains hum {.live-coding}
-
-* A slow 3 Hz signal plus 50 Hz hum and noise
-* Its spectrum: where is the hum?
-* Zero the hum, transform back, compare
-
-::: {.notes}
 ```python
-import scipy as sp
+import skimage as ski
 
-fs = 500                                     # samples per second
-t = np.arange(0, 2, 1 / fs)
-rng = np.random.default_rng(0)
-clean = np.sin(2 * np.pi * 3 * t)
-recorded = clean + 0.8 * np.sin(2 * np.pi * 50 * t) + rng.normal(0, 0.2, t.size)
-
-spectrum = sp.fft.rfft(recorded)
-freqs = sp.fft.rfftfreq(t.size, d=1 / fs)
-fig, ax = plt.subplots()
-ax.plot(freqs, np.abs(spectrum))
-ax.set_xlabel("frequency (Hz)")             # peaks at 3 and 50
-
-spectrum[np.abs(freqs - 50) < 2] = 0        # a mask on the frequencies
-filtered = sp.fft.irfft(spectrum, n=t.size)
-
-fig, ax = plt.subplots(figsize=(8, 3))
-ax.plot(t, recorded, alpha=0.4, label="recorded")
-ax.plot(t, filtered, label="hum removed")
-ax.legend()
+image = ski.io.imread("nuclei.tif")                  # a NumPy array
+smooth = ski.filters.gaussian(image, sigma=2)
+mask = smooth > ski.filters.threshold_otsu(smooth)   # a boolean mask
+labels = ski.measure.label(mask)                     # 0 = background, 1..N = objects
+table = ski.measure.regionprops_table(labels, properties=["area", "eccentricity"])
 ```
+
+:::{.incremental}
+* **Use it when:** you filter, threshold, segment or measure microscopy (or any) images
+* Measurements come out as a table, ready for pandas and seaborn
 :::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 2: FFT filtering** (after SPL Ex. 42)
-
-* The same idea on real data: remove the **60 Hz** mains hum (US recording) and its harmonics from the LFP
-
-**8 minutes**. **Stretch:** statistical distributions (Ex. 41), the six-hump camelback minimisation (Ex. 40), the summary exercises
 
 ::: {.source-note}
-Exercises from Scientific Python Lectures [@spl].
+[scikit-image.org/docs/stable/user_guide](https://scikit-image.org/docs/stable/user_guide.html); SPL, [scikit-image: image processing](https://lectures.scientific-python.org/packages/scikit-image/index.html)
 :::
-
-## Break {background-color="#1E1E1E"}
-
-10 minutes
-
-# scikit-image {background-color="#03A062"}
-
-## Images are NumPy arrays
-
-:::: {.columns}
-::: {.column width="55%"}
-```{python}
-import skimage as ski
-
-rgb = ski.data.hubble_deep_field()
-image = ski.color.rgb2gray(rgb)
-print(rgb.shape, rgb.dtype)
-print(image.shape, image.dtype)
-
-fig, ax = plt.subplots(figsize=(3, 3))
-ax.imshow(image, cmap="gray")
-ax.set_axis_off()
-```
-:::
-::: {.column width="45%"}
-* Grey `(rows, cols)`; colour `(rows, cols, 3)`; stacks add `z` or time
-* Usually `uint8` or `uint16`; most filters return `float` in [0, 1]
-* Everything from NumPy works: slicing crops, masks select
-* Today we count **galaxies**; in the exercise you count **nuclei**
-:::
-::::
-
-## Filtering and thresholding
-
-```{python}
-smoothed = ski.filters.gaussian(image, sigma=2)   # reduce noise
-threshold = ski.filters.threshold_yen(smoothed)   # automatic threshold
-binary = smoothed > threshold                     # a boolean mask
-
-fig, axes = plt.subplots(1, 3, figsize=(9, 3))
-images = {"original": image, "gaussian": smoothed, "Yen": binary}
-for ax, (title, im) in zip(axes, images.items()):
-    ax.imshow(im[:250, :250], cmap="gray")
-    ax.set_title(title)
-    ax.set_axis_off()
-```
-
-* Several rules pick the threshold: Otsu, Li, Yen, triangle, ...; each gives a different mask
-
-## Live coding: looking and thresholding {.live-coding}
-
-* Load the Hubble image: shape, dtype, colour to grey
-* Its histogram: what is sky, what is galaxy?
-* Smooth with different `sigma`
-* Compare two thresholds
-
-::: {.notes}
-```python
-import skimage as ski
-
-rgb = ski.data.hubble_deep_field()
-rgb.shape, rgb.dtype
-image = ski.color.rgb2gray(rgb)
-image.shape, image.dtype, image.min(), image.max()
-
-fig, ax = plt.subplots()
-ax.hist(image.ravel(), bins=100, log=True)   # mostly dark sky
-
-crop = image[:250, :250]
-fig, axes = plt.subplots(1, 3, figsize=(10, 3))
-for ax, sigma in zip(axes, [0.5, 2, 5]):
-    ax.imshow(ski.filters.gaussian(crop, sigma=sigma), cmap="gray")
-    ax.set_title(f"sigma={sigma}")
-
-smoothed = ski.filters.gaussian(image, sigma=2)
-t_yen = ski.filters.threshold_yen(smoothed)
-t_li = ski.filters.threshold_li(smoothed)
-t_yen, t_li
-
-fig, axes = plt.subplots(1, 2, figsize=(8, 4))
-axes[0].imshow(smoothed > t_yen, cmap="gray")
-axes[1].imshow(smoothed > t_li, cmap="gray")
-(smoothed > t_yen).mean(), (smoothed > t_li).mean()   # fraction marked as galaxy
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_04_scikit_image.ipynb]{.notebook}, **sections 1 to 3**: the same steps on nuclei
-
-* **Look:** shape, dtype, histogram
-* **Filter:** a Gaussian
-* **Threshold:** Otsu, then compare methods with `try_all_threshold`
-
-**15 minutes**
-
-## Labelling and segmentation
-
-```{python}
-cleaned = ski.morphology.remove_small_objects(binary, max_size=20)
-cleaned = ski.segmentation.clear_border(cleaned)
-labels = ski.measure.label(cleaned)  # 0 = background, 1..N = objects
-print("objects found:", labels.max())
-
-overlay = ski.color.label2rgb(labels, image=image, bg_label=0)
-fig, ax = plt.subplots(figsize=(9, 2.2))
-ax.imshow(overlay[300:520, :])
-ax.set_axis_off()
-```
-
-* Touching objects merge into one; a **watershed** separates them (stretch exercise)
-
-## Measuring objects with `regionprops`
-
-:::: {.columns}
-::: {.column width="62%"}
-```{python}
-props = ski.measure.regionprops_table(
-    labels,
-    intensity_image=image,
-    properties=["label", "area",
-                "eccentricity", "intensity_mean"],
-)
-galaxies = pd.DataFrame(props)
-galaxies.head(4).round(2)
-```
-:::
-::: {.column width="38%"}
-* One row per object, ready for pandas and seaborn
-* Dozens of properties: `perimeter`, `centroid`, `bbox`, `intensity_*`, ...
-* Measured in **pixels**: multiply by the pixel size for µm
-:::
-::::
-
-## Live coding: label and measure {.live-coding}
-
-* Remove specks and objects on the border
-* Label, count, and overlay the labels on the image
-* Measure every galaxy into a DataFrame
-* Which galaxies are the most elongated? Is size related to brightness?
-
-::: {.notes}
-```python
-binary = smoothed > t_yen
-cleaned = ski.morphology.remove_small_objects(binary, max_size=20)
-ski.measure.label(cleaned).max()             # count before clearing the border
-cleaned = ski.segmentation.clear_border(cleaned)
-labels = ski.measure.label(cleaned)
-labels.max()
-
-overlay = ski.color.label2rgb(labels, image=image, bg_label=0)
-fig, ax = plt.subplots()
-ax.imshow(overlay)
-
-props = ski.measure.regionprops_table(
-    labels, intensity_image=image,
-    properties=["label", "area", "eccentricity", "intensity_mean", "centroid"],
-)
-galaxies = pd.DataFrame(props)
-galaxies.describe()
-galaxies.sort_values("eccentricity").tail()  # the most elongated
-
-fig, ax = plt.subplots()
-ax.scatter(galaxies["area"], galaxies["intensity_mean"], c=galaxies["eccentricity"])
-ax.set_xscale("log")
-ax.set_xlabel("area (pixels)")
-ax.set_ylabel("mean brightness")
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_04_scikit_image.ipynb]{.notebook}, **sections 4 and 5**
-
-* **Clean, label and count** the nuclei
-* **Measure** them into pandas: what are the biggest objects?
-
-**15 minutes**. **Stretch:** split touching nuclei with a watershed; the SPL coins exercises
-
-# Whirlwind tour {background-color="#03A062"}
 
 ## xarray: labelled N-D arrays
 
-* **Problem:** with NumPy you must remember that time is axis 0
-* Dimensions have **names**; coordinates have **values** (seconds, channel numbers, µm, brain areas)
-* Select by label, reduce by name, group by a coordinate
-
 ```python
-lfp.sel(time=slice(622.5, 624), channel=200)
-lfp.mean(dim="time")
+import xarray as xr
+
+lfp = xr.DataArray(lfp_uv, dims=("time", "channel"),
+                   coords={"time": time, "area": ("channel", area)})
+lfp.sel(time=slice(2, 4)).mean(dim="time")   # by label and by name, not position
 lfp.groupby("area").mean()
 ```
+
+:::{.incremental}
+* **Use it when:** you keep forgetting which axis is time, or carry coordinates (seconds, µm, brain areas) alongside your arrays
+* Reads and writes NetCDF and Zarr; pandas-style `groupby` on N-D data
+:::
 
 ::: {.source-note}
 [tutorial.xarray.dev](https://tutorial.xarray.dev)
 :::
 
-## Live coding: a labelled recording {.live-coding}
-
-* Wrap the LFP in a `DataArray`: `time` and `channel`, plus `area` and `depth` per channel
-* Select by session time and by brain area, not by position
-* Reduce over `time`; group by `depth` and by `area`
-* Spike counts with three named dimensions, grouped by stimulus strength
-
-::: {.notes}
-Follow the Demo section of `day2_05_xarray.ipynb`.
-
-```python
-lfp = xr.DataArray(raw * uV_per_count, dims=("time", "channel"),
-                   coords={"time": lfp_start + np.arange(raw.shape[0]) / sampling_rate,
-                           "channel": np.arange(raw.shape[1]),
-                           "area": ("channel", area), "depth": ("channel", depth_um)})
-
-lfp.sel(channel=200).sel(time=slice(stim_on[89] - 0.5, stim_on[89] + 1)).plot()
-lfp.sel(channel=lfp.area == "SSp-n")
-lfp.std(dim="time").plot(y="depth")
-lfp.groupby("depth").mean().plot(x="time", y="depth", cmap="RdBu_r", robust=True)
-
-rate = counts.mean("unit").groupby("strength").mean() / 0.05
-rate.plot.line(x="time", hue="strength")
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_05_xarray.ipynb]{.notebook}, **Try it**
-
-* Two brain areas around one stimulus, on one plot, selected by label
-* Which area fluctuates more? Then the same selection in plain NumPy
-
-**5 minutes**
-
 ## dask: bigger than memory, in parallel
 
-* A dask array is a grid of NumPy **chunks**
-* Operations are **lazy**: they only build a task graph
-* `.compute()` runs the graph on all cores, a few chunks at a time
-* `xr.open_dataset(..., chunks={...})` makes xarray use dask
+```python
+import dask.array as da
+
+with h5py.File("big_recording.h5") as f:
+    lfp = da.from_array(f["lfp/data"], chunks=(100_000, 384))   # lazy: nothing read yet
+    channel_std = lfp.std(axis=0)                               # NumPy code, still lazy
+    result = channel_std.compute()                              # runs, chunk by chunk, on all cores
+```
+
+:::{.incremental}
+* **Use it when:** your data do not fit in memory, or one core is too slow
+* NumPy- and pandas-like interfaces; xarray uses it under the hood
+:::
 
 ::: {.source-note}
 [tutorial.dask.org](https://tutorial.dask.org)
 :::
 
-## Live coding: 10 minutes of LFP {.live-coding}
-
-* A 4.6 GB stand-in for 10 minutes of raw-rate LFP, 1.5 million samples × 384 channels
-* NumPy-style operations return instantly
-* `.compute()` runs them; check the answer
-* Read an HDF5 file lazily with `da.from_array`: the same code would run on the 51 GB original
-
-::: {.notes}
-Follow the Demo section of `day2_06_dask.ipynb`.
-
-```python
-import dask.array as da
-
-x = da.random.normal(0, 100, size=(1_500_000, 384), chunks=(25_000, 384))
-x                                   # the chunk diagram
-
-channel_std = (x - x.mean(axis=1, keepdims=True)).std(axis=0)
-channel_std                         # instant: just a graph
-len(channel_std.__dask_graph__())
-
-%time channel_std.compute().mean()  # just under 100
-
-with h5py.File("data/ibl_session.h5") as f:
-    lazy = da.from_array(f["lfp/data"], chunks=(1000, 384))
-    lazy.std(axis=0).compute()
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_06_dask.ipynb]{.notebook}, **Try it**
-
-* Time a per-channel standard deviation on 80 s of stand-in LFP with three chunk sizes
-* What happens to the number of tasks, and to the run time?
-
-**5 minutes**
-
 ## napari: look at your data
 
-* An interactive viewer for N-D images and annotations: labels, points, shapes, tracks
-* Sliders for z, time and channels
-* Each layer's `.data` is a NumPy array you can read back
-* Opens a **desktop window**: run it on your own laptop
+```python
+import napari
+
+viewer = napari.Viewer()
+viewer.add_image(image, name="nuclei")
+viewer.add_labels(labels, name="segmentation")
+edited = viewer.layers["segmentation"].data          # read your edits back as an array
+```
+
+:::{.incremental}
+* **Use it when:** you need to browse, check or annotate N-D images: z-stacks, time-lapses, many channels
+* Opens a desktop window: install it on your own machine
+:::
 
 ::: {.source-note}
 [napari.org/stable/tutorials](https://napari.org/stable/tutorials/)
 :::
 
-## Live coding: the nuclei in napari {.live-coding}
-
-* Open the image, the segmentation and the centres as layers
-* Toggle layers, change opacity, hover to read label numbers
-* Edit a label with the fill bucket and the brush
-* Read the edited labels back into Python
-
-::: {.notes}
-Run the data cells of `day2_07_napari.ipynb` first, then:
-
-```python
-%gui qt
-import napari
-
-viewer = napari.Viewer()
-viewer.add_image(image, name="nuclei image", colormap="gray")
-viewer.add_labels(nuclei, name="segmentation", opacity=0.4)
-viewer.add_points(coords, name="centres", size=4, face_color="yellow")
-
-edited = viewer.layers["segmentation"].data
-len(np.unique(edited)) - 1
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_07_napari.ipynb]{.notebook}, **Try it**
-
-* Fix a nucleus the watershed split or merged
-* Recount, then compare with the Otsu mask
-
-**6 minutes**
-
 ## Also worth knowing
 
 | Package | What it is for |
 |---|---|
-| **scikit-learn** | Machine learning: classification, clustering, regression ([SPL chapter](https://lectures.scientific-python.org/packages/scikit-learn/index.html)) |
+| **statsmodels** | Regression models and statistical tests with full summary tables |
+| **pingouin** | Common statistical tests on DataFrames, with effect sizes |
 | **Zarr** | Chunked, compressed N-D arrays on disk or in the cloud |
 | **Polars** | Fast DataFrames with a lazy query engine |
-| **Numba** | Compiles Python loops to machine code with `@numba.njit` |
+| **Numba** | Compiles the Python loops you cannot avoid to machine code with `@numba.njit` |
 
 ## Wrap-up
 
+:::{.incremental}
+* **Tables:** `loc` versus `iloc`, masks, `groupby`, and tidy (long) data
 * **Plot** with `fig, ax = plt.subplots()`; seaborn for tidy DataFrames
-* **Check SciPy** (and scikit-image) before writing an algorithm yourself
-* **Images are arrays**: filter, threshold, label, then measure into a DataFrame
-* **Scale up** with xarray (labels), dask (size) and napari (looking)
+* **Two days, one figure:** arrays, SciPy and scikit-learn underneath, pandas and Matplotlib on top
+* **Check the ecosystem** before writing an algorithm yourself: SciPy, scikit-image, xarray, dask, napari
+:::
+
+. . .
 
 **Keep going:** the [Scientific Python Development Guide](https://learn.scientific-python.org/development/), the advanced chapters of Scientific Python Lectures [@spl], and the [BioImage Analysis Notebooks](https://haesleinhuepf.github.io/BioImageAnalysisNotebooks/).
 
