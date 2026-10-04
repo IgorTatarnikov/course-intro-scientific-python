@@ -16,6 +16,11 @@
 # 6. **Stretch:** separate touching nuclei with a watershed, then try the SPL coins
 #    exercises
 #
+# Our recording has no images, so this block switches to microscopy, the other
+# place most of you will meet image data. The steps (filter, threshold, label,
+# measure) are the same for cells in a two-photon recording or in brain
+# sections.
+#
 # The image is `skimage.data.human_mitosis()`: human cells in culture,
 # some of them dividing, stained for DNA. It comes from Moffat *et al.*, *Cell*
 # 124:1283 (2006), courtesy of David Root, licensed CC0.

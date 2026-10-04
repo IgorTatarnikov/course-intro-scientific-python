@@ -3,169 +3,223 @@
 #
 # **Block:** SciPy (25 min, including slides and live coding)
 #
-# 1. **Curve fitting** (8 min): SPL Exercise 39, fit a yearly cycle to Alaska temperatures
-# 2. **Image denoising with the FFT** (8 min): SPL Exercise 42, clean up the moon landing image
-# 3. **Stretch:** statistical distributions (SPL Exercise 41) and 2-D minimisation
-#    (SPL Exercise 40), then the chapter's summary exercises
+# 1. **Curve fitting** (8 min): after SPL Exercise 39, fit the mouse's
+#    psychometric curve in each block of trials
+# 2. **Filtering with the FFT** (8 min): after SPL Exercise 42, remove the mains
+#    hum from the LFP
+# 3. **Stretch:** which distribution fits the response times (after SPL
+#    Exercise 41), 2-D minimisation (SPL Exercise 40), then the chapter's
+#    summary exercises
 #
-# Adapted from [Scientific Python Lectures, SciPy: high-level scientific
-# computing](https://lectures.scientific-python.org/intro/scipy/index.html) (CC BY 4.0).
+# We keep using the recording from Day 1. The exercises are adapted from
+# [Scientific Python Lectures, SciPy: high-level scientific
+# computing](https://lectures.scientific-python.org/intro/scipy/index.html) (CC
+# BY 4.0), which fits Alaska's temperatures and cleans up a photograph instead.
 #
 # Before writing your own algorithm, **check whether SciPy already has it**.
 # The [API reference](https://docs.scipy.org/doc/scipy/reference/) lists every submodule.
 
 # %%
+import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
+with h5py.File("../data/ibl_session.h5") as f:
+    contrast = f["trials/contrast"][:]
+    choice = f["trials/choice"][:]
+    probability_left = f["trials/probability_left"][:]
+    rt = f["trials/response_time_s"][:]
+    lfp_uv = f["lfp/data"][:] * f["lfp"].attrs["uV_per_count"]
+    sampling_rate = f["lfp"].attrs["sampling_rate_Hz"]
+
 # %% [markdown]
-# ## 1. Curve fitting (SPL Exercise 39)
+# ## 1. Curve fitting (after SPL Exercise 39)
 #
-# The temperature extremes in Alaska for each month, starting in January, are (in °C):
+# On Day 1 you computed the **psychometric curve**: the fraction of rightward
+# choices at each contrast. The task switches between blocks in which the
+# stimulus is more often on the left (`probability_left` 0.8) or on the right
+# (0.2). Here is the curve for each kind of block:
 
 # %%
-temp_max = np.array([17, 19, 21, 28, 33, 38, 37, 37, 31, 23, 19, 18])
-temp_min = np.array([-62, -59, -56, -46, -32, -18, -9, -13, -25, -46, -52, -58])
-months = np.arange(12)
+levels = np.unique(contrast)
+right_block = probability_left == 0.2
+left_block = probability_left == 0.8
+frac_right_rb = np.array([(choice[right_block & (contrast == c)] == 1).mean() for c in levels])
+frac_right_lb = np.array([(choice[left_block & (contrast == c)] == 1).mean() for c in levels])
+levels, frac_right_rb.round(2), frac_right_lb.round(2)
 
 # %% [markdown]
-# 1. Plot these temperature extremes.
-# 2. Define a function that can describe both the minimum and the maximum
-#    temperatures. Hint: it must have a period of one year (12 months), and it
-#    needs a time offset.
-# 3. Fit it to each series with `sp.optimize.curve_fit`.
-# 4. Plot the fits on a fine time grid. Is the fit reasonable? If not, why not?
-# 5. Is the time offset the same for the minimum and the maximum, within the fit's
-#    accuracy? (Hint: `curve_fit` also returns a covariance matrix. The square roots
-#    of its diagonal are the parameters' standard errors.)
+# 1. Plot both curves against contrast.
+# 2. Write a function `psychometric(c, bias, width, lapse)` that can describe
+#    both. A common choice is a cumulative Gaussian, which rises from `lapse` to
+#    `1 - lapse`, is centred on `bias` and rises over about `width` (in %
+#    contrast):
+#
+#    $$p(c) = \text{lapse} + (1 - 2\,\text{lapse})\, \tfrac{1}{2}\left(1 + \text{erf}\!\left(\frac{c - \text{bias}}{\sqrt{2}\,\text{width}}\right)\right)$$
+#
+#    `sp.special.erf` is the error function.
+# 3. Fit it to each curve with `sp.optimize.curve_fit`, starting from
+#    `p0=[0, 10, 0.05]`.
+# 4. Plot the fits on a fine contrast grid. Is the fit reasonable?
+# 5. Is the `bias` the same in the two kinds of block, within the fit's
+#    accuracy? (Hint: `curve_fit` also returns a covariance matrix. The square
+#    roots of its diagonal are the parameters' standard errors.) What does the
+#    answer say about the mouse?
 
 # %% tags=["solution"]
-def yearly_temps(times, avg, ampl, time_offset):
-    return avg + ampl * np.cos((times + time_offset) * 2 * np.pi / 12)
+def psychometric(c, bias, width, lapse):
+    return lapse + (1 - 2 * lapse) * 0.5 * (1 + sp.special.erf((c - bias) / (np.sqrt(2) * width)))
 
 
-res_max, cov_max = sp.optimize.curve_fit(yearly_temps, months, temp_max, p0=[20, 10, 0])
-res_min, cov_min = sp.optimize.curve_fit(yearly_temps, months, temp_min, p0=[-40, 20, 0])
+res_rb, cov_rb = sp.optimize.curve_fit(psychometric, levels, frac_right_rb, p0=[0, 10, 0.05])
+res_lb, cov_lb = sp.optimize.curve_fit(psychometric, levels, frac_right_lb, p0=[0, 10, 0.05])
 
-days = np.linspace(0, 12, num=365)
+fine = np.linspace(-100, 100, 401)
 fig, ax = plt.subplots()
-ax.plot(months, temp_max, "ro", label="max")
-ax.plot(days, yearly_temps(days, *res_max), "r-")
-ax.plot(months, temp_min, "bo", label="min")
-ax.plot(days, yearly_temps(days, *res_min), "b-")
-ax.set_xlabel("Month")
-ax.set_ylabel("Temperature (°C)")
+ax.plot(levels, frac_right_rb, "ro", label="right block (p left = 0.2)")
+ax.plot(fine, psychometric(fine, *res_rb), "r-")
+ax.plot(levels, frac_right_lb, "bo", label="left block (p left = 0.8)")
+ax.plot(fine, psychometric(fine, *res_lb), "b-")
+ax.set_xlabel("Contrast (%; negative = left)")
+ax.set_ylabel("Fraction of rightward choices")
 ax.legend();
 
 # %% tags=["solution"]
-err_max = np.sqrt(np.diag(cov_max))
-err_min = np.sqrt(np.diag(cov_min))
-print(f"offset (max): {res_max[2]:.2f} ± {err_max[2]:.2f} months")
-print(f"offset (min): {res_min[2]:.2f} ± {err_min[2]:.2f} months")
+err_rb = np.sqrt(np.diag(cov_rb))
+err_lb = np.sqrt(np.diag(cov_lb))
+for name, res, err in [("right block", res_rb, err_rb), ("left block", res_lb, err_lb)]:
+    print(f"{name}: bias {res[0]:.1f} ± {err[0]:.1f} %, width {res[1]:.1f} ± {err[1]:.1f} %, lapse {res[2]:.2f}")
+difference = res_lb[0] - res_rb[0]
+print(f"difference: {difference:.1f} % = {difference / np.hypot(err_rb[0], err_lb[0]):.1f} combined standard errors")
 
 # %% [markdown] tags=["answer"]
-# The fits follow the data closely: a cosine with a one-year period describes
-# both series well. The offsets are 0.28 ± 0.10 months (max) and -0.16 ± 0.13
-# months (min). Both amplitudes are negative, so the warmest point of each curve
-# falls at month 6 minus the offset (counting January as 0): late June (5.7) for
-# the maxima and early July (6.2) for the minima. The difference, about 0.4 months, is roughly 2.7
-# combined standard errors, so the offsets are probably *not* the same. With
-# only 12 points per series, though, do not read too much into it.
+# The fits follow the points closely; the curves only differ in the middle,
+# where the stimulus is hard to see. In right blocks the bias is about 0%; in left
+# blocks about 6%, roughly four combined standard errors higher, so the shift is
+# real. A positive bias means the mouse needs more contrast on the right
+# before it chooses right: when the stimulus has mostly been on the left, it
+# guesses left when unsure. The mouse has learned the blocks' statistics and
+# uses them as a prior.
 #
-# Note that SPL's own solution divides by `times.max()` instead of 12. That makes
-# the period depend on whichever time array you pass in: 11 months for `months`
-# but 12 for `days`. It is a bug worth spotting!
+# The fit treats every contrast equally, although some have only 5 trials in a
+# block and others 50. Passing `sigma=` (the standard error of each fraction)
+# to `curve_fit` weights the points properly; a fit to the individual choices by
+# maximum likelihood is better still.
 
 # %% [markdown]
-# ## 2. Image denoising with the FFT (SPL Exercise 42)
+# ## 2. Filtering with the FFT (after SPL Exercise 42)
 #
-# `moonlanding.png` is heavily contaminated with periodic noise. Clean it up using
-# the Fast Fourier Transform:
+# The recording was made in the United States, where mains electricity
+# alternates at **60 Hz**. Every cable in the room radiates it, and some ends up
+# in the LFP. Remove it with the Fast Fourier Transform:
 #
-# 1. Load the image with `plt.imread` and display it in grey.
-# 2. Find the 2-D FFT function in `sp.fft` and plot the spectrum (its absolute
-#    value). Is it hard to see anything? Why? (Hint: try
-#    `norm=matplotlib.colors.LogNorm(vmin=5)` in `imshow`.)
-# 3. The spectrum has high- and low-frequency components. The noise is in the
-#    **high**-frequency part, which for `fft2` output is the **middle** of the array.
-#    Set those components to zero with slicing, keeping only, say, the first and last
-#    10% of rows and columns.
-# 4. Apply the inverse FFT and display the real part of the result.
+# 1. Take `trace`, channel 200 of `lfp_uv`, and plot its first 0.5 s.
+# 2. Find the FFT for real signals in `sp.fft` (`rfft`), and the matching
+#    frequencies (`rfftfreq`, which needs the time between samples). Plot the
+#    spectrum (the absolute value) against frequency. Is it hard to see
+#    anything? Why? (Hint: `ax.set_yscale("log")`.)
+# 3. Find the mains hum in the spectrum. Set the components within 1 Hz of
+#    60 Hz **and of its harmonics**, 120 and 180 Hz, to zero, using a mask on the
+#    frequencies.
+# 4. Apply the inverse FFT (`irfft`, with `n=` the length of `trace`), and plot
+#    what you **removed**, `trace - cleaned`, for the first 0.2 s. What does it
+#    look like?
 
 # %%
-from matplotlib.colors import LogNorm
-
-im = plt.imread("../data/moonlanding.png").astype(float)
-im.shape
+trace = lfp_uv[:, 200]
+time = np.arange(trace.size) / sampling_rate
 
 # %% tags=["solution"]
-fig, ax = plt.subplots()
-ax.imshow(im, cmap="gray")
-ax.set_title("Original image");
+fig, ax = plt.subplots(figsize=(8, 3))
+ax.plot(time[:250], trace[:250])
+ax.set_xlabel("time (s)")
+ax.set_ylabel("LFP (µV)");
 
 # %% tags=["solution"]
-im_fft = sp.fft.fft2(im)
+spectrum = sp.fft.rfft(trace)
+freqs = sp.fft.rfftfreq(trace.size, d=1 / sampling_rate)
 
-fig, ax = plt.subplots()
-img = ax.imshow(np.abs(im_fft), norm=LogNorm(vmin=5))
-fig.colorbar(img, ax=ax)
-ax.set_title("Fourier transform (log scale)");
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+axes[0].plot(freqs, np.abs(spectrum))
+axes[0].set_title("linear scale")
+axes[1].plot(freqs, np.abs(spectrum))
+axes[1].set_yscale("log")
+axes[1].set_title("log scale")
+for ax in axes:
+    ax.set_xlabel("frequency (Hz)")
 
 # %% [markdown] tags=["answer"]
-# On a linear scale a few very large coefficients (the image's mean brightness
-# and the lowest frequencies) dominate, and everything else looks black. A
-# logarithmic colour scale shows the structure, including the bright spots of the
-# periodic noise.
+# On a linear scale the slow frequencies, below a few hertz, dominate (the LFP is
+# mostly slow waves) and everything else looks flat. On a log scale the spectrum
+# falls steadily with frequency, with sharp spikes at 60, 120 and 180 Hz: the
+# mains hum and its harmonics. The FFT of a real signal is symmetric, so `rfft`
+# keeps only the positive frequencies, up to half the sampling rate (250 Hz).
 
 # %% tags=["solution"]
-keep_fraction = 0.1
-im_fft2 = im_fft.copy()
-r, c = im_fft2.shape
-im_fft2[int(r * keep_fraction) : int(r * (1 - keep_fraction))] = 0
-im_fft2[:, int(c * keep_fraction) : int(c * (1 - keep_fraction))] = 0
+hum = (np.abs(freqs - 60) < 1) | (np.abs(freqs - 120) < 1) | (np.abs(freqs - 180) < 1)
+filtered = spectrum.copy()
+filtered[hum] = 0
+cleaned = sp.fft.irfft(filtered, n=trace.size)
 
-im_new = sp.fft.ifft2(im_fft2).real
-
-fig, axes = plt.subplots(1, 2, figsize=(12, 5))
-axes[0].imshow(np.abs(im_fft2), norm=LogNorm(vmin=5))
-axes[0].set_title("Filtered spectrum")
-axes[1].imshow(im_new, cmap="gray")
-axes[1].set_title("Reconstructed image");
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+axes[0].plot(freqs, np.abs(spectrum), label="original")
+axes[0].plot(freqs, np.abs(filtered), label="filtered")
+axes[0].set_yscale("log")
+axes[0].set_xlim(40, 200)
+axes[0].set_xlabel("frequency (Hz)")
+axes[0].legend()
+axes[1].plot(time[:100], (trace - cleaned)[:100])
+axes[1].set_xlabel("time (s)")
+axes[1].set_title("what was removed (µV)");
 
 # %% [markdown] tags=["solution"]
-# Zeroing the high frequencies is a crude **low-pass filter**: it blurs the image
-# as well as removing the noise. `sp.ndimage.gaussian_filter(im, 4)` blurs in
-# one line. The scikit-image block that comes next has many better filters.
+# What was removed repeats 12 times in 0.2 s: 60 Hz, as expected, peaking at
+# about 15 µV. Each cycle has a second, smaller bump: that is the 120 Hz
+# harmonic. Zeroing FFT bins like this is a crude **notch
+# filter**: fine for a quick look, but it can ring at the edges of the
+# recording. `sp.signal.iirnotch` with `sp.signal.filtfilt` is the usual tool.
+# `rfft(lfp_uv, axis=0)` would clean all 384 channels in one call.
 
 # %% [markdown]
 # ## 3. Stretch
 #
-# ### Statistical distributions (SPL Exercise 41)
+# ### Which distribution fits the response times? (after SPL Exercise 41)
 #
-# Draw 1000 random values from a gamma distribution with shape parameter 1 (hint:
-# `sp.stats.gamma(1)` makes a "frozen" distribution, and its `.rvs` method draws
-# values). Plot their histogram with the distribution's PDF on top. Then estimate
-# the shape parameter back from the sample with `sp.stats.gamma.fit`.
+# Response times are positive and skewed, with a long tail. Take the response
+# times below 5 s (the others are trials where the mouse was not engaged). Fit
+# a gamma distribution and a lognormal distribution to them with
+# `sp.stats.gamma.fit` and `sp.stats.lognorm.fit`, fixing the location at 0
+# (`floc=0`). Plot their PDFs on top of the histogram. Which fits better? Compare
+# the total log-likelihood, `dist.logpdf(sample, *params).sum()`, too: higher is
+# better.
 #
-# Extra: plot the cumulative distribution function and compute the variance.
+# Extra: plot the cumulative distribution function of the better fit, and use
+# its `.ppf` to find the response time that 90% of trials beat.
 
 # %% tags=["solution"]
-rng = np.random.default_rng(0)
-dist = sp.stats.gamma(1)
-sample = dist.rvs(size=1000, random_state=rng)
+sample = rt[rt < 5]
+params_gamma = sp.stats.gamma.fit(sample, floc=0)
+params_lognorm = sp.stats.lognorm.fit(sample, floc=0)
 
-x = np.linspace(0, sample.max(), 200)
+x = np.linspace(0.01, 2, 300)
 fig, ax = plt.subplots()
-ax.hist(sample, bins=40, density=True, alpha=0.5, label="sample")
-ax.plot(x, dist.pdf(x), label="PDF")
-ax.plot(x, dist.cdf(x), label="CDF")
+ax.hist(sample, bins=np.linspace(0, 2, 60), density=True, alpha=0.5, label="response times")
+ax.plot(x, sp.stats.gamma.pdf(x, *params_gamma), label="gamma")
+ax.plot(x, sp.stats.lognorm.pdf(x, *params_lognorm), label="lognormal")
+ax.set_xlabel("response time (s)")
 ax.legend()
 
-shape, loc, scale = sp.stats.gamma.fit(sample)
-print(f"fitted shape: {shape:.2f}, variance: {dist.var():.2f}")
+for name, dist, params in [("gamma", sp.stats.gamma, params_gamma), ("lognormal", sp.stats.lognorm, params_lognorm)]:
+    print(f"{name:10} log-likelihood {dist.logpdf(sample, *params).sum():.1f}")
+print(f"90% of responses are faster than {sp.stats.lognorm.ppf(0.9, *params_lognorm):.2f} s")
 
-# %% [markdown]
+# %% [markdown] tags=["solution"]
+# The lognormal fits much better: it has the sharp peak around 0.3 s and the long
+# tail, and its log-likelihood is about 110 higher. A lognormal means that the
+# **logarithm** of the response time is normally distributed, which is why the
+# log scale suited these data in the seaborn block.
+#
 # ### 2-D minimisation (SPL Exercise 40)
 #
 # The six-hump camelback function

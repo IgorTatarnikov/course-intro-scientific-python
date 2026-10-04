@@ -133,8 +133,8 @@ plt.xlabel("time (s)")
 
 Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 
-* Build the sine and cosine figure step by step
-* Colours, limits, ticks, spines, legend, then save it
+* Build a figure of two LFP traces step by step, from Day 1's recording [@ibl_bwm_dandi]
+* Colours, limits, ticks at the stimuli, spines, legend, then save it
 * Step 7 (annotations) is optional
 
 **12 minutes**
@@ -209,10 +209,10 @@ ax.imshow(moon[100:250, 50:300], cmap="magma")   # a crop, another colormap
 
 Open [notebooks/day2_01_matplotlib.ipynb]{.notebook}, **Parts 2 and 3**
 
-* **Scatter and imshow** (SPL Ex. 28 and 31): reproduce two figures
-* **Framing a Face**: crop the raccoon and frame it with a mask
+* **Scatter and imshow** (after SPL Ex. 28 and 31): the units along the probe, and the whole LFP as an image
+* **Spike counts as an image**: normalise, crop and sort by depth
 
-**17 minutes**. **Stretch:** hare versus lynx (SPL Ex. 23.6), `subplot_mosaic` layouts, gapminder plots, more plot types
+**17 minutes**. **Stretch:** the population response (Day 1's data statistics, part 6), `subplot_mosaic` layouts, the LFP's envelope, more plot types
 
 # seaborn {background-color="#03A062"}
 
@@ -293,36 +293,29 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 ## Live coding: the seaborn tour {.live-coding}
 
-* Reshape gapminder from wide to long
-* `relplot`: relationships
-* `lineplot`: change over time, with a confidence band
-* Distributions with `kdeplot` and `boxplot`, and one panel per continent
+* Back to the recording: trials and units are already tidy; melt spike counts from wide to long
+* `relplot`: units by depth, amplitude, area and firing rate
+* `lineplot`: the psychometric curve per block, with confidence bands
+* Distributions with `histplot` and `boxplot`, and one panel per brain area
 
 ::: {.notes}
-Follow the Demo section of `day2_02_seaborn.ipynb`.
+Follow the Demo section of `day2_02_seaborn.ipynb`, which loads `trials`, `units` and `rates_long` in its first cells.
 
 ```python
-import seaborn as sns
-
-wide = pd.read_csv("data/gapminder_all.csv")
-gapminder = pd.wide_to_long(
-    wide, stubnames=["gdpPercap", "lifeExp", "pop"], i="country", j="year", sep="_"
-).reset_index()
-gapminder.shape, wide.shape
-
-g = sns.relplot(data=gapminder[gapminder["year"] == 2007],
-                x="gdpPercap", y="lifeExp", hue="continent", size="pop", sizes=(10, 800))
+g = sns.relplot(data=units, x="amplitude_uV", y="depth_um", hue="area",
+                size="firing_rate_Hz", sizes=(5, 300), alpha=0.6)
 g.set(xscale="log")
 
-fig, ax = plt.subplots(figsize=(8, 4))
-sns.lineplot(data=gapminder, x="year", y="lifeExp", hue="continent", ax=ax)
+trials["block"] = trials["probability_left"].astype(str)   # a category, not a number
+sns.lineplot(data=trials, x="contrast", y="chose_right", hue="block", marker="o")
+sns.lineplot(data=rates_long, x="time_s", y="rate_Hz", hue="area")
 
-first_last = gapminder[gapminder["year"].isin([1952, 2007])].astype({"year": str})
-sns.kdeplot(data=first_last, x="lifeExp", hue="year", fill=True)   # year as a category
-sns.boxplot(data=gapminder[gapminder["year"] == 2007], x="continent", y="gdpPercap", log_scale=True)
+sns.histplot(data=units[units["spike_width_ms"] > 0], x="spike_width_ms",
+             hue="label", multiple="stack")
+sns.boxplot(data=trials.assign(strength=trials["contrast"].abs()),
+            x="strength", y="response_time_s", log_scale=True)
 
-sns.displot(data=gapminder[gapminder["year"] == 2007], x="lifeExp",
-            col="continent", col_wrap=3, height=2.5)
+sns.displot(data=units, x="firing_rate_Hz", col="area", col_wrap=4, height=2.5)
 ```
 :::
 
@@ -330,7 +323,7 @@ sns.displot(data=gapminder[gapminder["year"] == 2007], x="lifeExp",
 
 Open [notebooks/day2_02_seaborn.ipynb]{.notebook}, **Your turn: one plot of your own**
 
-* Ask a question of the gapminder data and answer it with one plot
+* Ask a question of the trials or units and answer it with one plot
 * Proper axis labels, then save it
 
 **5 minutes**. The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
@@ -381,10 +374,10 @@ params.round(2), errors.round(2)
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 1: curve fitting** (SPL Ex. 39)
+Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 1: curve fitting** (after SPL Ex. 39)
 
-* Fit a yearly cycle to Alaska's monthly temperature extremes
-* Are the two curves shifted in time, within the fit's uncertainty?
+* Fit the mouse's psychometric curve in each kind of block
+* Is the bias different between blocks, within the fit's uncertainty?
 
 **8 minutes**
 
@@ -430,9 +423,9 @@ ax.legend()
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 2: FFT denoising** (SPL Ex. 42)
+Open [notebooks/day2_03_scipy.ipynb]{.notebook}, **Part 2: FFT filtering** (after SPL Ex. 42)
 
-* The same idea in **2-D**: remove periodic noise from the moon landing photo
+* The same idea on real data: remove the **60 Hz** mains hum (US recording) and its harmonics from the LFP
 
 **8 minutes**. **Stretch:** statistical distributions (Ex. 41), the six-hump camelback minimisation (Ex. 40), the summary exercises
 
@@ -623,41 +616,42 @@ Open [notebooks/day2_04_scikit_image.ipynb]{.notebook}, **sections 4 and 5**
 ## xarray: labelled N-D arrays
 
 * **Problem:** with NumPy you must remember that time is axis 0
-* Dimensions have **names**; coordinates have **values** (dates, latitudes, µm)
-* Select by label, reduce by name, group by season
+* Dimensions have **names**; coordinates have **values** (seconds, channel numbers, µm, brain areas)
+* Select by label, reduce by name, group by a coordinate
 
 ```python
-air.sel(lat=50, lon=260, method="nearest")
-air.mean(dim="time")
-air.groupby("time.season").mean()
+lfp.sel(time=slice(622.5, 624), channel=200)
+lfp.mean(dim="time")
+lfp.groupby("area").mean()
 ```
 
 ::: {.source-note}
 [tutorial.xarray.dev](https://tutorial.xarray.dev)
 :::
 
-## Live coding: air temperatures {.live-coding}
+## Live coding: a labelled recording {.live-coding}
 
-* Open a netCDF file and explore the `Dataset`
-* Select a point by latitude and longitude
-* Average over time, then group by season
+* Wrap the LFP in a `DataArray`: `time` and `channel`, plus `area` and `depth` per channel
+* Select by session time and by brain area, not by position
+* Reduce over `time`; group by `depth` and by `area`
+* Spike counts with three named dimensions, grouped by stimulus strength
 
 ::: {.notes}
 Follow the Demo section of `day2_05_xarray.ipynb`.
 
 ```python
-import xarray as xr
+lfp = xr.DataArray(raw * uV_per_count, dims=("time", "channel"),
+                   coords={"time": lfp_start + np.arange(raw.shape[0]) / sampling_rate,
+                           "channel": np.arange(raw.shape[1]),
+                           "area": ("channel", area), "depth": ("channel", depth_um)})
 
-ds = xr.open_dataset("data/air_temperature_daily.nc")
-ds
-air = ds["air"] - 273.15            # Kelvin to °C, coordinates kept
-air.attrs["units"] = "°C"
+lfp.sel(channel=200).sel(time=slice(stim_on[89] - 0.5, stim_on[89] + 1)).plot()
+lfp.sel(channel=lfp.area == "SSp-n")
+lfp.std(dim="time").plot(y="depth")
+lfp.groupby("depth").mean().plot(x="time", y="depth", cmap="RdBu_r", robust=True)
 
-air.sel(lat=50, lon=260, method="nearest").plot()
-air.mean(dim="time").plot(cmap="RdBu_r")
-seasonal = air.groupby("time.season").mean().sel(season=["DJF", "MAM", "JJA", "SON"])
-seasonal.plot(col="season", cmap="RdBu_r", col_wrap=4)
-air.sel(time=slice("2013-07-01", "2013-07-31")).mean(dim=["lat", "lon"]).plot()
+rate = counts.mean("unit").groupby("strength").mean() / 0.05
+rate.plot.line(x="time", hue="strength")
 ```
 :::
 
@@ -665,8 +659,8 @@ air.sel(time=slice("2013-07-01", "2013-07-31")).mean(dim=["lat", "lon"]).plot()
 
 Open [notebooks/day2_05_xarray.ipynb]{.notebook}, **Try it**
 
-* Chicago versus Miami: daily temperatures in 2013 on one plot
-* Which city has the larger range?
+* Two brain areas around one stimulus, on one plot, selected by label
+* Which area fluctuates more? Then the same selection in plain NumPy
 
 **5 minutes**
 
@@ -681,12 +675,12 @@ Open [notebooks/day2_05_xarray.ipynb]{.notebook}, **Try it**
 [tutorial.dask.org](https://tutorial.dask.org)
 :::
 
-## Live coding: a 3.2 GB array {.live-coding}
+## Live coding: 10 minutes of LFP {.live-coding}
 
-* A 20,000 × 20,000 random array that never fits in memory at once
+* A 4.6 GB stand-in for 10 minutes of raw-rate LFP, 1.5 million samples × 384 channels
 * NumPy-style operations return instantly
 * `.compute()` runs them; check the answer
-* The same with xarray and `chunks=`
+* Read an HDF5 file lazily with `da.from_array`: the same code would run on the 51 GB original
 
 ::: {.notes}
 Follow the Demo section of `day2_06_dask.ipynb`.
@@ -694,19 +688,18 @@ Follow the Demo section of `day2_06_dask.ipynb`.
 ```python
 import dask.array as da
 
-x = da.random.random((20_000, 20_000), chunks=(2_000, 2_000))
+x = da.random.normal(0, 100, size=(1_500_000, 384), chunks=(25_000, 384))
 x                                   # the chunk diagram
 
-result = ((x - x.mean(axis=0)) ** 2).mean()
-result                              # instant: just a graph
-len(result.__dask_graph__())
+channel_std = (x - x.mean(axis=1, keepdims=True)).std(axis=0)
+channel_std                         # instant: just a graph
+len(channel_std.__dask_graph__())
 
-%time result.compute()              # about 1/12 = 0.0833
+%time channel_std.compute().mean()  # just under 100
 
-import xarray as xr
-ds = xr.open_dataset("data/air_temperature_daily.nc", chunks={"time": 100})
-ds["air"]
-ds["air"].mean(dim="time").compute().shape
+with h5py.File("data/ibl_session.h5") as f:
+    lazy = da.from_array(f["lfp/data"], chunks=(1000, 384))
+    lazy.std(axis=0).compute()
 ```
 :::
 
@@ -714,7 +707,7 @@ ds["air"].mean(dim="time").compute().shape
 
 Open [notebooks/day2_06_dask.ipynb]{.notebook}, **Try it**
 
-* Time a column standard deviation with three chunk sizes
+* Time a per-channel standard deviation on 80 s of stand-in LFP with three chunk sizes
 * What happens to the number of tasks, and to the run time?
 
 **5 minutes**

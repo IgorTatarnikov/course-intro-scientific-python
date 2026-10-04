@@ -6,14 +6,15 @@
 # The first part is a **live demo**: follow along, run the cells and change
 # things. The demo mirrors the Python Data Science Handbook's [Visualization
 # with Seaborn](https://jakevdp.github.io/PythonDataScienceHandbook/04.14-visualization-with-seaborn.html),
-# but uses the gapminder data from Day 1. Then make **one plot of your
-# own**.
+# but uses the trials and units tables of our recording from Day 1. Then make
+# **one plot of your own**.
 #
 # The [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) and
 # [example gallery](https://seaborn.pydata.org/examples/index.html) are the best
 # places to look things up.
 
 # %%
+import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -21,22 +22,52 @@ import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 
+
+def read_table(group):
+    """Read one group of ../data/ibl_session.h5 into a DataFrame (as on Day 1)."""
+    with h5py.File("../data/ibl_session.h5") as f:
+        columns = {}
+        for name, values in f[group].items():
+            values = values[:]
+            if values.dtype.kind == "S":
+                values = values.astype(str)
+            columns[name] = values
+    return pd.DataFrame(columns)
+
+
+trials = read_table("trials")
+units = read_table("units")
+trials["chose_right"] = trials["choice"] == 1
+
 # %% [markdown]
 # ## Tidy ("long") data
 #
-# seaborn wants **one row per observation** and **one column per variable**. The
-# gapminder file is "wide": one column per measurement *and* year. `pd.wide_to_long`
-# splits the column names at the underscore:
+# seaborn wants **one row per observation** and **one column per variable**.
+# `trials` (one row per trial) and `units` (one row per unit) are already tidy.
+# The spike counts are not: averaged over trials they make a "wide" table, one
+# row per unit and **one column per time bin**. `melt` turns it long, one row
+# per unit *and* time bin:
 
 # %%
-wide = pd.read_csv("../data/gapminder_all.csv")
-gapminder = pd.wide_to_long(
-    wide, stubnames=["gdpPercap", "lifeExp", "pop"], i="country", j="year", sep="_"
-).reset_index()
-gapminder.head()
+with h5py.File("../data/ibl_session.h5") as f:
+    spike_counts = f["spike_counts/data"][:]
+    spike_unit = f["spike_counts/unit"][:]
+    bin_start = f["spike_counts/bin_start_s"][:]
+
+rates = pd.DataFrame(
+    spike_counts.mean(axis=1) / 0.05,  # spikes per second
+    index=pd.Index(spike_unit, name="unit"),
+    columns=(bin_start + 0.025).round(3),  # the centre of each bin
+)
+rates.iloc[:3, :6]
 
 # %%
-gapminder.shape, wide.shape
+rates_long = rates.reset_index().melt(id_vars="unit", var_name="time_s", value_name="rate_Hz")
+rates_long = rates_long.merge(units[["unit", "area"]], on="unit")  # add each unit's area
+rates_long.head()
+
+# %%
+rates.shape, rates_long.shape
 
 # %% [markdown]
 # ## Demo
@@ -47,80 +78,101 @@ gapminder.shape, wide.shape
 
 # %%
 g = sns.relplot(
-    data=gapminder[gapminder["year"] == 2007],
-    x="gdpPercap",
-    y="lifeExp",
-    hue="continent",
-    size="pop",
-    sizes=(10, 800),
-    alpha=0.7,
-    height=5,
-    aspect=1.4,
+    data=units,
+    x="amplitude_uV",
+    y="depth_um",
+    hue="area",
+    size="firing_rate_Hz",
+    sizes=(5, 300),
+    alpha=0.6,
+    height=6,
+    aspect=0.9,
 )
-g.set(xscale="log", xlabel="GDP per capita (log scale)", ylabel="Life expectancy (years)");
+g.set(xscale="log", xlabel="Spike amplitude (µV, log scale)", ylabel="Height above probe tip (µm)");
 
 # %% [markdown]
-# The same plot in plain Matplotlib needs a loop over continents, manual colours
+# The same plot in plain Matplotlib needs a loop over areas, manual colours
 # and a hand-made size legend. That is the main reason to reach for seaborn when
 # your data is already in a DataFrame.
 #
-# ### Change over time, with uncertainty: `lineplot`
+# ### Averages, with uncertainty: `lineplot`
 #
-# Several countries share each (year, continent) pair. seaborn **aggregates** them
-# (mean by default) and shades a 95% confidence interval:
+# Many trials share each contrast. seaborn **aggregates** them (mean by
+# default) and shades a 95% confidence interval. The mean of `chose_right` is
+# the fraction of rightward choices: the psychometric curve from Day 1, now with
+# error bands.
+#
+# Watch out: `probability_left` is a number, so as a `hue` seaborn would give it
+# a *continuous* colour scale, which makes the three blocks hard to tell apart.
+# Converting it to a string makes it a category with distinct colours.
 
 # %%
-fig, ax = plt.subplots(figsize=(8, 4))
-sns.lineplot(data=gapminder, x="year", y="lifeExp", hue="continent", ax=ax);
+trials["block"] = trials["probability_left"].astype(str)
+
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.lineplot(data=trials, x="contrast", y="chose_right", hue="block", marker="o", ax=ax)
+ax.set(xlabel="Contrast (%; negative = left)", ylabel="Fraction of rightward choices");
+
+# %% [markdown]
+# The same works for the long spike-count table: one line per area, each the
+# mean over its units, with a band across units.
+
+# %%
+fig, ax = plt.subplots(figsize=(7, 4))
+sns.lineplot(data=rates_long, x="time_s", y="rate_Hz", hue="area", ax=ax)
+ax.axvline(0, color="grey", linestyle="--")
+ax.set(xlabel="Time from stimulus (s)", ylabel="Firing rate (spikes/s)");
 
 # %% [markdown]
 # ### Distributions: `histplot`, `kdeplot`, `boxplot`, `violinplot`
 
-# %% [markdown]
-# Watch out: `year` is a number, so as a `hue` seaborn would give it a
-# *continuous* colour scale, which makes two years hard to tell apart. Converting
-# it to a string makes it a category with distinct colours.
-
 # %%
-first_last = gapminder[gapminder["year"].isin([1952, 2007])].astype({"year": str})
-
 fig, axes = plt.subplots(1, 2, figsize=(12, 4))
-sns.kdeplot(
-    data=first_last,
-    x="lifeExp",
-    hue="year",
-    fill=True,
+sns.histplot(
+    data=units[units["spike_width_ms"] > 0],
+    x="spike_width_ms",
+    hue="label",
+    multiple="stack",
+    bins=20,
     ax=axes[0],
 )
 sns.boxplot(
-    data=gapminder[gapminder["year"] == 2007],
-    x="continent",
-    y="gdpPercap",
+    data=trials.assign(strength=trials["contrast"].abs()),
+    x="strength",
+    y="response_time_s",
     log_scale=True,
     ax=axes[1],
-);
+)
+axes[1].set(xlabel="Contrast (%, either side)", ylabel="Response time (s, log scale)");
 
 # %% [markdown]
+# Spike widths have two humps: narrow spikes (often inhibitory interneurons)
+# and broad ones (often excitatory pyramidal cells). The response times are
+# skewed, with a long tail of slow trials, so a log scale shows them better.
+#
 # ### Small multiples: one panel per category with `col=`
 
 # %%
 sns.displot(
-    data=gapminder[gapminder["year"] == 2007],
-    x="lifeExp",
-    col="continent",
-    col_wrap=3,
+    data=units,
+    x="firing_rate_Hz",
+    col="area",
+    col_wrap=4,
     height=2.5,
-    bins=10,
+    bins=15,
 );
 
 # %% [markdown]
 # ### Regression: `lmplot`
 #
-# A straight-line fit with its confidence band, here against log GDP:
+# A straight-line fit with its confidence band, here of log response time
+# against stimulus strength, on the trials that were not unusually slow:
 
 # %%
-gapminder["logGdp"] = np.log10(gapminder["gdpPercap"])
-sns.lmplot(data=gapminder[gapminder["year"] == 2007], x="logGdp", y="lifeExp", height=4, aspect=1.4);
+quick = trials[trials["response_time_s"] < 5].copy()
+quick["strength"] = quick["contrast"].abs()
+quick["log_rt"] = np.log10(quick["response_time_s"])
+sns.lmplot(data=quick, x="strength", y="log_rt", x_jitter=1, scatter_kws={"alpha": 0.3}, height=4, aspect=1.4);
 
 # %% [markdown]
 # Every seaborn figure is still Matplotlib underneath: axes-level functions
@@ -131,30 +183,34 @@ sns.lmplot(data=gapminder[gapminder["year"] == 2007], x="logGdp", y="lifeExp", h
 #
 # ## Your turn: one plot of your own
 #
-# Use `gapminder` to make one seaborn plot that answers a question **you** find
-# interesting. Give it proper axis labels and save it to a file. Ideas:
+# Use `trials`, `units` or `rates_long` to make one seaborn plot that answers a
+# question **you** find interesting. Give it proper axis labels and save it to a
+# file. Ideas:
 #
-# * How has the *spread* of life expectancy within each continent changed between
-#   1952 and 2007? (`catplot` with `kind="box"` or `kind="violin"`)
-# * Which countries' populations grew fastest? (compute a growth column first)
-# * Does the GDP versus life expectancy relationship look the same in 1952 as in
-#   2007? (`relplot` with `col="year"`)
+# * Does the mouse respond faster on correct trials than on wrong ones, at every
+#   contrast? (`catplot` with `kind="box"` or `kind="violin"` and `hue="correct"`)
+# * Do narrow-spiking units fire faster than broad-spiking ones? (make a column
+#   that splits `spike_width_ms` at 0.4 ms first)
+# * Does the mouse get better or worse during the session? (a rolling mean of
+#   `correct` against trial number, with `.rolling(50).mean()`)
 
 # %% tags=["solution"]
-# One possible answer: the spread of life expectancy within each continent, 1952 and 2007.
+# One possible answer: response times on correct and wrong trials, by stimulus strength.
+quick["outcome"] = np.where(quick["correct"], "correct", "wrong")
 g = sns.catplot(
-    data=first_last,
-    x="continent",
-    y="lifeExp",
-    hue="year",
+    data=quick,
+    x="strength",
+    y="response_time_s",
+    hue="outcome",
     kind="violin",
     split=True,
     inner="quart",
-    density_norm="width",  # every violin equally wide; Oceania has only two countries
+    density_norm="width",  # every violin equally wide, however many trials it has
     cut=0,  # do not draw the density beyond the observed values
+    log_scale=True,
     height=4,
     aspect=2,
 )
-g.set_axis_labels("", "Life expectancy (years)")
-g.figure.suptitle("Life expectancy rose everywhere; Africa's spread widened", y=1.03)
-g.savefig("life_expectancy_by_continent.png", dpi=150)
+g.set_axis_labels("Contrast (%, either side)", "Response time (s, log scale)")
+g.figure.suptitle("Wrong answers are slower, most of all on easy trials", y=1.03)
+g.savefig("response_times_by_outcome.png", dpi=150)

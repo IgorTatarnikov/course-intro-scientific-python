@@ -19,6 +19,7 @@ dependencies:
   - scikit-image=0.26
   - xarray=2026.9
   - netcdf4=1.7
+  - h5py=3.16
   - dask=2026.8
   - napari=0.9
   - pyqt=5.15

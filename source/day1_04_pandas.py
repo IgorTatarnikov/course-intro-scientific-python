@@ -3,54 +3,78 @@
 #
 # **Block:** pandas (55 min, about 10 of them slides)
 #
-# We use the **gapminder** data here and again for plotting on Day 2: GDP per capita (and, in
-# `gapminder_all.csv`, life expectancy and population) for 142 countries from
-# 1952 to 2007, one CSV file per continent.
+# We stay with the recording from the NumPy block, and now look at its
+# **tables**, which pandas is made for:
+#
+# * **trials**: one row per trial of the task: when the stimulus appeared, its
+#   contrast (negative on the left, positive on the right, in %), the block's
+#   prior (`probability_left`), the mouse's choice (-1 left, 1 right), whether
+#   it was correct, and its response time.
+# * **units**: one row per neuron (unit) found by spike sorting: the channel it
+#   was largest on, that channel's brain area and height above the probe tip,
+#   the sorter's quality label, and a few measurements.
 #
 # 1. **Reading tabular data** (10 min): Reading Other Data, Inspecting Data, Writing Data
 # 2. **Selecting data** (15 min): Selection of Individual Values, Extent of
 #    Slicing, Selecting Indices, Practice with Selection, Boolean masks
 # 3. **Group by: split-apply-combine** (15 min), finishing with a grouping question of your own
-# 4. **Stretch:** Many Ways of Access, then missing data, merging and reshaping
+# 4. **Stretch:** Many Ways of Access, then merging and reshaping
 #
-# Sections 1 to 3 are adapted from Software Carpentry's [Plotting and Programming
-# in Python](https://swcarpentry.github.io/python-novice-gapminder/), episodes
-# [Reading Tabular Data into
+# Sections 1 to 3 follow the exercises of Software Carpentry's [Plotting and
+# Programming in Python](https://swcarpentry.github.io/python-novice-gapminder/),
+# episodes [Reading Tabular Data into
 # DataFrames](https://swcarpentry.github.io/python-novice-gapminder/07-reading-tabular.html)
 # and [Pandas
 # DataFrames](https://swcarpentry.github.io/python-novice-gapminder/08-data-frames.html)
-# (CC BY 4.0).
+# (CC BY 4.0), which use the gapminder data from the slides.
 
 # %%
+import h5py
 import pandas as pd
 
 # %% [markdown]
 # ## 1. Reading tabular data
 #
-# `read_csv` turns a CSV file into a `DataFrame`. `index_col` picks the column
-# whose values become the row labels.
+# A CSV file goes straight into a DataFrame with `pd.read_csv`. Our tables live
+# in the HDF5 file instead, one array per column, so this small function reads
+# one group of the file into a DataFrame. Text is stored as bytes in HDF5, so it
+# converts those columns to strings.
 
 # %%
-data_oceania = pd.read_csv("../data/gapminder_gdp_oceania.csv", index_col="country")
-data_oceania
+def read_table(group):
+    """Read one group of ../data/ibl_session.h5 into a DataFrame."""
+    with h5py.File("../data/ibl_session.h5") as f:
+        columns = {}
+        for name, values in f[group].items():
+            values = values[:]
+            if values.dtype.kind == "S":
+                values = values.astype(str)
+            columns[name] = values
+    return pd.DataFrame(columns)
+
+
+trials = read_table("trials")
+trials.index.name = "trial"
+trials
 
 # %%
-data_oceania.info()
+trials.info()
 
 # %% [markdown]
 # ### Reading Other Data
 #
-# Read the data in `gapminder_gdp_americas.csv` (in the same `../data/` folder)
-# into a variable called `data_americas` and display its summary statistics.
+# Read the `"units"` group into a variable called `units`. Make its `unit`
+# column the row labels (the index) with `.set_index`, then display its summary
+# statistics.
 
 # %% tags=["solution"]
-data_americas = pd.read_csv("../data/gapminder_gdp_americas.csv", index_col="country")
-data_americas.describe()
+units = read_table("units").set_index("unit")
+units.describe()
 
 # %% [markdown]
 # ### Inspecting Data
 #
-# Use `help(data_americas.head)` and `help(data_americas.tail)` to find out what
+# Use `help(units.head)` and `help(units.tail)` to find out what
 # `DataFrame.head` and `DataFrame.tail` do.
 #
 # 1. What method call will display the first three rows of this data?
@@ -59,49 +83,56 @@ data_americas.describe()
 
 # %% tags=["solution"]
 # 1.
-data_americas.head(n=3)
+units.head(n=3)
 
 # %% tags=["solution"]
 # 2. Transpose so the columns become rows, take the last three, transpose back.
-data_americas.T.tail(n=3).T
+units.T.tail(n=3).T
 
 # %% [markdown] tags=["solution"]
-# `data_americas.iloc[:, -3:]` does the same thing more directly. You will meet
+# `units.iloc[:, -3:]` does the same thing more directly, and keeps each
+# column's dtype (the transposes turn everything into `object`). You will meet
 # `iloc` in the next section.
 
 # %% [markdown]
 # ### Writing Data
 #
 # As well as `read_csv`, pandas provides `to_csv` to write DataFrames to files.
-# Write one of your DataFrames to a file called `processed.csv`. Use `help` to
-# find out how `to_csv` works, then read the file back in to check it.
+# Write `units` to a file called `units.csv`, so a colleague without HDF5 could
+# open it in a spreadsheet. Use `help` to find out how `to_csv` works, then read
+# the file back in with `pd.read_csv` to check it. Which argument makes `unit`
+# the index again?
 
 # %% tags=["solution"]
-data_americas.to_csv("processed.csv")
-pd.read_csv("processed.csv", index_col="country").head(3)
+units.to_csv("units.csv")
+pd.read_csv("units.csv", index_col="unit").head(3)
 
 # %% [markdown] tags=["solution"]
-# `help(pd.to_csv)` fails, because `to_csv` is a **method** of a DataFrame, not
-# a pandas function. Use `help(data_americas.to_csv)` or `help(pd.DataFrame.to_csv)`.
+# `index_col="unit"`. `help(pd.to_csv)` fails, because `to_csv` is a **method**
+# of a DataFrame, not a pandas function. Use `help(units.to_csv)` or
+# `help(pd.DataFrame.to_csv)`.
 
 # %% [markdown]
 # ## 2. Selecting data
 #
 # * `df.iloc[row, col]` selects by **position** (0, 1, 2, ...)
-# * `df.loc[row, col]` selects by **label** (`"Albania"`, `"gdpPercap_1952"`)
+# * `df.loc[row, col]` selects by **label** (unit `32`, column `"area"`)
 # * `:` on its own means all rows or all columns
+#
+# Here the row labels of both tables are numbers, which makes the difference
+# between the two easy to miss.
 
 # %%
-data_europe = pd.read_csv("../data/gapminder_gdp_europe.csv", index_col="country")
-data_europe.head()
+units = read_table("units").set_index("unit")
+units.head()
 
 # %% [markdown]
 # ### Selection of Individual Values
 #
-# Write an expression to find the GDP per capita of Serbia in 2007.
+# Write an expression to find the firing rate of unit 32.
 
 # %% tags=["solution"]
-data_europe.loc["Serbia", "gdpPercap_2007"]
+units.loc[32, "firing_rate_Hz"]
 
 # %% [markdown]
 # ### Extent of Slicing
@@ -111,13 +142,14 @@ data_europe.loc["Serbia", "gdpPercap_2007"]
 #    slices and in named slices in pandas?
 
 # %%
-print(data_europe.iloc[0:2, 0:2])
-print(data_europe.loc["Albania":"Belgium", "gdpPercap_1952":"gdpPercap_1962"])
+print(units.iloc[0:2, 0:2])
+print(units.loc[0:2, "channel":"area"])
 
 # %% [markdown] tags=["answer"]
-# No. The second gives an extra row (Belgium) and an extra column (1962).
-# A numerical slice `0:2` **excludes** the end, as everywhere else in Python. A
-# named slice `"Albania":"Belgium"` **includes** the end label.
+# No. The second gives an extra row (unit 2). A position slice `0:2` **excludes**
+# the end, as everywhere else in Python. A label slice includes the end label,
+# both for rows (`0:2` means the labels 0 to 2) and for columns
+# (`"channel":"area"`).
 
 # %% [markdown]
 # ### Selecting Indices
@@ -126,125 +158,139 @@ print(data_europe.loc["Albania":"Belgium", "gdpPercap_1952":"gdpPercap_1962"])
 # would you use these methods?
 
 # %%
-print(data_europe.idxmin())
-print(data_europe.idxmax())
+measurements = units[["firing_rate_Hz", "amplitude_uV", "presence_ratio"]]
+print(measurements.idxmin())
+print(measurements.idxmax())
 
 # %% [markdown] tags=["answer"]
-# For each column, `idxmin` returns the **row label** (here, the country) where
-# the minimum value is, and `idxmax` does the same for the maximum. Use them when
-# you want to know *which* row holds the extreme value, not the value itself.
+# For each column, `idxmin` returns the **row label** (here, the unit number)
+# where the minimum value is, and `idxmax` does the same for the maximum. Use them
+# when you want to know *which* row holds the extreme value, not the value
+# itself: for example, which unit fires fastest.
 
 # %% [markdown]
 # ### Practice with Selection
 #
-# Using `data_europe`, write an expression to select each of the following:
+# Using `trials`, write an expression to select each of the following:
 #
-# 1. GDP per capita for all countries in 1982.
-# 2. GDP per capita for Denmark for all years.
-# 3. GDP per capita for all countries for years *after* 1985.
-# 4. GDP per capita for each country in 2007 as a multiple of GDP per capita for
-#    that country in 1952.
+# 1. The response time of every trial.
+# 2. Everything about trial 89.
+# 3. The columns from `contrast` to `choice`, for trials 500 onwards.
+# 4. Each trial's response time as a multiple of the median response time.
 
 # %% tags=["solution"]
 # 1.
-data_europe["gdpPercap_1982"]
+trials["response_time_s"]
 
 # %% tags=["solution"]
 # 2.
-data_europe.loc["Denmark", :]
+trials.loc[89, :]
 
 # %% tags=["solution"]
-# 3. No column is called gdpPercap_1985, but labels are sorted strings, so the
-#    slice starts at the first label after it.
-data_europe.loc[:, "gdpPercap_1985":]
+# 3. A label slice: 500 to the end, contrast to choice inclusive.
+trials.loc[500:, "contrast":"choice"]
 
 # %% tags=["solution"]
 # 4.
-data_europe["gdpPercap_2007"] / data_europe["gdpPercap_1952"]
+trials["response_time_s"] / trials["response_time_s"].median()
 
 # %% [markdown]
 # ### Boolean masks
 #
 # Comparisons give a Series of `True`/`False` that selects rows, exactly like
-# NumPy masks. They work on text columns too. `gapminder_all.csv` has every
-# country, with a `continent` column and three measurements per year:
-# `gdpPercap_*`, `lifeExp_*` and `pop_*`.
+# NumPy masks. They work on text columns too. Here are the units on sites
+# **above** the brain, which should not exist:
 
 # %%
-data_all = pd.read_csv("../data/gapminder_all.csv", index_col="country")
-in_africa = data_all["continent"] == "Africa"
-in_africa.sum()
+on_void = units["area"] == "void"
+on_void.sum()
 
 # %% [markdown]
-# Using masks on `data_all`, make:
+# Using masks on `units`, make:
 #
-# 1. `n_small_1952`: the number of countries with a population below one
-#    million in 1952
-# 2. `big_asia`: the `lifeExp_2007` and `pop_2007` columns, for countries in
-#    **Asia** with a population above 100 million in 2007
-# 3. `short_lived`: the names of the countries in the **Americas or
-#    Oceania** whose life expectancy in 2007 was below 70 (Hint: `.index`, and
+# 1. `n_slow`: the number of units firing below 1 spike per second
+# 2. `good_ss`: the `firing_rate_Hz` and `amplitude_uV` columns, for units in
+#    **`"SSs"`** that the sorter labelled `"good"`
+# 3. `suspicious`: the unit numbers of the units that are either on `"void"`
+#    sites **or** have a spike width of 0 or less (a waveform the
+#    measurement could not handle). How many are there? (Hint: `.index`, and
 #    brackets around each comparison.)
 
 # %% tags=["solution"]
-n_small_1952 = (data_all["pop_1952"] < 1e6).sum()
-is_big_asian = (data_all["continent"] == "Asia") & (data_all["pop_2007"] > 100e6)
-big_asia = data_all.loc[is_big_asian, ["lifeExp_2007", "pop_2007"]]
-in_region = (data_all["continent"] == "Americas") | (data_all["continent"] == "Oceania")
-short_lived = data_all.index[in_region & (data_all["lifeExp_2007"] < 70)]
-print(n_small_1952)
-print(big_asia)
-print(short_lived)
+n_slow = (units["firing_rate_Hz"] < 1).sum()
+is_good_ss = (units["area"] == "SSs") & (units["label"] == "good")
+good_ss = units.loc[is_good_ss, ["firing_rate_Hz", "amplitude_uV"]]
+suspicious = units.index[(units["area"] == "void") | (units["spike_width_ms"] <= 0)]
+print(n_slow)
+print(good_ss)
+print(len(suspicious), suspicious[:10])
 
 # %% [markdown]
 # ## 3. Group by: split-apply-combine
 #
-# How do European countries split by wealth? First mark, for every country and
-# year, whether its GDP was above the European average for that year. Then
-# score each country by the fraction of years it was above average:
+# Does the mouse do the task? For every contrast, what fraction of the time did
+# it turn the stimulus **right**? First add a column of `True`/`False`. Then
+# **split** the trials by contrast, **apply** a mean to each group, and
+# **combine** the results:
 
 # %%
-mask_higher = data_europe > data_europe.mean()
-wealth_score = mask_higher.aggregate("sum", axis=1) / len(data_europe.columns)
-wealth_score.sort_values()
+trials["chose_right"] = trials["choice"] == 1
+psychometric = trials.groupby("contrast")["chose_right"].mean()
+psychometric
 
 # %% [markdown]
 # **Talk it through with your neighbour:**
 #
-# * What shape is `data_europe.mean()`, and how does it line up against `data_europe`?
-# * `True` counts as 1 and `False` as 0 when summed. What does `axis=1` do here?
+# * What does the mean of a column of `True`/`False` give?
+# * Does the curve look like a mouse that can see the stimulus? What happens at
+#   contrast 0, where there is nothing to see?
 #
-# Now **split** the countries by score, **apply** a sum to each group and
-# **combine** the results into one table:
+# The task has **blocks**: for a while the stimulus appears on the left 80% of
+# the time (`probability_left` 0.8), then on the right 80% of the time (0.2).
+# Group by two columns, and `unstack` one of them into columns:
 
 # %%
-data_europe.groupby(wealth_score).sum()
+by_block = trials.groupby(["probability_left", "contrast"])["chose_right"].mean()
+by_block.unstack("probability_left").round(2)
 
 # %% [markdown]
+# Compare the 0.2 and 0.8 columns at contrast 0. Has the mouse learned the
+# blocks?
+#
 # ### Your own grouping question
 #
-# Ask and answer **one** question of your own about `data_all` that needs
-# `groupby`. For example:
+# Ask and answer **one** question of your own that needs `groupby`, about
+# `trials` or `units`. For example:
 #
-# * Which continent's total population grew the most from 1952 to 2007, as a
-#   multiple of its 1952 population?
-# * How spread out was life expectancy within each continent in 2007? (Hint:
-#   `.agg` with `"std"`, `"min"` and `"max"`.)
-# * How many countries in each continent had a life expectancy above 70 in
-#   2007? (Hint: a mask is a column of `True`/`False` values, and you can group it.)
+# * Does the mouse respond faster when the stimulus is stronger? (Hint: group
+#   the median response time by `trials["contrast"].abs()`. A Series can be the
+#   thing you group by.)
+# * Is the mouse more often correct in some blocks than in others?
+# * How many units does each brain area have, how fast do they fire, and how
+#   many are labelled `"good"`? (Hint: `.agg` with several functions.)
 
 # %% tags=["solution"]
-# Population growth per continent, 1952 to 2007.
-by_continent = data_all.groupby("continent")
-(by_continent["pop_2007"].sum() / by_continent["pop_1952"].sum()).sort_values()
+# Median response time against stimulus strength.
+trials.groupby(trials["contrast"].abs())["response_time_s"].median().round(3)
 
 # %% tags=["solution"]
-# Spread of life expectancy within each continent in 2007.
-by_continent["lifeExp_2007"].agg(["std", "min", "max"]).round(1)
+# Fraction correct in each block.
+trials.groupby("probability_left")["correct"].mean().round(3)
 
 # %% tags=["solution"]
-# Countries per continent with a life expectancy above 70 in 2007.
-(data_all["lifeExp_2007"] > 70).groupby(data_all["continent"]).sum()
+# Units per brain area.
+units.groupby("area").agg(
+    n_units=("firing_rate_Hz", "size"),
+    median_rate_Hz=("firing_rate_Hz", "median"),
+    n_good=("label", lambda label: (label == "good").sum()),
+)
+
+# %% [markdown] tags=["solution"]
+# Responses get faster as the contrast rises, from about 0.5 s at 0% to under
+# 0.3 s at 100%: a stronger stimulus is an easier decision. The mouse does worst
+# in the unbiased (0.5) blocks, the first trials of the session, before it can
+# use the prior. Half of the units are in the two somatosensory areas, and only
+# about one in ten passes the sorter's quality checks.
 
 # %% [markdown]
 # ## 4. Stretch
@@ -256,7 +302,7 @@ by_continent["lifeExp_2007"].agg(["std", "min", "max"]).round(1)
 #
 # There are many ways to get at the same data: by label or by position, and as
 # a `DataFrame` or as a `Series`. Suggest at least two different ways of doing each
-# of the following on `data_europe`:
+# of the following on `units`:
 #
 # 1. Access a single column
 # 2. Access a single row
@@ -271,40 +317,56 @@ by_continent["lifeExp_2007"].agg(["std", "min", "max"]).round(1)
 
 # %% tags=["solution"]
 # 1. Single column
-data_europe["gdpPercap_1952"]       # Series
-data_europe[["gdpPercap_1952"]]     # DataFrame
-data_europe.iloc[:, 0]              # Series, by position
+units["area"]                       # Series
+units[["area"]]                     # DataFrame
+units.iloc[:, 1]                    # Series, by position
 
 # 2. Single row
-data_europe.loc["Denmark"]          # Series
-data_europe.loc[["Denmark"]]        # DataFrame
-data_europe.iloc[7]                 # Series, by position (Denmark is row 7)
+units.loc[32]                       # Series
+units.loc[[32]]                     # DataFrame
+units.iloc[32]                      # Series, by position (unit 32 is row 32)
 
 # 3. Single element
-data_europe.loc["Denmark", "gdpPercap_1952"]
-data_europe.iloc[7, 0]
-data_europe.at["Denmark", "gdpPercap_1952"]  # fast scalar access
+units.loc[32, "firing_rate_Hz"]
+units.iloc[32, 4]
+units.at[32, "firing_rate_Hz"]      # fast scalar access
 
 # 4. Several columns
-data_europe[["gdpPercap_1952", "gdpPercap_2007"]]
-data_europe.iloc[:, [0, -1]]
+units[["area", "firing_rate_Hz"]]
+units.iloc[:, [1, 4]]
 
 # 5. Several rows
-data_europe.loc[["Denmark", "Norway"]]
-data_europe.iloc[[7, 18]]
+units.loc[[24, 32]]
+units.iloc[[24, 32]]
 
 # 6. Specific rows and columns
-data_europe.loc[["Denmark", "Norway"], ["gdpPercap_1952", "gdpPercap_2007"]]
-data_europe.iloc[[7, 18], [0, -1]]
+units.loc[[24, 32], ["area", "firing_rate_Hz"]]
+units.iloc[[24, 32], [1, 4]]
 
 # 7. Ranges
-data_europe.loc["Denmark":"Germany", "gdpPercap_1952":"gdpPercap_1962"]
-data_europe.iloc[7:11, 0:3]   # rows 7 to 10, the same as the .loc line: the end is excluded
+units.loc[30:33, "channel":"depth_um"]
+units.iloc[30:34, 0:3]   # rows 30 to 33, the same as the .loc line: the end is excluded
 
 # %% [markdown] tags=["solution"]
 # A single label or position gives a `Series`. A **list** of labels (even a list
-# of one, `[["gdpPercap_1952"]]`) or a slice keeps the result two-dimensional,
-# so it is a `DataFrame`.
+# of one, `[["area"]]`) or a slice keeps the result two-dimensional, so it is a
+# `DataFrame`. Here unit numbers and positions happen to be equal, because the
+# units are numbered 0, 1, 2, ... in order. After filtering or sorting they no
+# longer would be, and `loc` and `iloc` would give different rows.
+
+# %% [markdown]
+# ### Merging: which layer is each unit in?
+#
+# The `"electrodes"` group has one row per channel, including its cortical
+# `layer`. Read it into a DataFrame, then use `pd.merge` (or `units.merge`) on
+# the `channel` column to give every unit the layer of its channel. How many
+# units are in each layer? (Sites outside the cortex, in `PIR` or above the
+# brain, have no layer: an empty string.)
+
+# %% tags=["solution"]
+electrodes = read_table("electrodes")
+units_with_layer = units.reset_index().merge(electrodes[["channel", "layer"]], on="channel")
+units_with_layer.groupby("layer")["unit"].count()
 
 # %% [markdown]
 # ### Further reading
@@ -322,13 +384,13 @@ data_europe.iloc[7:11, 0:3]   # rows 7 to 10, the same as the .loc line: the end
 # * The [pandas_exercises](https://github.com/guipsamora/pandas_exercises) repository.
 #
 # A small taste of reshaping, which you need for seaborn on Day 2. The
-# **wide** table has one column per year; the **long** table has one row per
-# country and year:
+# **wide** table from the group-by section has one column per block; the
+# **long** table has one row per block and contrast:
 
 # %%
-gdp_long = (
-    data_europe.reset_index()
-    .melt(id_vars="country", var_name="year", value_name="gdpPercap")
-    .assign(year=lambda df: df["year"].str.removeprefix("gdpPercap_").astype(int))
+psychometric_long = (
+    by_block.unstack("probability_left")
+    .reset_index()
+    .melt(id_vars="contrast", var_name="probability_left", value_name="fraction_right")
 )
-gdp_long.head()
+psychometric_long.head()

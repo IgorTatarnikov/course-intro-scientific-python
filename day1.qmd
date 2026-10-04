@@ -673,10 +673,11 @@ c = np.clip(a, 0, 10)
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing, views and in-place changes**
 
-* Fetch frames, pixels and crops from a 3-D array
+* A real recording: a Neuropixels probe in a mouse brain [@ibl_bwm_dandi]
+* Fetch time windows from chosen channels, and trials from 3-D spike counts
 * Change part of a recording, with and without changing the original
 * Fix a function that changes its input by accident
-* Fix a dtype problem
+* Fix two dtype problems in the raw `int16` data
 
 **15 minutes**
 
@@ -765,8 +766,8 @@ col * 10 + row                     # (3, 4)
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 2: aggregations and broadcasting**
 
-* Summarise 3-D spike counts along one axis, or several
-* Distances between cells and ΔF/F by broadcasting, no loops
+* Summarise spike counts (unit × trial × bin) along one axis, or several
+* Distances between recording sites, re-referencing and baseline correction by broadcasting, no loops
 * Fix a broadcasting error
 
 **12 minutes**
@@ -877,10 +878,11 @@ PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHan
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks, fancy indexing and vectorising**
 
-* Reaction times: select trials by condition, and replace outliers with `NaN`
-* Fancy indexing: lookup tables, reordering, colouring a label image
-* Time a loop against NumPy on an animal's path
-* **Data statistics** (SPL Ex. 23): hare and lynx populations, **no for-loops**
+* Response times: select trials by condition, and replace outliers with `NaN`
+* Select channels by brain area and layer with masks
+* Fancy indexing: each unit's brain area, reordering trials, colouring channels
+* Time a loop against NumPy on the LFP
+* **Data statistics** (after SPL Ex. 23): response times, peak times, busiest units, **no for-loops**
 
 **20 minutes**. **Stretch:** a 3-D integral by broadcasting (SPL Ex. 24); Markov chain (SPL Ex. 26)
 
@@ -979,9 +981,9 @@ data.loc["Albania":"Austria", "gdpPercap_1952":"gdpPercap_1957"].round()
 
 ## Your turn {.exercise-slide}
 
-Open [notebooks/day1_04_pandas.ipynb]{.notebook}. The exercises are from the Software Carpentry gapminder lesson [@swc_gapminder].
+Open [notebooks/day1_04_pandas.ipynb]{.notebook}. The exercises follow the Software Carpentry gapminder lesson [@swc_gapminder], on the recording's trials and units tables.
 
-1. **Reading tabular data** (10 min): read, inspect and write CSV files
+1. **Reading tabular data** (10 min): read tables from the HDF5 file, inspect them, write and read back a CSV
 2. **Selecting data** (15 min): individual values, slices, `idxmin`/`idxmax`, selection practice
 
 ## Boolean masks
@@ -1052,10 +1054,10 @@ Beyond today: missing data, `merge`/`join` and reshaping with `melt` are stretch
 
 Open [notebooks/day1_04_pandas.ipynb]{.notebook}
 
-1. **Boolean masks** (5 min): the end of section 2, on every country, combining text and number conditions
-2. **Group by** (15 min): a wealth score for Europe, then **one grouping question of your own** on `gapminder_all.csv`
+1. **Boolean masks** (5 min): the end of section 2, on the units, combining text and number conditions
+2. **Group by** (15 min): the mouse's psychometric curve, block by block, then **one grouping question of your own**
 
-**Stretch:** Many Ways of Access; missing data, merge and join, and reshaping (PDSH)
+**Stretch:** Many Ways of Access; merging units with electrodes, and reshaping (PDSH)
 
 ## Wrap-up
 

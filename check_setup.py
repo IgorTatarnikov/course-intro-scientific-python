@@ -22,19 +22,18 @@ PACKAGES = [
     ("scikit-image", "skimage"),
     ("xarray", "xarray"),
     ("netCDF4", "netCDF4"),
+    ("h5py", "h5py"),
     ("dask", "dask"),
     ("napari", "napari"),
     ("jupyterlab", "jupyterlab"),
 ]
 
 DATA_FILES = [
-    "populations.txt",
-    "moonlanding.png",
-    "face.png",
+    "ibl_session.h5",
     "human_mitosis.png",
+    "moonlanding.png",
     "gapminder_gdp_europe.csv",
     "gapminder_all.csv",
-    "air_temperature_daily.nc",
 ]
 
 

@@ -2,6 +2,8 @@
 
 A two-day course (3 hours a day) covering environments, NumPy, pandas, Matplotlib, seaborn, SciPy and scikit-image, with a short tour of xarray, dask and napari. Each block mixes short runs of slides with live coding, then ends with exercises in a Jupyter notebook.
 
+The exercises follow one real experiment from start to finish: a Neuropixels recording from a mouse doing a visual decision task, from the [International Brain Laboratory](https://www.internationalbrainlab.com/) via the [DANDI archive](https://dandiarchive.org/dandiset/000409). Students index its voltage traces by time and recording site, mask channels by brain area, summarise its trials and neurons with pandas, plot it, fit the mouse's psychometric curve, filter mains hum out of it, and treat it as labelled and as bigger-than-memory arrays. Only scikit-image and napari, which need images, switch to a microscopy image.
+
 ## For learners
 
 Do this **before Day 1**:
@@ -38,13 +40,13 @@ napari opens a desktop window, so please use your own laptop rather than Jupyter
 |---|---|---|
 | `day1_01_getting_help` | Setup and help | SPL *Getting help* |
 | `day1_02_environments` | Environments (terminal work) | conda and uv docs |
-| `day1_03_numpy` | NumPy | SPL Ex. 22–24 and 26, plus indexing, views-and-copies and in-place tasks |
-| `day1_04_pandas` | pandas | SWC gapminder, episodes 7 and 8 |
-| `day2_01_matplotlib` | Matplotlib | SPL *Simple plot*, Ex. 28 and 31, *Framing a Face* |
-| `day2_02_seaborn` | seaborn | Live demo on gapminder, after PDSH 4.14 |
-| `day2_03_scipy` | SciPy | SPL Ex. 39 and 42 (stretch: 40 and 41) |
+| `day1_03_numpy` | NumPy | An IBL Neuropixels recording (DANDI 000409), plus SPL Ex. 22–24 and 26 |
+| `day1_04_pandas` | pandas | SWC gapminder episodes 7 and 8, on the IBL trials and units tables |
+| `day2_01_matplotlib` | Matplotlib | After SPL *Simple plot*, Ex. 28, 31 and 35, on the recording |
+| `day2_02_seaborn` | seaborn | Live demo on the trials and units, after PDSH 4.14 |
+| `day2_03_scipy` | SciPy | After SPL Ex. 39, 41 and 42, on the recording (stretch: Ex. 40) |
 | `day2_04_scikit_image` | scikit-image | Nuclei segmentation (stretch: SPL coins exercises) |
-| `day2_05_xarray`, `day2_06_dask`, `day2_07_napari` | Whirlwind tour | Each project's tutorial |
+| `day2_05_xarray`, `day2_06_dask`, `day2_07_napari` | Whirlwind tour | Each project's tutorial; xarray and dask on the recording |
 
 Compared with the original three-day outline in `plan.md`, the two-day version moves these exercises to **stretch** (they are still in the notebooks): NumPy Ex. 24, pandas *Many Ways of Access*, the Matplotlib annotation step (now optional), SciPy Ex. 40 and 41, and the SPL coins exercises. The environments comparison is now a debrief led by the instructor, and the four "one slide each" packages share one slide.
 
@@ -103,9 +105,8 @@ Some slides run code at render time and read from `data/`. CI installs `requirem
 - Exercises adapted from [Scientific Python Lectures](https://lectures.scientific-python.org) (CC BY 4.0) and Software Carpentry's [Plotting and Programming in Python](https://swcarpentry.github.io/python-novice-gapminder/) (CC BY 4.0).
 - The [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/) is linked for reading only. Its text is CC BY-NC-ND, so none of it is copied here.
 - Data:
-  - `populations.txt` and `moonlanding.png`: from SPL (CC BY 4.0)
-  - gapminder CSVs: from Software Carpentry (CC BY 4.0)
-  - `face.png`: from `scipy.datasets`
+  - `ibl_session.h5`: a 1.9 MB slice of one session of the International Brain Laboratory's Brain Wide Map, [DANDI:000409](https://doi.org/10.48324/dandi.000409/0.260309.1324) (CC BY 4.0). `scripts/fetch_data.py` rebuilds it from DANDI.
+  - `moonlanding.png` (Day 2 slides only): from SPL (CC BY 4.0)
+  - gapminder CSVs (slides only): from Software Carpentry (CC BY 4.0)
   - `human_mitosis.png`: from `skimage.data`, CC0, courtesy of David Root, from Moffat *et al.*, *Cell* 2006
   - Hubble Deep Field (Day 2 slides only): loaded from `skimage.data`, NASA, public domain
-  - `air_temperature_daily.nc`: NCEP reanalysis via the xarray tutorial data, reduced to daily means

@@ -65,8 +65,10 @@ print(np.arange(5, dtype=float))
 # %% [markdown]
 # ## 3. Read a traceback
 #
-# The cell below fails on purpose. The error happens inside a function, which is
-# called from another function. Read the traceback from the **bottom up**:
+# The cell below fails on purpose. It reports the range of a few voltage
+# samples from the brain recording we use all course (you meet it properly in
+# the NumPy block). The error happens inside a function, which is called from
+# another function. Read the traceback from the **bottom up**:
 #
 # 1. What type of error is it, and what does the message say?
 # 2. In which function, and on which line, did it break?
@@ -82,16 +84,16 @@ def report(name, values):
     print(name, "range:", peak_to_peak(values))
 
 
-report("weights", [61.2, 74.5, 58.9])
+report("LFP, channel 100 (µV)", [112.5, -37.5, 84.4])
 
 # %% [markdown] tags=["answer"]
 # 1. An `AttributeError`: `'list' object has no attribute 'max'`.
 # 2. In `peak_to_peak`, on the line `return values.max() - values.min()`.
-# 3. The last line, `report("weights", ...)`, which calls `report`, which calls `peak_to_peak`.
+# 3. The last line, `report("LFP, channel 100 (µV)", ...)`, which calls `report`, which calls `peak_to_peak`.
 # 4. A Python list has no `.max()` method; a NumPy array does. Pass an array instead.
 
 # %% tags=["solution"]
-report("weights", np.array([61.2, 74.5, 58.9]))
+report("LFP, channel 100 (µV)", np.array([112.5, -37.5, 84.4]))
 
 # %% [markdown]
 # ## 4. Tab completion and searching
