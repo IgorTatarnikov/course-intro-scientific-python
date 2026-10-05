@@ -1,0 +1,77 @@
+/* Course-specific additions on top of _brand.yml. */
+
+/* Slightly smaller base text than reveal's 40px: these decks carry code and tables. */
+:root {
+  --r-main-font-size: 34px;
+}
+
+/* "Your turn" exercise slides: a green bar so they stand out when flicking through. */
+.reveal .slide.exercise-slide {
+  border-left: 0.4em solid var(--brand-niu-green, #03A062);
+  padding-left: 0.8em;
+}
+
+.reveal .exercise-slide h2::before {
+  content: "✍️ ";
+}
+
+/* Live coding slides: an amber bar, so they are easy to tell apart from exercises. */
+.reveal .slide.live-coding {
+  border-left: 0.4em solid #F2A900;
+  padding-left: 0.8em;
+}
+
+.reveal .live-coding h2::before {
+  content: "💻 ";
+}
+
+/* Notebook path shown on exercise slides. */
+.reveal .notebook {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.8em;
+  background: rgba(3, 160, 98, 0.1);
+  padding: 0.1em 0.4em;
+  border-radius: 0.2em;
+}
+
+/* Layered "ecosystem" diagram built from plain divs. */
+.reveal .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  font-size: 0.9em;
+}
+
+.reveal .stack > div {
+  border-radius: 0.3em;
+  padding: 0.35em 0.6em;
+  text-align: center;
+}
+
+.reveal .stack .layer-domain { background: #e8f0fe; }
+.reveal .stack .layer-tools  { background: #d2f4e4; }
+.reveal .stack .layer-core   { background: #b4e9cf; font-weight: 600; }
+.reveal .stack .layer-base   { background: #ececec; }
+
+/* Small grey print for sources under a slide. */
+.reveal .source-note {
+  font-size: 0.55em;
+  color: #666;
+}
+
+/* Quarto's default code size (0.55em) is too small to read from the back of a room. */
+.reveal div.sourceCode pre code,
+.reveal div.cell-output pre code {
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+/* Rendered DataFrames: compact, so a few rows and columns fit beside the code. */
+.reveal .cell-output-display table {
+  font-size: 0.75em;
+  margin: 0.3em 0;
+}
+.reveal .cell-output-display table th,
+.reveal .cell-output-display table td {
+  padding: 0.15em 0.5em;
+}
