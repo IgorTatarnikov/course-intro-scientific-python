@@ -51,7 +51,8 @@ Each block has a core that most learners should finish in the time given, follow
 ## Repository layout
 
 ```
-day1.qmd, day2.qmd, index.qmd   slide decks (Quarto + reveal.js)
+index.qmd                       the slide deck (Quarto + reveal.js)
+_day1.qmd, _day2.qmd            each day's slides, included by index.qmd
 source/                         single source for every notebook (Jupytext percent scripts)
 notebooks/                      exercise notebooks (generated: solutions stripped)
 solutions/                      solution notebooks (generated)
@@ -92,8 +93,8 @@ Install [Quarto](https://quarto.org/docs/get-started/). Point `QUARTO_PYTHON` at
 
 ```sh
 export QUARTO_PYTHON=$(which python)   # with the course environment active
-quarto render                          # renders index, day1 and day2 into build/
-quarto preview day1.qmd                # live preview while editing
+quarto render                          # renders the deck into build/index.html
+quarto preview index.qmd               # live preview while editing
 ```
 
 Some slides run code at render time and read from `data/`. CI installs `requirements.txt` and renders all decks; pushing a release tag deploys them to GitHub Pages (see `.github/workflows/render_and_deploy.yml`).

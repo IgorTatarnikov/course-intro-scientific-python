@@ -1,9 +1,4 @@
----
-title: "Day 2: pandas, plotting and scikit-learn"
-subtitle: Introduction to Scientific Python
-author: Neuroinformatics Unit
-date: 2026-10-06
----
+# Day 2: pandas, plotting and scikit-learn {#day-2}
 
 ```{python}
 #| echo: false
@@ -748,9 +743,4 @@ edited = viewer.layers["segmentation"].data          # read your edits back as a
 
 ::: {.source-note}
 Exercises adapted from Scientific Python Lectures [@spl] (CC BY 4.0) and the Software Carpentry gapminder lesson [@swc_gapminder] (CC BY 4.0). Further reading in the Python Data Science Handbook [@pdsh].
-:::
-
-## References {.smaller}
-
-::: {#refs}
 :::

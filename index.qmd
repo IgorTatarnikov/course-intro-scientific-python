@@ -8,8 +8,8 @@ date: 2026-10-05
 
 | Day | Topics | Slides |
 |-----|--------|--------|
-| 1 | Setup and help · packages and environments · NumPy · SciPy | [Day 1](day1.html) |
-| 2 | pandas · Matplotlib · seaborn · scikit-learn · where to go next | [Day 2](day2.html) |
+| 1 | Setup and help · packages and environments · NumPy · SciPy | [Day 1](#day-1) |
+| 2 | pandas · Matplotlib · seaborn · scikit-learn · where to go next | [Day 2](#day-2) |
 
 Each day runs **3 hours**, with a 10-minute break. Every block starts with a few minutes of slides, then exercises.
 
@@ -55,6 +55,10 @@ Every line should say `OK`.
 - **Python Data Science Handbook** [@pdsh]: background reading for NumPy, pandas and plotting
 
 Material from these sources is adapted under their licences. See each notebook's header for details.
+
+{{< include _day1.qmd >}}
+
+{{< include _day2.qmd >}}
 
 ## References {.smaller}
 

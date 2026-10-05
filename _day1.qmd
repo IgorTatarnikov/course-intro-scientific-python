@@ -1,11 +1,4 @@
----
-title: "Day 1: Environments, NumPy and SciPy"
-subtitle: Introduction to Scientific Python
-author: Neuroinformatics Unit
-date: 2026-10-05
----
-
-# Welcome
+# Day 1: Environments, NumPy and SciPy {#day-1}
 
 While we get started: run `jupyter lab`, open [notebooks/day1_01_getting_help.ipynb]{.notebook} and run the first cell, the setup check.
 
@@ -1138,9 +1131,4 @@ Exercises adapted from Scientific Python Lectures [@spl].
 
 ::: {.source-note}
 Exercises adapted from Scientific Python Lectures [@spl] (CC BY 4.0). Further reading in the Python Data Science Handbook [@pdsh].
-:::
-
-## References {.smaller}
-
-::: {#refs}
 :::

@@ -1,11 +1,10 @@
 project:
   type: default
   output-dir: build
-  # Only the slide decks are rendered; notebooks, source/ are not.
+  # Only the slide deck is rendered; notebooks, source/ are not.
+  # index.qmd includes the two days from _day1.qmd and _day2.qmd.
   render:
     - index.qmd
-    - day1.qmd
-    - day2.qmd
 
 bibliography: references.bib
 
