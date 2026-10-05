@@ -381,8 +381,7 @@ y = choice == 1
 # 4. Make `frac_right_rb` and `frac_right_lb`: the same curve for the
 #    right-block trials (`probability_left == 0.2`) and the left-block trials
 #    (0.8) only. (Hint: select the rows of `at_level` and `y` with a mask
-#    first.) Compare the two at contrast 0, where there is nothing to see. Has
-#    the mouse learned the blocks?
+#    first.) Do the two curves differ, and at which contrasts?
 
 # %% tags=["solution"]
 at_level = contrast[:, np.newaxis] == levels  # (533, 1) == (9,) -> (533, 9)
@@ -400,12 +399,12 @@ print(frac_right_rb.round(2))
 print(frac_right_lb.round(2))
 
 # %% [markdown] tags=["answer"]
-# At strong contrasts the mouse is nearly always right, whatever the block. At
-# contrast 0 it chooses right about half the time in right blocks but under a
-# third of the time in left blocks: when it cannot see the stimulus, it guesses
-# the side that has been more likely lately. It has learned the blocks and uses
-# them as a prior. (`(at_level & y[:, np.newaxis]).mean(axis=0)` would be wrong:
-# it divides by all 533 trials, not by the trials at each contrast.)
+# They agree at strong contrasts and differ at the weak ones: at contrast 0 the
+# fraction is 0.52 in right blocks and 0.29 in left blocks. Each fraction is
+# **number of right choices / number of trials** at that contrast, so dividing
+# by the right count matters: `(at_level & y[:, np.newaxis]).mean(axis=0)` would
+# divide by all 533 trials instead. Print `at_level[right_block].sum(axis=0)`
+# too: some points rest on only 5 trials, which a bare fraction does not show.
 
 # %% [markdown]
 # ## 4. Check your work with a plot
@@ -765,7 +764,7 @@ spike_unit[:10]
 # Compute and print, **without any for-loops**:
 #
 # 1. The mean and standard deviation of the response time, for correct and for
-#    wrong trials. What does the difference tell you about the mouse?
+#    wrong trials. Why is the standard deviation larger than the mean?
 # 2. For each unit, the time (from `bin_start`) of the bin where its
 #    trial-averaged count is highest. (Hint: `argmax` of `psth`, then fancy
 #    indexing of `bin_start`.)
@@ -787,9 +786,9 @@ print(f"Wrong:   {rt[~correct].mean():.2f} +/- {rt[~correct].std():.2f} s")
 
 # %% [markdown] tags=["answer"]
 # Wrong trials are about three times slower on average, and far more variable.
-# Many of them are trials where the mouse was not paying attention. The
-# standard deviations are larger than the means because a few very slow trials
-# (over 10 s) dominate; the median is a better summary here.
+# The standard deviations are larger than the means because a few very slow
+# trials (over 10 s) dominate. For skewed data like this, `np.median` is a
+# better summary than the mean.
 
 # %% tags=["solution"]
 # 2.

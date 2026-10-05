@@ -108,8 +108,8 @@ print(f"baseline {baseline:.3f}")
 # ## 2. Look inside the model
 #
 # 1. `model.coef_` holds one weight per feature (in the order of the columns of
-#    `X`) and `model.intercept_` the constant. What does the **sign** of each
-#    weight tell you about the mouse?
+#    `X`) and `model.intercept_` the constant. When a feature goes up, does the
+#    predicted probability of choosing right go up or down?
 # 2. Make `grid`, 201 contrasts from -100 to 100. For each kind of block, make a
 #    DataFrame with the same columns as `X`: the grid as `contrast`, and the
 #    block's `probability_left` (0.2 or 0.8) in every row. (Hint:
@@ -126,11 +126,12 @@ print(f"baseline {baseline:.3f}")
 print(model.coef_, model.intercept_)
 
 # %% [markdown] tags=["answer"]
-# The contrast weight is positive: the more the stimulus is on the right, the
-# more likely the mouse turns right. The `probability_left` weight is negative:
-# in blocks where the stimulus is usually on the left, the mouse is less likely
-# to choose right, whatever it sees. That is the prior you saw in the
-# psychometric curve, now as a number.
+# The contrast weight is positive, so the predicted probability of a right
+# choice rises with contrast. The `probability_left` weight is negative, so it
+# falls in left blocks: the model has picked up the difference between the
+# block curves. Read the **signs**, not the sizes: `LogisticRegression`
+# regularises by default (its `C` parameter), which shrinks the weights, and
+# features on different scales get weights on different scales.
 
 # %% tags=["solution"]
 grid = np.linspace(-100, 100, 201)
@@ -150,13 +151,13 @@ ax.set_ylabel("probability of choosing right")
 ax.legend();
 
 # %% [markdown] tags=["answer"]
-# The model's curves rise far too slowly. The mouse is already nearly always
-# right at 12.5% and 25% contrast, but the model says only 0.73 and 0.86 in
-# right blocks, and 0.46 and 0.66 in left blocks. Logistic regression assumes
-# each extra percent of contrast changes the odds by the same factor, all the
-# way to 100%. The mouse's vision saturates: going from 0 to 25% matters far
-# more than going from 25 to 100%. The model is only as good as the features
-# you give it (stretch: a better feature).
+# The model's curves rise far too slowly. The data are already near 1 at 12.5%
+# and 25% contrast, but the model says only 0.73 and 0.86 in right blocks, and
+# 0.46 and 0.66 in left blocks. Logistic regression assumes each extra percent
+# of contrast changes the odds by the same factor, all the way to 100%, and
+# these data level off well before that. Plotting a model over its data is the
+# quickest way to see a misfit that a single score hides. The model is only as
+# good as the features you give it (stretch: a better feature).
 
 # %% [markdown]
 # ## 3. Stretch
@@ -190,10 +191,10 @@ ax.legend();
 
 # %% [markdown] tags=["solution"]
 # The curves now follow the data closely. The test score barely moves (0.851 to
-# 0.858), because the score only counts which side is more likely, and both
-# models agree on that for most trials. The probabilities are much better,
-# which is what matters if you want to describe the mouse rather than just
-# guess its choice.
+# 0.858), because `score` only counts which side is more likely, and both
+# models agree on that for most trials. A score can hide a large difference in
+# the predicted probabilities, so look at a plot, or at a metric that uses
+# them (`sklearn.metrics.log_loss`).
 #
 # ### Does the block help? One split is not enough
 #
@@ -213,10 +214,8 @@ print(f"contrast only, cross-validated {cross_val_score(LogisticRegression(), X[
 
 # %% [markdown] tags=["solution"]
 # On our one split the block seems to help (0.836 to 0.851). Cross-validated,
-# the two are the same (about 0.855). The block only changes the choice on the
-# hard trials near contrast 0, which are a small fraction of the session, so it
-# hardly changes the score, even though its weight is large. Small differences
-# between models on one split are often luck.
+# the two are the same (about 0.855). Small differences between models on one
+# split are often luck, so compare models with cross-validation.
 #
 # ### Decode the choice from the neurons
 #
@@ -243,10 +242,9 @@ X_before = spike_counts[:, :, :10].sum(axis=2).T
 print("before stimulus:", cross_val_score(decoder, X_before, y, cv=5).mean().round(3))
 
 # %% [markdown] tags=["solution"]
-# The neurons predict the choice about 68% of the time, against about 50% for
-# both controls, so they carry real information about it, and only once the
-# stimulus has appeared. The five folds range from about 0.52 to 0.77, so
-# report the spread as well as the mean. These are somatosensory and insular
-# neurons, and the mouse starts turning the wheel within the window, so they
-# may well be signalling the movement rather than the decision. Telling those
-# apart needs a better design, not a better model.
+# The decoder scores about 0.68, against about 0.50 for both controls: the
+# controls show what "no information" scores, so the 0.68 means something. The
+# five folds range from about 0.52 to 0.77, so report the spread as well as the
+# mean. For a classifier, `cv=5` uses `StratifiedKFold` without shuffling,
+# which keeps the trials roughly in session order, so each fold tests on a
+# different part of the session; that is one reason the folds differ.

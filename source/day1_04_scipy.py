@@ -196,7 +196,7 @@ ax.legend();
 # ### Which distribution fits the response times? (after SPL Exercise 41)
 #
 # Response times are positive and skewed, with a long tail. Take the response
-# times below 5 s (the others are trials where the mouse was not engaged). Fit
+# times below 5 s (a few much slower trials would stretch the plot). Fit
 # a gamma distribution and a lognormal distribution to them with
 # `sp.stats.gamma.fit` and `sp.stats.lognorm.fit`, fixing the location at 0
 # (`floc=0`). Plot their PDFs on top of the histogram (`ax.hist(...,

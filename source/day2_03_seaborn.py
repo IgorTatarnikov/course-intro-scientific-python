@@ -130,9 +130,9 @@ sns.boxplot(
 axes[1].set(xlabel="Contrast (%, either side)", ylabel="Response time (s, log scale)");
 
 # %% [markdown]
-# Spike widths have two humps: narrow spikes (often inhibitory interneurons)
-# and broad ones (often excitatory pyramidal cells). The response times are
-# skewed, with a long tail of slow trials, so a log scale shows them better.
+# `multiple="stack"` stacks the groups instead of overlapping them. The
+# response times are skewed, with a long tail of slow trials, so a log scale
+# (`log_scale=True`) shows them better.
 #
 # ### Small multiples: one panel per category with `col=`
 

@@ -212,9 +212,9 @@ ax.set_ylabel("height above probe tip (µm)");
 # `origin="upper"`, puts row 0 at the top, like a matrix or a photograph; images
 # from microscopes and cameras usually want the default. Clipping the colour
 # scale at the 99th percentile stops a few large values from washing out the
-# rest. The broad vertical bands are slow waves that reach most of the probe at
-# once. Above about 2.7 mm they are weaker, and at times have the opposite
-# sign, which tells you where the currents behind them flow.
+# rest. A diverging colormap centred on 0 makes the sign of the signal easy to
+# read: the broad vertical bands are slow waves that reach most of the probe at
+# once.
 
 # %% [markdown]
 # ## 3. Stretch
@@ -319,8 +319,8 @@ ax.set_ylabel("unit, deepest first");
 # Plot the mean firing rate of all 51 units (in spikes per second: divide the
 # mean count by the 0.05 s bin width) against time from the stimulus, once for
 # **correct** trials and once for **wrong** ones, on the same axes. Mark the
-# stimulus with a vertical line. Does the population respond to the stimulus?
-# Is the response the same when the mouse gets it wrong?
+# stimulus with a vertical line, and put the number of trials behind each line
+# in its legend label.
 
 # %% tags=["solution"]
 rate_correct = spike_counts[:, correct].mean(axis=(0, 1)) / 0.05
@@ -336,12 +336,9 @@ ax.set_ylabel("mean firing rate (spikes/s)")
 ax.legend();
 
 # %% [markdown] tags=["solution"]
-# The population fires about a third faster from about 0.1 s after the
-# stimulus, as the mouse starts to move (the median response is registered at
-# 0.35 s). These areas are
-# somatosensory and insular cortex, not visual cortex, so the rise more likely
-# follows the movement and the reward than the stimulus itself. Wrong trials,
-# with no reward and often no prompt response, show a smaller rise.
+# Both lines rise after the stimulus; the one for wrong trials is noisier,
+# because it averages over far fewer trials. An f-string in `label=` keeps the
+# trial counts in the legend, so nobody has to guess them.
 
 # %% [markdown]
 # ### Multiple subplots (SPL Exercise 35)

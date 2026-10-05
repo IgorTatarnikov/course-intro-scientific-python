@@ -245,8 +245,8 @@ psychometric
 # **Talk it through with your neighbour:**
 #
 # * What does the mean of a column of `True`/`False` give?
-# * Does the curve look like a mouse that can see the stimulus? What happens at
-#   contrast 0, where there is nothing to see?
+# * How would you get the **number** of trials behind each value instead?
+#   (Hint: `.count()` or `.size()` in place of `.mean()`.)
 #
 # The task has **blocks**: the session starts with 90 unbiased trials
 # (`probability_left` 0.5). Then, for a while, the stimulus appears on the left
@@ -258,8 +258,7 @@ by_block = trials.groupby(["probability_left", "contrast"])["chose_right"].mean(
 by_block.unstack("probability_left").round(2)
 
 # %% [markdown]
-# Compare the 0.2 and 0.8 columns at contrast 0. Has the mouse learned the
-# blocks?
+# Compare the 0.2 and 0.8 columns. At which contrasts do they differ?
 #
 # Yesterday you computed the same curve with a mask and broadcasting. Here is
 # that NumPy version again, for the right blocks:
@@ -310,11 +309,12 @@ units.groupby("area").agg(
 )
 
 # %% [markdown] tags=["solution"]
-# Responses get faster as the contrast rises, from about 0.5 s at 0% to under
-# 0.3 s at 100%: a stronger stimulus is an easier decision. The mouse does worst
-# in the unbiased (0.5) blocks, the first trials of the session, before it can
-# use the prior. Half of the units are in the two somatosensory areas, and only
-# about one in ten passes the sorter's quality checks.
+# Grouping by `trials["contrast"].abs()` works because `groupby` accepts any
+# Series with the same index, not just a column name. The median response time
+# falls from about 0.5 s at 0% to under 0.3 s at 100%. The fraction correct is
+# lowest in the 0.5 block. Named aggregation, `.agg(new_name=(column,
+# function))`, gives the result tidy column names; a `lambda` works where no
+# built-in function fits.
 
 # %% [markdown]
 # ## 4. Tidy data

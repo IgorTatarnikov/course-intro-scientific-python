@@ -632,7 +632,7 @@ ax.plot(grid[:, 0], model.predict_proba(grid)[:, 1])
 Open [notebooks/day2_04_sklearn.ipynb]{.notebook}
 
 1. **Fit a model** (10 min): predict the mouse's choice from contrast and block; score it on held-out trials against a baseline
-2. **Look inside** (10 min): what do the coefficients say about the mouse? Plot the model's curves over the psychometric curve from the pandas block
+2. **Look inside** (10 min): what do the coefficients mean? Plot the model's curves over the psychometric curve from the pandas block
 
 **Stretch:** a better feature, whether the block helps (cross-validation), decoding the choice from the neurons
 
