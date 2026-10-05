@@ -17,11 +17,6 @@
 # 5. **Stretch**, for anyone who finishes early: views and copies, in-place
 #    changes, dtypes, more broadcasting, fancy indexing and data statistics
 #
-# The slides and live coding used 2-D tables of scores and a week of
-# temperatures. The exercises use one real experiment, a recording from a
-# mouse brain described below; only a few small SPL exercises use made-up
-# arrays.
-#
 # Most tasks ask you to store a result in a named variable. Print it, and
 # check its `.shape` and values against the array you started from. Part 4
 # shows just enough Matplotlib to check a result by eye; plotting proper is on
@@ -51,7 +46,7 @@ rng = np.random.default_rng(seed=0)
 # A mouse sits in front of a screen. A striped patch (the stimulus) appears on
 # the left or the right, faint or strong, and the mouse turns a wheel to move it
 # to the centre. A correct turn earns a drop of water. Meanwhile a
-# **Neuropixels probe** records from the mouse's brain.
+# Neuropixels probe records from the mouse's brain.
 #
 # The data come from the [International Brain Laboratory](https://www.internationalbrainlab.com/)
 # and were downloaded from the [DANDI archive](https://dandiarchive.org/dandiset/000409)
@@ -149,10 +144,10 @@ downsampled = lfp[::5]
 # END SOLUTION
 
 # %% tags=["solution"]
-print(deepest_trace.shape, one_value)
+print(deepest_trace.shape)
+print(one_value)
 for result in [first_second, sites_50_to_200, last_second, every_other_site, top_first, downsampled]:
     print(result.shape)
-print(area[[0, -1]], area[::-1][[0, -1]])  # top_first's first column is a void site
 
 # %% [markdown]
 # Now in `spike_counts`, which has three axes `[unit, trial, bin]`:
@@ -299,8 +294,7 @@ print(ssp_lfp.shape, in_brain.shape)
 # ### 3b. Vectorised versus loops
 #
 # The **line length** of a signal is the sum of the absolute differences between
-# consecutive samples. It is large when the signal is busy, and is a cheap
-# measure of activity in seizure detection.
+# consecutive samples. It is large when the signal is busy.
 #
 # `line_length_loop(signals)` below computes it with `for` loops over the
 # channels and the samples. Write `line_length_numpy(signals)`, which does the

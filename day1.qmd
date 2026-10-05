@@ -136,7 +136,7 @@ np.linspace(0, 1, int(n_points))   # fix
 Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
 1. If you haven't yet: run the setup check, every line should say `OK`
-2. Look up `np.arange` three ways and answer the questions
+2. Look up the built-in `range` three ways and answer the questions
 3. Read a traceback through two functions and fix the call
 
 **5 minutes**. **Stretch:** section 4, tab completion and searching
@@ -198,7 +198,7 @@ Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
     * Managed with `venv` + `pip`, or `uv`
 * **Global or task-based**: environments exist globally, easy to share across projects
     * Typically stored in a central location (`~/miniforge3/envs/`)
-    * Managed with `conda` or `pixi`
+    * Managed with `conda`
 :::
 
 ## conda and conda-forge
@@ -563,39 +563,6 @@ a[:2, 1:3]
 :::
 ::::
 
-## Live coding: creating and slicing arrays {.live-coding}
-
-* Lists versus arrays
-* Create arrays with `arange`, `linspace`, `zeros` and `reshape`
-* Inspect `shape`, `ndim` and `dtype`
-* Fetch single values, rows, columns and blocks
-
-::: {.notes}
-```python
-import numpy as np
-
-data = [1, 2, 3]
-data * 2                  # repeats
-np.array(data) * 2        # multiplies
-data + 1                  # TypeError
-np.array(data) + 1
-
-a = np.arange(1, 26).reshape(5, 5)
-a.shape, a.ndim, a.dtype
-
-a[0, 0], a[2, 3], a[-1, -1]
-a[1]                      # a row
-a[:, 1]                   # a column
-a[1:4, 1:4]               # the centre block
-a[::2, ::2]               # every other row and column
-a[::-1]                   # rows reversed
-
-np.linspace(0, 1, 5)
-np.zeros((2, 3), dtype=np.uint8)
-np.array([1, 2, 3]) / 2   # int / int -> float
-```
-:::
-
 ## Views and copies
 
 ::: {.panel-tabset}
@@ -923,6 +890,13 @@ week = temps.reshape(2, 7)
 ```{python}
 #| output-location: fragment
 x = np.arange(10, 20)
+print(x)
+```
+
+. . .
+
+```{python}
+#| output-location: fragment
 x[[0, 2, 2, -1]]
 ```
 
@@ -931,14 +905,21 @@ x[[0, 2, 2, -1]]
 ```{python}
 #| output-location: fragment
 M = np.arange(9).reshape(3, 3)
-M[[0, 1, 2], [2, 1, 0]]   # pairs (0,2) (1,1) (2,0)
+print(M)
 ```
 
 . . .
 
 ```{python}
 #| output-location: fragment
-M[[0, 2]]                 # rows 0 and 2
+M[[0, 2]]                 
+```
+
+. . .
+
+```{python}
+#| output-location: fragment
+M[[0, 1, 2], [2, 1, 0]]
 ```
 
 ## Vectorise instead of looping
@@ -1088,38 +1069,6 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 * Periodic noise shows up as isolated peaks
     * Remove them, then transform back
 * `sp.fft` has the forward and inverse transforms, in 1-D, 2-D and N-D
-:::
-
-## Live coding: removing mains hum {.live-coding}
-
-* A slow 3 Hz signal plus 50 Hz hum and noise
-* Its spectrum: where is the hum?
-* Zero the hum, transform back, compare
-
-::: {.notes}
-```python
-import scipy as sp
-
-fs = 500                                     # samples per second
-t = np.arange(0, 2, 1 / fs)
-rng = np.random.default_rng(0)
-clean = np.sin(2 * np.pi * 3 * t)
-recorded = clean + 0.8 * np.sin(2 * np.pi * 50 * t) + rng.normal(0, 0.2, t.size)
-
-spectrum = sp.fft.rfft(recorded)
-freqs = sp.fft.rfftfreq(t.size, d=1 / fs)
-fig, ax = plt.subplots()
-ax.plot(freqs, np.abs(spectrum))
-ax.set_xlabel("frequency (Hz)")             # peaks at 3 and 50
-
-spectrum[np.abs(freqs - 50) < 2] = 0        # a mask on the frequencies
-filtered = sp.fft.irfft(spectrum, n=t.size)
-
-fig, ax = plt.subplots(figsize=(8, 3))
-ax.plot(t, recorded, alpha=0.4, label="recorded")
-ax.plot(t, filtered, label="hum removed")
-ax.legend()
-```
 :::
 
 ## Your turn {.exercise-slide}
