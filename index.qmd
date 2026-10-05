@@ -13,11 +13,13 @@ date: 2026-10-05
 
 Each day runs **3 hours**, with a 10-minute break. Every block starts with a few minutes of slides, then exercises.
 
-## Setup
+## Setup {.smaller}
 
 1. Install [Miniforge](https://conda-forge.org/download/), which gives you `conda` with conda-forge as the default channel.
 2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv).
-3. Get the course materials: `git clone` the course repository, or [download](https://github.com/IgorTatarnikov/course-intro-scientific-python/archive/main.zip) it as a ZIP.
+3. Get the course materials with either:
+    a. `git clone https://github.com/neuroinformatics-unit/course-intro-scientific-python.git`
+    b. Or download the ZIP file [https://github.com/neuroinformatics-unit/course-intro-scientific-python/archive/main.zip](https://github.com/neuroinformatics-unit/course-intro-scientific-python/archive/main.zip)
 4. In a terminal, from the extracted or cloned course folder:
 
 ```bash
