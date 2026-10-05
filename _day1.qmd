@@ -6,8 +6,8 @@ While we get started: run `jupyter lab`, open [notebooks/day1_01_getting_help.ip
 
 | Day | Before the break | After the break |
 |-----|------------------|-----------------|
-| **1** | Setup and help · packages and environments · **NumPy** | **SciPy** |
-| 2 | pandas · Matplotlib | seaborn · scikit-learn · where to go next |
+| **1** | **Setup and help - packages and environments - NumPy** | **SciPy** |
+| 2 | pandas - Matplotlib | seaborn - scikit-learn - where to go next |
 
 <br>
 
@@ -324,7 +324,6 @@ Open [notebooks/day1_02_environments.ipynb]{.notebook}. The work happens in a **
 
 1. **conda** (12 min): create a scratch environment with pandas, export it, rebuild it under a new name, remove both
 2. **uv** (10 min): init a project, add requests, run a script, delete `.venv`, rebuild it from the lockfile
-3. **Debrief together:** which files would you commit?
 
 ::: {.callout-warning}
 Leave the course environment `scientific-python` alone: only work on the throwaway ones.
@@ -336,26 +335,7 @@ Leave the course environment `scientific-python` alone: only work on the throwaw
 
 ## The scientific Python ecosystem
 
-::: {.stack}
-::: {.layer-domain .fragment fragment-index=4}
-**Domain packages:** scikit-image · scikit-learn · napari · MNE · BrainGlobe · astropy · …
-:::
-::: {.layer-tools .fragment fragment-index=3}
-**Data and plotting:** pandas · xarray · dask · Matplotlib · seaborn
-:::
-::: {.layer-core .fragment fragment-index=2}
-**Core numerics:** NumPy (arrays) · SciPy (algorithms)
-:::
-::: {.layer-base .fragment fragment-index=1}
-**Interactive environments:** IPython · Jupyter &nbsp;&nbsp;|&nbsp;&nbsp; **Python** itself
-:::
-:::
-
-<br>
-
-::: {.fragment fragment-index=5}
-* Almost everything above NumPy **takes and returns NumPy arrays**
-:::
+![](img/Scientific-Python-Ecosystem.png)
 
 ::: {.source-note}
 After SPL, [Python scientific computing ecosystem](https://lectures.scientific-python.org/intro/intro.html).
@@ -408,7 +388,7 @@ np.arange(6)                 # like range()
 
 ```{python}
 #| output-location: fragment
-np.linspace(0, 1, 5)         # 5 evenly spaced points, end included
+np.linspace(0, 1, 5)       
 ```
 
 . . .
@@ -423,7 +403,7 @@ np.zeros((2, 3))             # also np.ones, np.full
 ```{python}
 #| output-location: fragment
 rng = np.random.default_rng(seed=0)
-rng.random((2, 3))           # uniform in [0, 1)
+rng.random((2, 3))           
 ```
 
 ## Shape, dimensions and dtype
@@ -618,18 +598,17 @@ c = np.clip(a, 0, 10)
 
 * Most NumPy **functions** return a new array; **assignment into** `a[...]` and `+=` change it in place
 
-## The recording
+## The example data
 
-:::: {.columns}
-::: {.column width="45%"}
-:::{.incremental}
+:::{.incremental .smaller}
 * A mouse turns a wheel to move a striped patch on a screen to the centre; a correct turn earns a drop of water
-* The patch appears left or right, faint or strong: its **contrast**
-* A **Neuropixels probe** records from 384 sites along 3.8 mm of brain
+* The patch appears left or right, faint or strong: its contrast
+* A Neuropixels probe records from 384 sites along 3.8 mm of brain
 :::
-:::
-::: {.column width="55%"}
-::: {.fragment}
+
+## The example data
+
+::: {.incremental}
 | Array | Shape | Axes |
 |---|---|---|
 | `lfp` | (5000, 384) | time (500 Hz, 10 s), channel |
@@ -639,8 +618,6 @@ c = np.clip(a, 0, 10)
 
 * Channel 0 is the **deepest** site
 :::
-:::
-::::
 
 ::: {.source-note}
 International Brain Laboratory, Brain Wide Map, via DANDI [@ibl_bwm_dandi].

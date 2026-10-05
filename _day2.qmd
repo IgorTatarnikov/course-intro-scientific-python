@@ -15,7 +15,7 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 |------------------|-----------------|
 | **pandas** (60 min) | **seaborn** (15 min) |
 | **Matplotlib** (25 min) | **scikit-learn** (30 min) |
-| | Where to go next · wrap-up |
+| | Where to go next - wrap-up |
 
 <br>
 
