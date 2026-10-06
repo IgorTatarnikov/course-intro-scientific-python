@@ -962,8 +962,6 @@ ax.legend();
 * A column of numbers is hard to judge; a plot is easy
 * `fig, ax = plt.subplots()`: a figure with one set of axes
 * `ax.plot(x, y)` draws a line; `"o-"` adds markers
-* Labels and a legend, and that's all for today
-* Tomorrow: Matplotlib properly
 :::
 :::
 ::::
@@ -975,8 +973,6 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 * Plot the psychometric curve in each kind of block
 * Does the picture agree with what you concluded from the numbers?
 * Didn't finish part 3? Copy the part 3c cells from [solutions/day1_03_numpy.ipynb]{.notebook}
-
-## Break {background-color="#1E1E1E"}
 
 # SciPy
 
@@ -1056,17 +1052,6 @@ Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 2: filtering with `scipy
 
 ::: {.source-note}
 Exercises adapted from Scientific Python Lectures [@spl].
-:::
-
-## Wrap-up
-
-:::{.incremental}
-* **Environments:** one per project, described by a committed file
-    * `environment.yml`, or `pyproject.toml` + `uv.lock`
-* **Arrays:** one dtype, a shape, and views versus copies
-* **Vectorise, don't loop:** ufuncs, aggregations along axes, broadcasting, masks
-* **SciPy:** check it before writing an algorithm; filters take an `axis`
-* **Tomorrow:** tables with pandas, figures with Matplotlib, then a first model with scikit-learn
 :::
 
 ::: {.source-note}
