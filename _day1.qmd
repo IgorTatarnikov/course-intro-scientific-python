@@ -928,35 +928,6 @@ def sum_of_squares_numpy(values):
 PDSH, [Profiling and Timing Code](https://jakevdp.github.io/PythonDataScienceHandbook/01.07-timing-and-profiling.html). Timings measured on an Apple-silicon laptop; yours will differ.
 :::
 
-## The psychometric curve
-
-:::: {.columns}
-::: {.column width="55%"}
-```{python}
-#| echo: false
-import matplotlib.pyplot as plt
-
-c = np.linspace(-100, 100, 401)
-fig, ax = plt.subplots(figsize=(5, 3.4))
-for bias, label in [(-0.8, "right blocks (0.2)"), (0, "unbiased (0.5)"), (0.8, "left blocks (0.8)")]:
-    ax.plot(c, 1 / (1 + np.exp(-(4 * np.tanh(c / 25) - bias))), label=label)
-ax.set_xlabel("contrast (%; negative = left)")
-ax.set_ylabel("fraction chose right")
-ax.set_title("Sketch, not the data", fontsize=10)
-ax.legend(title="probability_left", fontsize=8);
-```
-:::
-::: {.column width="45%"}
-:::{.incremental}
-* At each contrast: the fraction of trials on which the mouse chose **right**
-* Contrast 0: nothing to see, so the mouse has to guess
-* **Blocks:** 90 unbiased trials (`probability_left` 0.5), then the stimulus is on the left 80% of the time (0.8), then on the right 80% (0.2), ...
-* If the block affects its choices, the curve **shifts** between blocks
-* Part 3: compute the curve, block by block, without a loop
-:::
-:::
-::::
-
 ## Your turn {.exercise-slide}
 
 Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks and vectorising**
