@@ -13,9 +13,8 @@ plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
 
 | Before the break | After the break |
 |------------------|-----------------|
-| **pandas** (60 min) | **seaborn** (15 min) |
-| **Matplotlib** (25 min) | **scikit-learn** (30 min) |
-| | Where to go next - wrap-up |
+| **pandas** | **scikit-learn** |
+| **Matplotlib** | Where to go next - wrap-up |
 
 <br>
 
@@ -141,8 +140,8 @@ data.loc["Albania":"Austria", "gdpPercap_1952":"gdpPercap_1957"].round()
 
 Open [notebooks/day2_01_pandas.ipynb]{.notebook}. The exercises follow the Software Carpentry gapminder lesson [@swc_gapminder], on the recording's trials and units tables.
 
-1. **Reading tabular data** (10 min): read tables from the HDF5 file, inspect them, write and read back a CSV
-2. **Selecting data** (15 min): individual values, slices, `idxmin`/`idxmax`, selection practice
+1. **Reading tabular data**: read tables from the HDF5 file, inspect them, write and read back a CSV
+2. **Selecting data**: individual values, slices, `idxmin`/`idxmax`, selection practice
 
 ## Boolean masks
 
@@ -176,7 +175,7 @@ all_countries.groupby("continent")["lifeExp_2007"].mean().round(1)
 ```
 
 ::: {.source-note}
-Beyond today: missing data and `merge`/`join` are stretch material in the notebook (PDSH chapter 3).
+Beyond today: merging tables is stretch material in the notebook; PDSH chapter 3 also covers missing data.
 :::
 
 ## Live coding: masks and group by {.live-coding}
@@ -210,8 +209,8 @@ grouped["lifeExp_gain"].median().sort_values()
 
 Open [notebooks/day2_01_pandas.ipynb]{.notebook}
 
-1. **Boolean masks** (5 min): the end of section 2, on the units, combining text and number conditions
-2. **Group by** (10 min): yesterday's psychometric curve in one line, checked against your NumPy version
+1. **Boolean masks**: the end of section 2, on the units, combining text and number conditions
+2. **Group by**: yesterday's psychometric curve in one line, checked against your NumPy version
 
 **Stretch:** one grouping question of your own
 
@@ -238,9 +237,6 @@ gapminder[["country", "year", "lifeExp", "pop"]].head(3)
 
 :::
 
-. . .
-
-* seaborn, after the break, wants long tables
 
 ## Your turn {.exercise-slide}
 
@@ -249,7 +245,7 @@ Open [notebooks/day2_01_pandas.ipynb]{.notebook}, **Part 4: tidy data**
 * Melt the psychometric curve, one column per block, into a long table
 * Melt the firing rates, one column per time bin, into one row per unit and bin
 
-**8 minutes**. **Stretch:** Many Ways of Access; merging units with electrodes (PDSH)
+**Stretch:** Many Ways of Access; merging units with electrodes (PDSH)
 
 
 # Matplotlib
@@ -327,20 +323,6 @@ fig.savefig("figure.png", dpi=300, bbox_inches="tight")  # raster: images, slide
 * `bbox_inches="tight"` trims the white border
 :::
 
-## Plots from an LLM
-
-:::{.incremental}
-* Fine for a first draft: you rarely need to remember `ax.spines[...]` or `annotate` arguments
-* **Ask well:** the shape and dtype of your arrays or the columns of your DataFrame, units, the message of the plot; ask for `fig, ax` code
-* **Read before you run:** which data goes on which axis, and which `ax` each line changes
-* **Check what you see:**
-    * Axis labels **with units**; limits that do not hide data
-    * Colormap: sequential for magnitudes, diverging only for data centred on zero
-    * Images: `origin`, `aspect` and `extent`
-    * Legend entries that match the lines
-* The figure carries your name, not the LLM's
-:::
-
 ## Live coding: a first figure {.live-coding}
 
 * Plot a damped oscillation with the defaults
@@ -382,7 +364,7 @@ Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 1: simple plot**
 * Build a figure of two LFP traces step by step, from the recording [@ibl_bwm_dandi]
 * Colours and a legend, ticks at the stimuli, then save it
 
-**8 minutes**. **Optional:** limits, spines and an annotation
+**Optional:** limits, spines and an annotation
 
 ## More plot types
 
@@ -429,93 +411,9 @@ Open [notebooks/day2_02_matplotlib.ipynb]{.notebook}, **Part 2: the whole record
 
 * A first attempt shows the LFP badly: fix its aspect, origin, axis units and colormap
 
-**8 minutes**. **Stretch:** a scatter of the units along the probe, spike counts as an image, the population response, `subplot_mosaic` layouts, the LFP's envelope, more plot types
+**Stretch:** a scatter of the units along the probe, spike counts as an image, the population response, `subplot_mosaic` layouts, the LFP's envelope, more plot types
 
 ## Break {background-color="#1E1E1E"}
-
-10 minutes
-
-# seaborn
-
-## Statistical plots from DataFrames
-
-:::: {.columns}
-::: {.column width="50%"}
-```{python}
-#| output: false
-import seaborn as sns
-
-y2007 = gapminder.query("year == 2007")
-sns.relplot(
-    data=y2007,
-    x="gdpPercap", y="lifeExp",
-    hue="continent", size="pop",
-    sizes=(10, 600),
-).set(xscale="log")
-```
-
-::: {.incremental}
-* Each argument maps a **column** to a visual property
-* Legends, colours and sizes come for free
-:::
-:::
-::: {.column width="50%" .fragment fragment-index=1}
-```{python}
-#| echo: false
-#| fig-width: 6
-#| fig-height: 4
-sns.set_theme(style="whitegrid")
-g = sns.relplot(
-    data=gapminder.query("year == 2007"),
-    x="gdpPercap", y="lifeExp", hue="continent", size="pop",
-    sizes=(10, 600), alpha=0.7, height=4, aspect=1.3,
-)
-g.set(xscale="log", xlabel="GDP per capita (log)", ylabel="Life expectancy")
-sns.reset_orig()
-plt.rcParams.update({"figure.dpi": 110, "font.size": 11})
-```
-:::
-::::
-
-## When to reach for seaborn
-
-:::{.incremental}
-* **seaborn:** a tidy DataFrame; colour, size or panels by category; means with confidence intervals; distributions
-* **Plain Matplotlib:** arrays and images, custom layouts, unusual plot types
-* seaborn draws **with** Matplotlib: `ax=`, `fig.savefig` and the last block still apply
-:::
-
-## Live coding: the seaborn tour {.live-coding}
-
-* Back to the recording: `trials`, `units`, and `rates_long` from the pandas block
-* `relplot`, `lineplot` with confidence bands, distributions, one panel per brain area
-
-::: {.notes}
-Follow the Demo section of `day2_03_seaborn.ipynb`, which loads `trials`, `units` and `rates_long` in its first cells.
-
-```python
-g = sns.relplot(data=units, x="amplitude_uV", y="depth_um", hue="area",
-                size="firing_rate_Hz", sizes=(5, 300), alpha=0.6)
-g.set(xscale="log")
-
-sns.lineplot(data=rates_long, x="time_s", y="rate_Hz", hue="area")
-
-sns.histplot(data=units[units["spike_width_ms"] > 0], x="spike_width_ms",
-             hue="label", multiple="stack")
-sns.boxplot(data=trials.assign(strength=trials["contrast"].abs()),
-            x="strength", y="response_time_s", log_scale=True)
-
-sns.displot(data=units, x="firing_rate_Hz", col="area", col_wrap=4, height=2.5)
-```
-:::
-
-## Your turn {.exercise-slide}
-
-Open [notebooks/day2_03_seaborn.ipynb]{.notebook}, **Your turn**
-
-* **The psychometric curve** straight from `trials`, one line per block, with confidence intervals: no `groupby` needed
-
-**5 minutes**. **Stretch:** one plot of your own, answering a question about the trials or units. The [seaborn gallery](https://seaborn.pydata.org/examples/index.html) is the fastest way to find a plot type.
 
 # scikit-learn
 
@@ -626,8 +524,8 @@ ax.plot(grid[:, 0], model.predict_proba(grid)[:, 1])
 
 Open [notebooks/day2_04_sklearn.ipynb]{.notebook}
 
-1. **Fit a model** (10 min): predict the mouse's choice from contrast and block; score it on held-out trials against a baseline
-2. **Look inside** (10 min): what do the coefficients mean? Plot the model's curves over the psychometric curve from the pandas block
+1. **Fit a model**: predict the mouse's choice from contrast and block; score it on held-out trials against a baseline
+2. **Look inside**: what do the coefficients mean? Plot the model's curves over the psychometric curve from the pandas block
 
 **Stretch:** a better feature, whether the block helps (cross-validation), decoding the choice from the neurons
 
@@ -651,7 +549,7 @@ table = ski.measure.regionprops_table(labels, properties=["area", "eccentricity"
 
 :::{.incremental}
 * **Use it when:** you filter, threshold, segment or measure microscopy (or any) images
-* Measurements come out as a table, ready for pandas and seaborn
+* Measurements come out as a table, ready for pandas
 :::
 
 ::: {.source-note}
@@ -663,6 +561,7 @@ table = ski.measure.regionprops_table(labels, properties=["area", "eccentricity"
 ```python
 import xarray as xr
 
+# lfp_uv: (n_samples, n_channels); time: seconds; area: one label per channel
 lfp = xr.DataArray(lfp_uv, dims=("time", "channel"),
                    coords={"time": time, "area": ("channel", area)})
 lfp.sel(time=slice(2, 4)).mean(dim="time")   # by label and by name, not position
@@ -670,7 +569,7 @@ lfp.groupby("area").mean()
 ```
 
 :::{.incremental}
-* **Use it when:** you keep forgetting which axis is time, or carry coordinates (seconds, µm, brain areas) alongside your arrays
+* **Use it when:** you want named dimensions, scales and attributes on N-D arrays
 * Reads and writes NetCDF and Zarr; pandas-style `groupby` on N-D data
 :::
 
@@ -682,6 +581,7 @@ lfp.groupby("area").mean()
 
 ```python
 import dask.array as da
+import h5py
 
 with h5py.File("big_recording.h5") as f:
     lfp = da.from_array(f["lfp/data"], chunks=(100_000, 384))   # lazy: nothing read yet
@@ -722,8 +622,6 @@ edited = viewer.layers["segmentation"].data          # read your edits back as a
 
 | Package | What it is for |
 |---|---|
-| **statsmodels** | Regression models and statistical tests with full summary tables |
-| **pingouin** | Common statistical tests on DataFrames, with effect sizes |
 | **Zarr** | Chunked, compressed N-D arrays on disk or in the cloud |
 | **Polars** | Fast DataFrames with a lazy query engine |
 | **Numba** | Compiles the Python loops you cannot avoid to machine code with `@numba.njit` |
@@ -732,7 +630,7 @@ edited = viewer.layers["segmentation"].data          # read your edits back as a
 
 :::{.incremental}
 * **Tables:** `loc` versus `iloc`, masks, `groupby`, and tidy (long) data
-* **Plot** with `fig, ax = plt.subplots()`; seaborn for tidy DataFrames
+* **Plot** with `fig, ax = plt.subplots()`
 * **scikit-learn:** `X` is samples × features; `fit`, then score on held-out data against a baseline
 * **Check the ecosystem** before writing an algorithm yourself: SciPy, scikit-image, xarray, dask, napari
 :::

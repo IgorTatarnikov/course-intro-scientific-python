@@ -7,12 +7,11 @@ While we get started: run `jupyter lab`, open [notebooks/day1_01_getting_help.ip
 | Day | Before the break | After the break |
 |-----|------------------|-----------------|
 | **1** | **Setup and help - packages and environments - NumPy** | **SciPy** |
-| 2 | pandas - Matplotlib | seaborn - scikit-learn - where to go next |
+| 2 | pandas - Matplotlib | scikit-learn - where to go next |
 
 <br>
 
 :::{.incremental}
-* Two days of 3 hours each
 * Today: arrays, and what you compute with them
 * Tomorrow: tables, figures of them, and a first model
 :::
@@ -129,10 +128,10 @@ np.linspace(0, 1, int(n_points))   # fix
 Open [notebooks/day1_01_getting_help.ipynb]{.notebook}
 
 1. If you haven't yet: run the setup check, every line should say `OK`
-2. Look up the built-in `range` three ways and answer the questions
+2. Look up `np.arange` three ways and answer the questions
 3. Read a traceback through two functions and fix the call
 
-**5 minutes**. **Stretch:** section 4, tab completion and searching
+**Stretch:** section 4, tab completion and searching
 
 # Packages and environments
 
@@ -322,8 +321,8 @@ uv sync     # rebuild .venv from pyproject.toml and uv.lock
 
 Open [notebooks/day1_02_environments.ipynb]{.notebook}. The work happens in a **terminal**.
 
-1. **conda** (12 min): create a scratch environment with pandas, export it, rebuild it under a new name, remove both
-2. **uv** (10 min): init a project, add requests, run a script, delete `.venv`, rebuild it from the lockfile
+1. **conda**: create a scratch environment with pandas, export it, rebuild it under a new name, remove both
+2. **uv**: init a project, add requests, run a script, delete `.venv`, rebuild it from the lockfile
 
 ::: {.callout-warning}
 Leave the course environment `scientific-python` alone: only work on the throwaway ones.
@@ -630,7 +629,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 1: indexing**
 * The recording from the previous slide, loaded for you in the first cells
 * Fetch time windows from chosen channels, and trials from 3-D spike counts
 
-**12 minutes**. **Stretch** (section 5): views and copies, a function that changes its input by accident, `int16` pitfalls
+**Stretch** (section 5): views and copies, a function that changes its input by accident, `int16` pitfalls
 
 ## Universal functions (ufuncs)
 
@@ -783,7 +782,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 2: aggregations and broa
 * Re-referencing and baseline correction by broadcasting
 * Fix a broadcasting error
 
-**15 minutes**. **Stretch:** distances between recording sites
+**Stretch:** distances between recording sites
 
 ## Boolean masks
 
@@ -967,7 +966,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 3: masks and vectorising
 * Time a loop against NumPy on the LFP
 * The mouse's **psychometric curve**, block by block, **without a loop**
 
-**18 minutes**. **Stretch:** fancy indexing, data statistics (after SPL Ex. 23)
+**Stretch:** fancy indexing, data statistics (after SPL Ex. 23)
 
 ## Checking your work with a plot
 
@@ -1006,12 +1005,7 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 * Does the picture agree with what you concluded from the numbers?
 * Didn't finish part 3? Copy the part 3c cells from [solutions/day1_03_numpy.ipynb]{.notebook}
 
-**5 minutes**
-
-
 ## Break {background-color="#1E1E1E"}
-
-10 minutes
 
 # SciPy
 
@@ -1046,8 +1040,6 @@ Open [notebooks/day1_03_numpy.ipynb]{.notebook}, **Part 4: check your work with 
 Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 1: filtering with the FFT** (after SPL Ex. 42)
 
 * The same idea on real data: find the **60 Hz** mains hum (US recording) and its harmonics in the LFP's spectrum, and remove them
-
-**10 minutes**
 
 ## Filtering with `scipy.signal`
 
@@ -1089,7 +1081,7 @@ Open [notebooks/day1_04_scipy.ipynb]{.notebook}, **Part 2: filtering with `scipy
 * A 1-30 Hz band-pass filter on one channel, then on all 384, with no loop
 * Didn't finish part 1? Copy its cells from [solutions/day1_04_scipy.ipynb]{.notebook}: part 2 compares with `cleaned`
 
-**10 minutes**. **Stretch:** a smoother spectrum with `welch`, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)
+**Stretch:** a smoother spectrum with `welch`, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)
 
 ::: {.source-note}
 Exercises adapted from Scientific Python Lectures [@spl].
@@ -1103,7 +1095,7 @@ Exercises adapted from Scientific Python Lectures [@spl].
 * **Arrays:** one dtype, a shape, and views versus copies
 * **Vectorise, don't loop:** ufuncs, aggregations along axes, broadcasting, masks
 * **SciPy:** check it before writing an algorithm; filters take an `axis`
-* **Tomorrow:** tables with pandas, figures with Matplotlib and seaborn, then a first model with scikit-learn
+* **Tomorrow:** tables with pandas, figures with Matplotlib, then a first model with scikit-learn
 :::
 
 ::: {.source-note}

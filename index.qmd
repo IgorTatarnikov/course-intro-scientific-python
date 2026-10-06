@@ -9,9 +9,9 @@ date: 2026-10-05
 | Day | Topics | Slides |
 |-----|--------|--------|
 | 1 | Setup and help - packages and environments - NumPy - SciPy | [Day 1](#day-1) |
-| 2 | pandas - Matplotlib - seaborn - scikit-learn - where to go next | [Day 2](#day-2) |
+| 2 | pandas - Matplotlib - scikit-learn - where to go next | [Day 2](#day-2) |
 
-Each day runs **3 hours**, with a 10-minute break. Every block starts with a few minutes of slides, then exercises.
+Each day has a break halfway through. Every block starts with a few slides, then exercises.
 
 ## Setup {.smaller}
 
