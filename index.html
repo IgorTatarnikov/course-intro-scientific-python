@@ -6,8 +6,8 @@
 <script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="index_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-eec68b17241c1efd3eae2de50d816e3e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-9bbf5fa004a0676d7f26111dc3fdfdb2.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="Neuroinformatics Unit">
   <meta name="dcterms.date" content="2026-10-05">
@@ -256,12 +256,12 @@ Neuroinformatics Unit
 </tr>
 <tr class="even">
 <td>2</td>
-<td>pandas - Matplotlib - seaborn - scikit-learn - where to go next</td>
+<td>pandas - Matplotlib - scikit-learn - where to go next</td>
 <td><a href="#/day-2">Day 2</a></td>
 </tr>
 </tbody>
 </table>
-<p>Each day runs <strong>3 hours</strong>, with a 10-minute break. Every block starts with a few minutes of slides, then exercises.</p>
+<p>Each day has a break halfway through. Every block starts with a few slides, then exercises.</p>
 </section>
 <section id="setup" class="slide level2 smaller scrollable">
 <h2>Setup</h2>
@@ -338,13 +338,12 @@ Neuroinformatics Unit
 <tr class="even">
 <td>2</td>
 <td>pandas - Matplotlib</td>
-<td>seaborn - scikit-learn - where to go next</td>
+<td>scikit-learn - where to go next</td>
 </tr>
 </tbody>
 </table>
 <p><br></p>
 <ul>
-<li class="fragment">Two days of 3 hours each</li>
 <li class="fragment">Today: arrays, and what you compute with them</li>
 <li class="fragment">Tomorrow: tables, figures of them, and a first model</li>
 </ul>
@@ -369,7 +368,7 @@ Neuroinformatics Unit
 <li class="fragment">Look for the last line that is <em>your</em> code</li>
 </ul>
 <div class="fragment">
-<div id="e244225e" class="cell" data-execution_count="1">
+<div id="73507279" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="" aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb2-2"><a href="" aria-label="2"></a></span>
 <span id="cb2-3"><a href="" aria-label="3"></a>n_points <span class="op">=</span> <span class="dv">100</span> <span class="op">/</span> <span class="dv">8</span></span>
@@ -409,7 +408,7 @@ Neuroinformatics Unit
 </section>
 <section id="tracebacks-through-functions" class="slide level2">
 <h2>Tracebacks through functions</h2>
-<div id="cc7b92ec" class="cell" data-execution_count="2">
+<div id="d0227a5e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="" aria-label="1"></a><span class="kw">def</span> divide_0(x):</span>
 <span id="cb3-2"><a href="" aria-label="2"></a>    <span class="cf">return</span> x <span class="op">/</span> <span class="dv">0</span></span>
 <span id="cb3-3"><a href="" aria-label="3"></a></span>
@@ -512,10 +511,10 @@ Neuroinformatics Unit
 <p>Open <span class="notebook">notebooks/day1_01_getting_help.ipynb</span></p>
 <ol type="1">
 <li>If you haven’t yet: run the setup check, every line should say <code>OK</code></li>
-<li>Look up the built-in <code>range</code> three ways and answer the questions</li>
+<li>Look up <code>np.arange</code> three ways and answer the questions</li>
 <li>Read a traceback through two functions and fix the call</li>
 </ol>
-<p><strong>5 minutes</strong>. <strong>Stretch:</strong> section 4, tab completion and searching</p>
+<p><strong>Stretch:</strong> section 4, tab completion and searching</p>
 </section></section>
 <section>
 <section id="packages-and-environments" class="title-slide slide level1 center">
@@ -768,8 +767,8 @@ Neuroinformatics Unit
 <h2>Your turn</h2>
 <p>Open <span class="notebook">notebooks/day1_02_environments.ipynb</span>. The work happens in a <strong>terminal</strong>.</p>
 <ol type="1">
-<li><strong>conda</strong> (12 min): create a scratch environment with pandas, export it, rebuild it under a new name, remove both</li>
-<li><strong>uv</strong> (10 min): init a project, add requests, run a script, delete <code>.venv</code>, rebuild it from the lockfile</li>
+<li><strong>conda</strong>: create a scratch environment with pandas, export it, rebuild it under a new name, remove both</li>
+<li><strong>uv</strong>: init a project, add requests, run a script, delete <code>.venv</code>, rebuild it from the lockfile</li>
 </ol>
 <div class="callout callout-warning callout-titled callout-style-default">
 <div class="callout-body">
@@ -817,7 +816,7 @@ Neuroinformatics Unit
 <ul id="tabset-5" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-5-1">Python list</a></li><li><a href="#tabset-5-2">NumPy array</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1">
-<div id="a4331ef0" class="cell" data-execution_count="3">
+<div id="a0844b43" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="" aria-label="1"></a>data <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
 <span id="cb16-2"><a href="" aria-label="2"></a>data <span class="op">*</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
@@ -829,7 +828,7 @@ Neuroinformatics Unit
 </ul>
 </div>
 <div id="tabset-5-2">
-<div id="895ed32c" class="cell" data-execution_count="4">
+<div id="0fe13235" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="" aria-label="1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb18-2"><a href="" aria-label="2"></a></span>
 <span id="cb18-3"><a href="" aria-label="3"></a>arr <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>])</span>
@@ -847,7 +846,7 @@ Neuroinformatics Unit
 </section>
 <section id="creating-arrays" class="slide level2">
 <h2>Creating arrays</h2>
-<div id="9d55a513" class="cell" data-execution_count="5">
+<div id="621f9aa3" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="" aria-label="1"></a>np.arange(<span class="dv">6</span>)                 <span class="co"># like range()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="5">
@@ -856,7 +855,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="e82cecfb" class="cell" data-execution_count="6">
+<div id="3a66b65d" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="" aria-label="1"></a>np.linspace(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">5</span>)       </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="6">
@@ -866,7 +865,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="339c833d" class="cell" data-execution_count="7">
+<div id="7e5264d7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="" aria-label="1"></a>np.zeros((<span class="dv">2</span>, <span class="dv">3</span>))             <span class="co"># also np.ones, np.full</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="7">
@@ -877,7 +876,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="4b3d2845" class="cell" data-execution_count="8">
+<div id="4aaa25fb" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="" aria-label="1"></a>rng <span class="op">=</span> np.random.default_rng(seed<span class="op">=</span><span class="dv">0</span>)</span>
 <span id="cb26-2"><a href="" aria-label="2"></a>rng.random((<span class="dv">2</span>, <span class="dv">3</span>))           </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -891,7 +890,7 @@ Neuroinformatics Unit
 </section>
 <section id="shape-dimensions-and-dtype" class="slide level2">
 <h2>Shape, dimensions and dtype</h2>
-<div id="9f632375" class="cell" data-execution_count="9">
+<div id="c709107a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="" aria-label="1"></a>a <span class="op">=</span> np.arange(<span class="dv">12</span>).reshape(<span class="dv">3</span>, <span class="dv">4</span>)</span>
 <span id="cb28-2"><a href="" aria-label="2"></a>a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -910,7 +909,7 @@ Neuroinformatics Unit
 <div class="fragment">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="7b98f9e8" class="cell" data-execution_count="10">
+<div id="5ad39b98" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="" aria-label="1"></a>a.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="10">
@@ -924,7 +923,7 @@ Neuroinformatics Unit
 </ul>
 </div>
 <div class="fragment">
-<div id="c4617bc4" class="cell" data-execution_count="11">
+<div id="3da86cec" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="" aria-label="1"></a>a.ndim</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="11">
@@ -935,7 +934,7 @@ Neuroinformatics Unit
 </div>
 </div><div class="column" style="width:50%;">
 <div class="fragment">
-<div id="3e0089c4" class="cell" data-execution_count="12">
+<div id="54ad33b9" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="" aria-label="1"></a>a.size</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="12">
@@ -945,7 +944,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="f077db0e" class="cell" data-execution_count="13">
+<div id="1820d959" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="" aria-label="1"></a>a.dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="13">
@@ -967,7 +966,7 @@ Neuroinformatics Unit
 <div class="fragment">
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="28b5cfc5" class="cell" data-execution_count="14">
+<div id="d00466b0" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="" aria-label="1"></a>np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]).dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="14">
@@ -977,7 +976,7 @@ Neuroinformatics Unit
 </div>
 </div><div class="column" style="width:50%;">
 <div class="fragment">
-<div id="8cd3a96c" class="cell" data-execution_count="15">
+<div id="5ddef463" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="" aria-label="1"></a>np.array([<span class="dv">1</span>, <span class="dv">2</span>, <span class="fl">3.5</span>]).dtype</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="15">
@@ -992,7 +991,7 @@ Neuroinformatics Unit
 <ul>
 <li>Small types wrap around silently. Images are often <code>uint8</code> (0 to 255):</li>
 </ul>
-<div id="7171dc52" class="cell" data-execution_count="16">
+<div id="cf34a3c7" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="" aria-label="1"></a>np.array([<span class="dv">200</span>, <span class="dv">250</span>], dtype<span class="op">=</span>np.uint8) <span class="op">+</span> <span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="16">
@@ -1012,7 +1011,7 @@ Neuroinformatics Unit
 <div class="fragment">
 <div class="columns">
 <div class="column" style="width:40%;">
-<div id="fcc3216c" class="cell" data-execution_count="17">
+<div id="3c180341" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="" aria-label="1"></a>a</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>array([[ 0,  1,  2,  3],
@@ -1021,7 +1020,7 @@ Neuroinformatics Unit
 </div>
 </div>
 </div><div class="column" style="width:60%;">
-<div id="1d698d3e" class="cell" data-execution_count="18">
+<div id="362fa1c8" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="" aria-label="1"></a>a[<span class="dv">1</span>, <span class="dv">2</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="18">
@@ -1030,7 +1029,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="ce6f63ff" class="cell" data-execution_count="19">
+<div id="0e94facd" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="" aria-label="1"></a>a[<span class="op">-</span><span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="19">
@@ -1040,7 +1039,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="e8823384" class="cell" data-execution_count="20">
+<div id="603c5f00" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="" aria-label="1"></a>a[:, <span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="20">
@@ -1050,7 +1049,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="bb6cad6c" class="cell" data-execution_count="21">
+<div id="e26248fc" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="" aria-label="1"></a>a[:<span class="dv">2</span>, <span class="dv">1</span>:<span class="dv">3</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="21">
@@ -1069,7 +1068,7 @@ Neuroinformatics Unit
 <ul id="tabset-6" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-6-1">View</a></li><li><a href="#tabset-6-2">Copy</a></li></ul>
 <div class="tab-content">
 <div id="tabset-6-1">
-<div id="036ecb90" class="cell" data-execution_count="22">
+<div id="d09d8db7" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="" aria-label="1"></a>a <span class="op">=</span> np.arange(<span class="dv">12</span>).reshape(<span class="dv">3</span>, <span class="dv">4</span>)</span>
 <span id="cb54-2"><a href="" aria-label="2"></a>b <span class="op">=</span> a[:<span class="dv">2</span>, :<span class="dv">2</span>]      <span class="co"># slicing gives a view</span></span>
 <span id="cb54-3"><a href="" aria-label="3"></a>b[<span class="dv">0</span>, <span class="dv">0</span>] <span class="op">=</span> <span class="dv">99</span></span>
@@ -1085,7 +1084,7 @@ Neuroinformatics Unit
 </ul>
 </div>
 <div id="tabset-6-2">
-<div id="a4118c08" class="cell" data-execution_count="23">
+<div id="5ca2318f" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="" aria-label="1"></a>a <span class="op">=</span> np.arange(<span class="dv">12</span>).reshape(<span class="dv">3</span>, <span class="dv">4</span>)</span>
 <span id="cb56-2"><a href="" aria-label="2"></a>c <span class="op">=</span> a[:<span class="dv">2</span>, :<span class="dv">2</span>].copy()</span>
 <span id="cb56-3"><a href="" aria-label="3"></a>c[<span class="dv">0</span>, <span class="dv">0</span>] <span class="op">=</span> <span class="dv">99</span></span>
@@ -1194,7 +1193,7 @@ Neuroinformatics Unit
 <li>The recording from the previous slide, loaded for you in the first cells</li>
 <li>Fetch time windows from chosen channels, and trials from 3-D spike counts</li>
 </ul>
-<p><strong>12 minutes</strong>. <strong>Stretch</strong> (section 5): views and copies, a function that changes its input by accident, <code>int16</code> pitfalls</p>
+<p><strong>Stretch</strong> (section 5): views and copies, a function that changes its input by accident, <code>int16</code> pitfalls</p>
 </section>
 <section id="universal-functions-ufuncs" class="slide level2">
 <h2>Universal functions (ufuncs)</h2>
@@ -1205,7 +1204,7 @@ Neuroinformatics Unit
 <li class="fragment">Comparisons: <code>&lt;</code>, <code>==</code>, … give <code>bool</code> arrays</li>
 </ul>
 <div class="fragment">
-<div id="eb630867" class="cell" data-execution_count="24">
+<div id="26fa84fc" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="" aria-label="1"></a>x <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">4.0</span>, <span class="fl">9.0</span>])</span>
 <span id="cb60-2"><a href="" aria-label="2"></a>np.sqrt(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1217,7 +1216,7 @@ Neuroinformatics Unit
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="fragment">
-<div id="55135a45" class="cell" data-execution_count="25">
+<div id="5796b375" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="" aria-label="1"></a>x <span class="op">*</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="25">
@@ -1228,7 +1227,7 @@ Neuroinformatics Unit
 </div>
 </div><div class="column" style="width:50%;">
 <div class="fragment">
-<div id="29f93870" class="cell" data-execution_count="26">
+<div id="b03e238e" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="" aria-label="1"></a>x <span class="op">&gt;</span> <span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="26">
@@ -1244,7 +1243,7 @@ Neuroinformatics Unit
 <h2>Aggregations and <code>axis</code></h2>
 <div class="columns">
 <div class="column" style="width:40%;">
-<div id="20f64617" class="cell" data-execution_count="27">
+<div id="390c2f44" class="cell" data-execution_count="27">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="" aria-label="1"></a>m <span class="op">=</span> np.arange(<span class="dv">6</span>).reshape(<span class="dv">2</span>, <span class="dv">3</span>)</span>
 <span id="cb66-2"><a href="" aria-label="2"></a>m</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1255,7 +1254,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="806d42e3" class="cell" data-execution_count="28">
+<div id="0aad4af8" class="cell" data-execution_count="28">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="" aria-label="1"></a>m.<span class="bu">sum</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="28">
@@ -1266,7 +1265,7 @@ Neuroinformatics Unit
 </div>
 </div><div class="column" style="width:60%;">
 <div class="fragment">
-<div id="46785f07" class="cell" data-execution_count="29">
+<div id="18ebaff4" class="cell" data-execution_count="29">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="" aria-label="1"></a>m.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="29">
@@ -1281,7 +1280,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="398c3d88" class="cell" data-execution_count="30">
+<div id="7de4c86b" class="cell" data-execution_count="30">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="" aria-label="1"></a>m.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="30">
@@ -1355,7 +1354,7 @@ Neuroinformatics Unit
 </section>
 <section id="broadcasting-in-practice" class="slide level2">
 <h2>Broadcasting in practice</h2>
-<div id="45c053bc" class="cell" data-execution_count="31">
+<div id="8825d65d" class="cell" data-execution_count="31">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="" aria-label="1"></a>col <span class="op">=</span> np.arange(<span class="dv">3</span>)[:, np.newaxis]  <span class="co"># (3, 1)</span></span>
 <span id="cb75-2"><a href="" aria-label="2"></a>row <span class="op">=</span> np.arange(<span class="dv">4</span>)                 <span class="co"># (4,)</span></span>
 <span id="cb75-3"><a href="" aria-label="3"></a>col <span class="op">*</span> <span class="dv">10</span> <span class="op">+</span> row                     <span class="co"># (3, 4)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1379,14 +1378,14 @@ Neuroinformatics Unit
 <li>Re-referencing and baseline correction by broadcasting</li>
 <li>Fix a broadcasting error</li>
 </ul>
-<p><strong>15 minutes</strong>. <strong>Stretch:</strong> distances between recording sites</p>
+<p><strong>Stretch:</strong> distances between recording sites</p>
 </section>
 <section id="boolean-masks" class="slide level2">
 <h2>Boolean masks</h2>
 <ul>
 <li>A comparison gives a <code>bool</code> array: a <strong>mask</strong></li>
 </ul>
-<div id="4602ba27" class="cell" data-execution_count="32">
+<div id="e5ab77fd" class="cell" data-execution_count="32">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="" aria-label="1"></a>x <span class="op">=</span> np.array([<span class="dv">3</span>, <span class="op">-</span><span class="dv">8</span>, <span class="dv">1</span>, <span class="dv">9</span>, <span class="op">-</span><span class="dv">4</span>])</span>
 <span id="cb77-2"><a href="" aria-label="2"></a>mask <span class="op">=</span> x <span class="op">&lt;</span> <span class="dv">0</span></span>
 <span id="cb77-3"><a href="" aria-label="3"></a>mask</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1400,7 +1399,7 @@ Neuroinformatics Unit
 <ul>
 <li>Index with the mask to <strong>fetch</strong> matching values (a copy)</li>
 </ul>
-<div id="4a423294" class="cell" data-execution_count="33">
+<div id="5209e606" class="cell" data-execution_count="33">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="" aria-label="1"></a>x[mask]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="33">
@@ -1413,7 +1412,7 @@ Neuroinformatics Unit
 <ul>
 <li>Assign through the mask to <strong>change</strong> them in place</li>
 </ul>
-<div id="def44974" class="cell" data-execution_count="34">
+<div id="b0f6a8e8" class="cell" data-execution_count="34">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="" aria-label="1"></a>x[mask] <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb81-2"><a href="" aria-label="2"></a>x</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1474,7 +1473,7 @@ Neuroinformatics Unit
 <li class="fragment">Always returns a <strong>copy</strong>; assigning through it changes the original</li>
 </ul>
 <div class="fragment">
-<div id="1f44735f" class="cell" data-execution_count="35">
+<div id="3000a6dd" class="cell" data-execution_count="35">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="" aria-label="1"></a>x <span class="op">=</span> np.arange(<span class="dv">10</span>, <span class="dv">20</span>)</span>
 <span id="cb84-2"><a href="" aria-label="2"></a><span class="bu">print</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1485,7 +1484,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="82adaf1c" class="cell" data-execution_count="36">
+<div id="ee3c60f5" class="cell" data-execution_count="36">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="" aria-label="1"></a>x[[<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="36">
@@ -1495,7 +1494,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="e04e1ee8" class="cell" data-execution_count="37">
+<div id="e5eccedd" class="cell" data-execution_count="37">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="" aria-label="1"></a>M <span class="op">=</span> np.arange(<span class="dv">9</span>).reshape(<span class="dv">3</span>, <span class="dv">3</span>)</span>
 <span id="cb88-2"><a href="" aria-label="2"></a><span class="bu">print</span>(M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -1508,7 +1507,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="d7654121" class="cell" data-execution_count="38">
+<div id="5233cf9a" class="cell" data-execution_count="38">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="" aria-label="1"></a>M[[<span class="dv">0</span>, <span class="dv">2</span>]]                 </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="38">
@@ -1519,7 +1518,7 @@ Neuroinformatics Unit
 </div>
 </div>
 <div class="fragment">
-<div id="c0c8e1a9" class="cell" data-execution_count="39">
+<div id="2913ea65" class="cell" data-execution_count="39">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="" aria-label="1"></a>M[[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], [<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">0</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell fragment" data-execution_count="39">
@@ -1568,7 +1567,7 @@ Neuroinformatics Unit
 <h2>The psychometric curve</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="184b3778" class="cell" data-execution_count="40">
+<div id="e70f0072" class="cell" data-execution_count="40">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -1596,13 +1595,13 @@ Neuroinformatics Unit
 <li>Time a loop against NumPy on the LFP</li>
 <li>The mouse’s <strong>psychometric curve</strong>, block by block, <strong>without a loop</strong></li>
 </ul>
-<p><strong>18 minutes</strong>. <strong>Stretch:</strong> fancy indexing, data statistics (after SPL Ex. 23)</p>
+<p><strong>Stretch:</strong> fancy indexing, data statistics (after SPL Ex. 23)</p>
 </section>
 <section id="checking-your-work-with-a-plot" class="slide level2">
 <h2>Checking your work with a plot</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="9cbc47e3" class="cell" data-execution_count="41">
+<div id="002a6c9e" class="cell" data-execution_count="41">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="" aria-label="1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb96-2"><a href="" aria-label="2"></a></span>
 <span id="cb96-3"><a href="" aria-label="3"></a>x <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">50</span>)</span>
@@ -1641,11 +1640,9 @@ Neuroinformatics Unit
 <li>Does the picture agree with what you concluded from the numbers?</li>
 <li>Didn’t finish part 3? Copy the part 3c cells from <span class="notebook">solutions/day1_03_numpy.ipynb</span></li>
 </ul>
-<p><strong>5 minutes</strong></p>
 </section>
 <section id="break" class="slide level2" data-background-color="#1E1E1E">
 <h2>Break</h2>
-<p>10 minutes</p>
 </section></section>
 <section>
 <section id="scipy" class="title-slide slide level1 center">
@@ -1708,13 +1705,12 @@ Neuroinformatics Unit
 <ul>
 <li>The same idea on real data: find the <strong>60 Hz</strong> mains hum (US recording) and its harmonics in the LFP’s spectrum, and remove them</li>
 </ul>
-<p><strong>10 minutes</strong></p>
 </section>
 <section id="filtering-with-scipy.signal" class="slide level2">
 <h2>Filtering with <code>scipy.signal</code></h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="c151c9c4" class="cell" data-execution_count="42">
+<div id="9d708828" class="cell" data-execution_count="42">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb97-1"><a href="" aria-label="1"></a><span class="im">import</span> scipy <span class="im">as</span> sp</span>
 <span id="cb97-2"><a href="" aria-label="2"></a></span>
 <span id="cb97-3"><a href="" aria-label="3"></a>fs <span class="op">=</span> <span class="dv">500</span></span>
@@ -1756,7 +1752,7 @@ Neuroinformatics Unit
 <li>A 1-30 Hz band-pass filter on one channel, then on all 384, with no loop</li>
 <li>Didn’t finish part 1? Copy its cells from <span class="notebook">solutions/day1_04_scipy.ipynb</span>: part 2 compares with <code>cleaned</code></li>
 </ul>
-<p><strong>10 minutes</strong>. <strong>Stretch:</strong> a smoother spectrum with <code>welch</code>, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)</p>
+<p><strong>Stretch:</strong> a smoother spectrum with <code>welch</code>, which distribution fits the response times (Ex. 41), 2-D minimisation (Ex. 40)</p>
 <div class="source-note">
 <p>Exercises adapted from Scientific Python Lectures <span class="citation" data-cites="spl">(<a href="#/references" role="doc-biblioref" onclick=""><span class="nocase">Varoquaux et al.</span> 2024</a>)</span>.</p>
 </div>
@@ -1771,7 +1767,7 @@ Neuroinformatics Unit
 <li class="fragment"><strong>Arrays:</strong> one dtype, a shape, and views versus copies</li>
 <li class="fragment"><strong>Vectorise, don’t loop:</strong> ufuncs, aggregations along axes, broadcasting, masks</li>
 <li class="fragment"><strong>SciPy:</strong> check it before writing an algorithm; filters take an <code>axis</code></li>
-<li class="fragment"><strong>Tomorrow:</strong> tables with pandas, figures with Matplotlib and seaborn, then a first model with scikit-learn</li>
+<li class="fragment"><strong>Tomorrow:</strong> tables with pandas, figures with Matplotlib, then a first model with scikit-learn</li>
 </ul>
 <div class="source-note">
 <p>Exercises adapted from Scientific Python Lectures <span class="citation" data-cites="spl">(<a href="#/references" role="doc-biblioref" onclick=""><span class="nocase">Varoquaux et al.</span> 2024</a>)</span> (CC BY 4.0). Further reading in the Python Data Science Handbook <span class="citation" data-cites="pdsh">(<a href="#/references" role="doc-biblioref" onclick="">VanderPlas 2016</a>)</span>.</p>
@@ -1793,15 +1789,11 @@ Neuroinformatics Unit
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>pandas</strong> (60 min)</td>
-<td><strong>seaborn</strong> (15 min)</td>
+<td><strong>pandas</strong></td>
+<td><strong>scikit-learn</strong></td>
 </tr>
 <tr class="even">
-<td><strong>Matplotlib</strong> (25 min)</td>
-<td><strong>scikit-learn</strong> (30 min)</td>
-</tr>
-<tr class="odd">
-<td></td>
+<td><strong>Matplotlib</strong></td>
 <td>Where to go next - wrap-up</td>
 </tr>
 </tbody>
@@ -1840,7 +1832,7 @@ Neuroinformatics Unit
 </section>
 <section id="reading-a-csv-file" class="slide level2">
 <h2>Reading a CSV file</h2>
-<div id="845420a7" class="cell" data-execution_count="45">
+<div id="a5b172c0" class="cell" data-execution_count="45">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb98-1"><a href="" aria-label="1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb98-2"><a href="" aria-label="2"></a></span>
 <span id="cb98-3"><a href="" aria-label="3"></a>data <span class="op">=</span> pd.read_csv(<span class="st">"data/gapminder_gdp_europe.csv"</span>, index_col<span class="op">=</span><span class="st">"country"</span>)</span>
@@ -2038,7 +2030,7 @@ Neuroinformatics Unit
 <ul id="tabset-9" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-9-1"><code>iloc</code>: by position</a></li><li><a href="#tabset-9-2"><code>loc</code>: by label</a></li></ul>
 <div class="tab-content">
 <div id="tabset-9-1">
-<div id="5553d6d3" class="cell" data-execution_count="46">
+<div id="430356f0" class="cell" data-execution_count="46">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb100-1"><a href="" aria-label="1"></a>data.iloc[<span class="dv">0</span>:<span class="dv">2</span>, <span class="dv">0</span>:<span class="dv">2</span>].<span class="bu">round</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="46">
 <div>
@@ -2091,7 +2083,7 @@ Neuroinformatics Unit
 </ul>
 </div>
 <div id="tabset-9-2">
-<div id="ce9948ac" class="cell" data-execution_count="47">
+<div id="c1650efe" class="cell" data-execution_count="47">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb101-1"><a href="" aria-label="1"></a>data.loc[<span class="st">"Albania"</span>:<span class="st">"Austria"</span>, <span class="st">"gdpPercap_1952"</span>:<span class="st">"gdpPercap_1957"</span>].<span class="bu">round</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="47">
 <div>
@@ -2154,8 +2146,8 @@ Neuroinformatics Unit
 <h2>Your turn</h2>
 <p>Open <span class="notebook">notebooks/day2_01_pandas.ipynb</span>. The exercises follow the Software Carpentry gapminder lesson <span class="citation" data-cites="swc_gapminder">(<a href="#/references" role="doc-biblioref" onclick="">Software Carpentry 2024</a>)</span>, on the recording’s trials and units tables.</p>
 <ol type="1">
-<li><strong>Reading tabular data</strong> (10 min): read tables from the HDF5 file, inspect them, write and read back a CSV</li>
-<li><strong>Selecting data</strong> (15 min): individual values, slices, <code>idxmin</code>/<code>idxmax</code>, selection practice</li>
+<li><strong>Reading tabular data</strong>: read tables from the HDF5 file, inspect them, write and read back a CSV</li>
+<li><strong>Selecting data</strong>: individual values, slices, <code>idxmin</code>/<code>idxmax</code>, selection practice</li>
 </ol>
 </section>
 <section id="boolean-masks-1" class="slide level2">
@@ -2163,7 +2155,7 @@ Neuroinformatics Unit
 <ul>
 <li>The same idea as NumPy masks, but rows keep their labels</li>
 </ul>
-<div id="89ba804e" class="cell" data-execution_count="48">
+<div id="5ab426a2" class="cell" data-execution_count="48">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb102-1"><a href="" aria-label="1"></a>rich <span class="op">=</span> data[<span class="st">"gdpPercap_2007"</span>] <span class="op">&gt;</span> <span class="dv">40000</span></span>
 <span id="cb102-2"><a href="" aria-label="2"></a>data.loc[rich, [<span class="st">"gdpPercap_1952"</span>, <span class="st">"gdpPercap_2007"</span>]].<span class="bu">round</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -2227,7 +2219,7 @@ Neuroinformatics Unit
 <li class="fragment"><strong>Combine</strong> the results into a table indexed by group</li>
 </ul>
 <div class="fragment">
-<div id="ed7b9f7b" class="cell" data-execution_count="49">
+<div id="5cd2fd7d" class="cell" data-execution_count="49">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb103-1"><a href="" aria-label="1"></a>all_countries <span class="op">=</span> pd.read_csv(<span class="st">"data/gapminder_all.csv"</span>, index_col<span class="op">=</span><span class="st">"country"</span>)</span>
 <span id="cb103-2"><a href="" aria-label="2"></a>all_countries.groupby(<span class="st">"continent"</span>)[<span class="st">"lifeExp_2007"</span>].mean().<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -2243,7 +2235,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </div>
 </div>
 <div class="source-note">
-<p>Beyond today: missing data and <code>merge</code>/<code>join</code> are stretch material in the notebook (PDSH chapter 3).</p>
+<p>Beyond today: merging tables is stretch material in the notebook; PDSH chapter 3 also covers missing data.</p>
 </div>
 </div>
 </section>
@@ -2287,8 +2279,8 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <h2>Your turn</h2>
 <p>Open <span class="notebook">notebooks/day2_01_pandas.ipynb</span></p>
 <ol type="1">
-<li><strong>Boolean masks</strong> (5 min): the end of section 2, on the units, combining text and number conditions</li>
-<li><strong>Group by</strong> (10 min): yesterday’s psychometric curve in one line, checked against your NumPy version</li>
+<li><strong>Boolean masks</strong>: the end of section 2, on the units, combining text and number conditions</li>
+<li><strong>Group by</strong>: yesterday’s psychometric curve in one line, checked against your NumPy version</li>
 </ol>
 <p><strong>Stretch:</strong> one grouping question of your own</p>
 </section>
@@ -2298,7 +2290,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <ul id="tabset-10" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-10-1">Wide</a></li><li><a href="#tabset-10-2">Long</a></li></ul>
 <div class="tab-content">
 <div id="tabset-10-1">
-<div id="45aba0fb" class="cell" data-execution_count="50">
+<div id="2bfcc94c" class="cell" data-execution_count="50">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb106-1"><a href="" aria-label="1"></a>wide.iloc[:<span class="dv">3</span>, :<span class="dv">5</span>].<span class="bu">round</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="50">
 <div>
@@ -2363,7 +2355,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </ul>
 </div>
 <div id="tabset-10-2">
-<div id="e923adba" class="cell" data-execution_count="51">
+<div id="dfea626e" class="cell" data-execution_count="51">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb107-1"><a href="" aria-label="1"></a>gapminder[[<span class="st">"country"</span>, <span class="st">"year"</span>, <span class="st">"lifeExp"</span>, <span class="st">"pop"</span>]].head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="51">
 <div>
@@ -2426,11 +2418,6 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div class="fragment">
-<ul>
-<li>seaborn, after the break, wants long tables</li>
-</ul>
-</div>
 </section>
 <section id="your-turn-10" class="slide level2 exercise-slide">
 <h2>Your turn</h2>
@@ -2439,7 +2426,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <li>Melt the psychometric curve, one column per block, into a long table</li>
 <li>Melt the firing rates, one column per time bin, into one row per unit and bin</li>
 </ul>
-<p><strong>8 minutes</strong>. <strong>Stretch:</strong> Many Ways of Access; merging units with electrodes (PDSH)</p>
+<p><strong>Stretch:</strong> Many Ways of Access; merging units with electrodes (PDSH)</p>
 </section></section>
 <section>
 <section id="matplotlib" class="title-slide slide level1 center">
@@ -2450,7 +2437,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <h2>Figures, axes and artists</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="362693e7" class="cell" data-execution_count="52">
+<div id="52f60751" class="cell" data-execution_count="52">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb108-1"><a href="" aria-label="1"></a>t <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">200</span>)</span>
 <span id="cb108-2"><a href="" aria-label="2"></a>env <span class="op">=</span> np.exp(<span class="op">-</span>t <span class="op">/</span> <span class="dv">3</span>)</span>
 <span id="cb108-3"><a href="" aria-label="3"></a></span>
@@ -2511,22 +2498,6 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <li class="fragment"><code>bbox_inches="tight"</code> trims the white border</li>
 </ul>
 </section>
-<section id="plots-from-an-llm" class="slide level2">
-<h2>Plots from an LLM</h2>
-<ul>
-<li class="fragment">Fine for a first draft: you rarely need to remember <code>ax.spines[...]</code> or <code>annotate</code> arguments</li>
-<li class="fragment"><strong>Ask well:</strong> the shape and dtype of your arrays or the columns of your DataFrame, units, the message of the plot; ask for <code>fig, ax</code> code</li>
-<li class="fragment"><strong>Read before you run:</strong> which data goes on which axis, and which <code>ax</code> each line changes</li>
-<li class="fragment"><strong>Check what you see:</strong>
-<ul>
-<li class="fragment">Axis labels <strong>with units</strong>; limits that do not hide data</li>
-<li class="fragment">Colormap: sequential for magnitudes, diverging only for data centred on zero</li>
-<li class="fragment">Images: <code>origin</code>, <code>aspect</code> and <code>extent</code></li>
-<li class="fragment">Legend entries that match the lines</li>
-</ul></li>
-<li class="fragment">The figure carries your name, not the LLM’s</li>
-</ul>
-</section>
 <section id="live-coding-a-first-figure" class="slide level2 live-coding">
 <h2>Live coding: a first figure</h2>
 <ul>
@@ -2577,7 +2548,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <li>Build a figure of two LFP traces step by step, from the recording <span class="citation" data-cites="ibl_bwm_dandi">(<a href="#/references" role="doc-biblioref" onclick=""><span class="nocase">International Brain Laboratory et al.</span> 2026</a>)</span></li>
 <li>Colours and a legend, ticks at the stimuli, then save it</li>
 </ul>
-<p><strong>8 minutes</strong>. <strong>Optional:</strong> limits, spines and an annotation</p>
+<p><strong>Optional:</strong> limits, spines and an annotation</p>
 </section>
 <section id="more-plot-types" class="slide level2">
 <h2>More plot types</h2>
@@ -2625,7 +2596,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <h2>Images and colormaps</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div id="7c54bba2" class="cell" data-execution_count="53">
+<div id="a38101ee" class="cell" data-execution_count="53">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb113"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb113-1"><a href="" aria-label="1"></a>moon <span class="op">=</span> plt.imread(<span class="st">"data/moonlanding.png"</span>)</span>
 <span id="cb113-2"><a href="" aria-label="2"></a></span>
 <span id="cb113-3"><a href="" aria-label="3"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>,</span>
@@ -2658,95 +2629,10 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <ul>
 <li>A first attempt shows the LFP badly: fix its aspect, origin, axis units and colormap</li>
 </ul>
-<p><strong>8 minutes</strong>. <strong>Stretch:</strong> a scatter of the units along the probe, spike counts as an image, the population response, <code>subplot_mosaic</code> layouts, the LFP’s envelope, more plot types</p>
+<p><strong>Stretch:</strong> a scatter of the units along the probe, spike counts as an image, the population response, <code>subplot_mosaic</code> layouts, the LFP’s envelope, more plot types</p>
 </section>
 <section id="break-1" class="slide level2" data-background-color="#1E1E1E">
 <h2>Break</h2>
-<p>10 minutes</p>
-</section></section>
-<section>
-<section id="seaborn" class="title-slide slide level1 center">
-<h1>seaborn</h1>
-
-</section>
-<section id="statistical-plots-from-dataframes" class="slide level2">
-<h2>Statistical plots from DataFrames</h2>
-<div class="columns">
-<div class="column" style="width:50%;">
-<div id="3b908d77" class="cell" data-execution_count="54">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href="" aria-label="1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
-<span id="cb114-2"><a href="" aria-label="2"></a></span>
-<span id="cb114-3"><a href="" aria-label="3"></a>y2007 <span class="op">=</span> gapminder.query(<span class="st">"year == 2007"</span>)</span>
-<span id="cb114-4"><a href="" aria-label="4"></a>sns.relplot(</span>
-<span id="cb114-5"><a href="" aria-label="5"></a>    data<span class="op">=</span>y2007,</span>
-<span id="cb114-6"><a href="" aria-label="6"></a>    x<span class="op">=</span><span class="st">"gdpPercap"</span>, y<span class="op">=</span><span class="st">"lifeExp"</span>,</span>
-<span id="cb114-7"><a href="" aria-label="7"></a>    hue<span class="op">=</span><span class="st">"continent"</span>, size<span class="op">=</span><span class="st">"pop"</span>,</span>
-<span id="cb114-8"><a href="" aria-label="8"></a>    sizes<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">600</span>),</span>
-<span id="cb114-9"><a href="" aria-label="9"></a>).<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<ul>
-<li class="fragment">Each argument maps a <strong>column</strong> to a visual property</li>
-<li class="fragment">Legends, colours and sizes come for free</li>
-</ul>
-</div><div class="column fragment" data-fragment-index="1" style="width:50%;">
-<div id="ddd8739e" class="cell" data-fig-height="4" data-fig-width="6" data-execution_count="55">
-<div class="cell-output cell-output-display">
-<div>
-<figure>
-<p><img data-src="index_files/figure-revealjs/cell-56-output-1.png" width="712" height="425"></p>
-</figure>
-</div>
-</div>
-</div>
-</div></div>
-</section>
-<section id="when-to-reach-for-seaborn" class="slide level2">
-<h2>When to reach for seaborn</h2>
-<ul>
-<li class="fragment"><strong>seaborn:</strong> a tidy DataFrame; colour, size or panels by category; means with confidence intervals; distributions</li>
-<li class="fragment"><strong>Plain Matplotlib:</strong> arrays and images, custom layouts, unusual plot types</li>
-<li class="fragment">seaborn draws <strong>with</strong> Matplotlib: <code>ax=</code>, <code>fig.savefig</code> and the last block still apply</li>
-</ul>
-</section>
-<section id="live-coding-the-seaborn-tour" class="slide level2 live-coding">
-<h2>Live coding: the seaborn tour</h2>
-<ul>
-<li>Back to the recording: <code>trials</code>, <code>units</code>, and <code>rates_long</code> from the pandas block</li>
-<li><code>relplot</code>, <code>lineplot</code> with confidence bands, distributions, one panel per brain area</li>
-</ul>
-<aside class="notes">
-<p>Follow the Demo section of <code>day2_03_seaborn.ipynb</code>, which loads <code>trials</code>, <code>units</code> and <code>rates_long</code> in its first cells.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb115"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb115-1"><a href="" aria-label="1"></a>g <span class="op">=</span> sns.relplot(data<span class="op">=</span>units, x<span class="op">=</span><span class="st">"amplitude_uV"</span>, y<span class="op">=</span><span class="st">"depth_um"</span>, hue<span class="op">=</span><span class="st">"area"</span>,</span>
-<span id="cb115-2"><a href="" aria-label="2"></a>                size<span class="op">=</span><span class="st">"firing_rate_Hz"</span>, sizes<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">300</span>), alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
-<span id="cb115-3"><a href="" aria-label="3"></a>g.<span class="bu">set</span>(xscale<span class="op">=</span><span class="st">"log"</span>)</span>
-<span id="cb115-4"><a href="" aria-label="4"></a></span>
-<span id="cb115-5"><a href="" aria-label="5"></a>sns.lineplot(data<span class="op">=</span>rates_long, x<span class="op">=</span><span class="st">"time_s"</span>, y<span class="op">=</span><span class="st">"rate_Hz"</span>, hue<span class="op">=</span><span class="st">"area"</span>)</span>
-<span id="cb115-6"><a href="" aria-label="6"></a></span>
-<span id="cb115-7"><a href="" aria-label="7"></a>sns.histplot(data<span class="op">=</span>units[units[<span class="st">"spike_width_ms"</span>] <span class="op">&gt;</span> <span class="dv">0</span>], x<span class="op">=</span><span class="st">"spike_width_ms"</span>,</span>
-<span id="cb115-8"><a href="" aria-label="8"></a>             hue<span class="op">=</span><span class="st">"label"</span>, multiple<span class="op">=</span><span class="st">"stack"</span>)</span>
-<span id="cb115-9"><a href="" aria-label="9"></a>sns.boxplot(data<span class="op">=</span>trials.assign(strength<span class="op">=</span>trials[<span class="st">"contrast"</span>].<span class="bu">abs</span>()),</span>
-<span id="cb115-10"><a href="" aria-label="10"></a>            x<span class="op">=</span><span class="st">"strength"</span>, y<span class="op">=</span><span class="st">"response_time_s"</span>, log_scale<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb115-11"><a href="" aria-label="11"></a></span>
-<span id="cb115-12"><a href="" aria-label="12"></a>sns.displot(data<span class="op">=</span>units, x<span class="op">=</span><span class="st">"firing_rate_Hz"</span>, col<span class="op">=</span><span class="st">"area"</span>, col_wrap<span class="op">=</span><span class="dv">4</span>, height<span class="op">=</span><span class="fl">2.5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<style type="text/css">
-        span.MJX_Assistive_MathML {
-          position:absolute!important;
-          clip: rect(1px, 1px, 1px, 1px);
-          padding: 1px 0 0 0!important;
-          border: 0!important;
-          height: 1px!important;
-          width: 1px!important;
-          overflow: hidden!important;
-          display:block!important;
-      }</style></aside>
-</section>
-<section id="your-turn-13" class="slide level2 exercise-slide">
-<h2>Your turn</h2>
-<p>Open <span class="notebook">notebooks/day2_03_seaborn.ipynb</span>, <strong>Your turn</strong></p>
-<ul>
-<li><strong>The psychometric curve</strong> straight from <code>trials</code>, one line per block, with confidence intervals: no <code>groupby</code> needed</li>
-</ul>
-<p><strong>5 minutes</strong>. <strong>Stretch:</strong> one plot of your own, answering a question about the trials or units. The <a href="https://seaborn.pydata.org/examples/index.html">seaborn gallery</a> is the fastest way to find a plot type.</p>
 </section></section>
 <section>
 <section id="scikit-learn" class="title-slide slide level1 center">
@@ -2781,28 +2667,28 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <h2>The estimator pattern</h2>
 <div class="columns">
 <div class="column" style="width:55%;">
-<div id="cf887076" class="cell" data-execution_count="56">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
-<span id="cb116-2"><a href="" aria-label="2"></a></span>
-<span id="cb116-3"><a href="" aria-label="3"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
-<span id="cb116-4"><a href="" aria-label="4"></a>hours <span class="op">=</span> rng.uniform(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">1</span>))     <span class="co"># X: 100 x 1</span></span>
-<span id="cb116-5"><a href="" aria-label="5"></a>passed <span class="op">=</span> hours[:, <span class="dv">0</span>] <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">100</span>) <span class="op">&gt;</span> <span class="dv">5</span>   <span class="co"># y</span></span>
-<span id="cb116-6"><a href="" aria-label="6"></a></span>
-<span id="cb116-7"><a href="" aria-label="7"></a>model <span class="op">=</span> LogisticRegression()</span>
-<span id="cb116-8"><a href="" aria-label="8"></a>model.fit(hours, passed)</span>
-<span id="cb116-9"><a href="" aria-label="9"></a>model.predict([[<span class="fl">2.0</span>], [<span class="fl">8.0</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="82504da5" class="cell" data-execution_count="54">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb114-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb114-2"><a href="" aria-label="2"></a></span>
+<span id="cb114-3"><a href="" aria-label="3"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb114-4"><a href="" aria-label="4"></a>hours <span class="op">=</span> rng.uniform(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">1</span>))     <span class="co"># X: 100 x 1</span></span>
+<span id="cb114-5"><a href="" aria-label="5"></a>passed <span class="op">=</span> hours[:, <span class="dv">0</span>] <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">100</span>) <span class="op">&gt;</span> <span class="dv">5</span>   <span class="co"># y</span></span>
+<span id="cb114-6"><a href="" aria-label="6"></a></span>
+<span id="cb114-7"><a href="" aria-label="7"></a>model <span class="op">=</span> LogisticRegression()</span>
+<span id="cb114-8"><a href="" aria-label="8"></a>model.fit(hours, passed)</span>
+<span id="cb114-9"><a href="" aria-label="9"></a>model.predict([[<span class="fl">2.0</span>], [<span class="fl">8.0</span>]])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell fragment" data-execution_count="56">
-<div class="cell-output cell-output-display" data-execution_count="56">
+<div class="cell fragment" data-execution_count="54">
+<div class="cell-output cell-output-display" data-execution_count="54">
 <pre><code>array([False,  True])</code></pre>
 </div>
 </div>
 <div class="fragment">
-<div id="1efbaf23" class="cell" data-execution_count="57">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href="" aria-label="1"></a>model.predict_proba([[<span class="fl">2.0</span>], [<span class="fl">8.0</span>]]).<span class="bu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="e7e54cbf" class="cell" data-execution_count="55">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb116-1"><a href="" aria-label="1"></a>model.predict_proba([[<span class="fl">2.0</span>], [<span class="fl">8.0</span>]]).<span class="bu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell fragment" data-execution_count="57">
-<div class="cell-output cell-output-display" data-execution_count="57">
+<div class="cell fragment" data-execution_count="55">
+<div class="cell-output cell-output-display" data-execution_count="55">
 <pre><code>array([[0.88, 0.12],
        [0.12, 0.88]])</code></pre>
 </div>
@@ -2827,11 +2713,11 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <li class="fragment"><strong>Cross-validation</strong> repeats the split several ways: <code>cross_val_score</code></li>
 </ul>
 <div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb120"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb120-2"><a href="" aria-label="2"></a></span>
-<span id="cb120-3"><a href="" aria-label="3"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.25</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb120-4"><a href="" aria-label="4"></a>model.fit(X_train, y_train)</span>
-<span id="cb120-5"><a href="" aria-label="5"></a>model.score(X_test, y_test)          <span class="co"># fraction correct</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb118"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb118-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb118-2"><a href="" aria-label="2"></a></span>
+<span id="cb118-3"><a href="" aria-label="3"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.25</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb118-4"><a href="" aria-label="4"></a>model.fit(X_train, y_train)</span>
+<span id="cb118-5"><a href="" aria-label="5"></a>model.score(X_test, y_test)          <span class="co"># fraction correct</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="live-coding-hours-of-study" class="slide level2 live-coding">
@@ -2842,24 +2728,24 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <li><code>coef_</code>, then <code>predict_proba</code> on a grid, plotted over the data</li>
 </ul>
 <aside class="notes">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb121"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
-<span id="cb121-2"><a href="" aria-label="2"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb121-3"><a href="" aria-label="3"></a></span>
-<span id="cb121-4"><a href="" aria-label="4"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
-<span id="cb121-5"><a href="" aria-label="5"></a>hours <span class="op">=</span> rng.uniform(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">1</span>))</span>
-<span id="cb121-6"><a href="" aria-label="6"></a>passed <span class="op">=</span> hours[:, <span class="dv">0</span>] <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">100</span>) <span class="op">&gt;</span> <span class="dv">5</span></span>
-<span id="cb121-7"><a href="" aria-label="7"></a>hours.shape, passed.shape</span>
-<span id="cb121-8"><a href="" aria-label="8"></a></span>
-<span id="cb121-9"><a href="" aria-label="9"></a>h_train, h_test, p_train, p_test <span class="op">=</span> train_test_split(hours, passed, test_size<span class="op">=</span><span class="fl">0.25</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb121-10"><a href="" aria-label="10"></a>model <span class="op">=</span> LogisticRegression().fit(h_train, p_train)</span>
-<span id="cb121-11"><a href="" aria-label="11"></a>model.score(h_train, p_train), model.score(h_test, p_test)</span>
-<span id="cb121-12"><a href="" aria-label="12"></a><span class="bu">max</span>(p_test.mean(), <span class="dv">1</span> <span class="op">-</span> p_test.mean())      <span class="co"># baseline</span></span>
-<span id="cb121-13"><a href="" aria-label="13"></a></span>
-<span id="cb121-14"><a href="" aria-label="14"></a>model.coef_, model.intercept_, model.classes_</span>
-<span id="cb121-15"><a href="" aria-label="15"></a>grid <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">101</span>)[:, np.newaxis]   <span class="co"># 2-D!</span></span>
-<span id="cb121-16"><a href="" aria-label="16"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
-<span id="cb121-17"><a href="" aria-label="17"></a>ax.plot(hours[:, <span class="dv">0</span>], passed, <span class="st">"o"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
-<span id="cb121-18"><a href="" aria-label="18"></a>ax.plot(grid[:, <span class="dv">0</span>], model.predict_proba(grid)[:, <span class="dv">1</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb119"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb119-1"><a href="" aria-label="1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb119-2"><a href="" aria-label="2"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb119-3"><a href="" aria-label="3"></a></span>
+<span id="cb119-4"><a href="" aria-label="4"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">0</span>)</span>
+<span id="cb119-5"><a href="" aria-label="5"></a>hours <span class="op">=</span> rng.uniform(<span class="dv">0</span>, <span class="dv">10</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">1</span>))</span>
+<span id="cb119-6"><a href="" aria-label="6"></a>passed <span class="op">=</span> hours[:, <span class="dv">0</span>] <span class="op">+</span> rng.normal(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">100</span>) <span class="op">&gt;</span> <span class="dv">5</span></span>
+<span id="cb119-7"><a href="" aria-label="7"></a>hours.shape, passed.shape</span>
+<span id="cb119-8"><a href="" aria-label="8"></a></span>
+<span id="cb119-9"><a href="" aria-label="9"></a>h_train, h_test, p_train, p_test <span class="op">=</span> train_test_split(hours, passed, test_size<span class="op">=</span><span class="fl">0.25</span>, random_state<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb119-10"><a href="" aria-label="10"></a>model <span class="op">=</span> LogisticRegression().fit(h_train, p_train)</span>
+<span id="cb119-11"><a href="" aria-label="11"></a>model.score(h_train, p_train), model.score(h_test, p_test)</span>
+<span id="cb119-12"><a href="" aria-label="12"></a><span class="bu">max</span>(p_test.mean(), <span class="dv">1</span> <span class="op">-</span> p_test.mean())      <span class="co"># baseline</span></span>
+<span id="cb119-13"><a href="" aria-label="13"></a></span>
+<span id="cb119-14"><a href="" aria-label="14"></a>model.coef_, model.intercept_, model.classes_</span>
+<span id="cb119-15"><a href="" aria-label="15"></a>grid <span class="op">=</span> np.linspace(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">101</span>)[:, np.newaxis]   <span class="co"># 2-D!</span></span>
+<span id="cb119-16"><a href="" aria-label="16"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb119-17"><a href="" aria-label="17"></a>ax.plot(hours[:, <span class="dv">0</span>], passed, <span class="st">"o"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb119-18"><a href="" aria-label="18"></a>ax.plot(grid[:, <span class="dv">0</span>], model.predict_proba(grid)[:, <span class="dv">1</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <style type="text/css">
         span.MJX_Assistive_MathML {
           position:absolute!important;
@@ -2872,12 +2758,12 @@ Name: lifeExp_2007, dtype: float64</code></pre>
           display:block!important;
       }</style></aside>
 </section>
-<section id="your-turn-14" class="slide level2 exercise-slide scrollable">
+<section id="your-turn-13" class="slide level2 exercise-slide scrollable">
 <h2>Your turn</h2>
 <p>Open <span class="notebook">notebooks/day2_04_sklearn.ipynb</span></p>
 <ol type="1">
-<li><strong>Fit a model</strong> (10 min): predict the mouse’s choice from contrast and block; score it on held-out trials against a baseline</li>
-<li><strong>Look inside</strong> (10 min): what do the coefficients mean? Plot the model’s curves over the psychometric curve from the pandas block</li>
+<li><strong>Fit a model</strong>: predict the mouse’s choice from contrast and block; score it on held-out trials against a baseline</li>
+<li><strong>Look inside</strong>: what do the coefficients mean? Plot the model’s curves over the psychometric curve from the pandas block</li>
 </ol>
 <p><strong>Stretch:</strong> a better feature, whether the block helps (cross-validation), decoding the choice from the neurons</p>
 <div class="source-note">
@@ -2891,16 +2777,16 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </section>
 <section id="scikit-image-images-are-arrays" class="slide level2">
 <h2>scikit-image: images are arrays</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb122"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href="" aria-label="1"></a><span class="im">import</span> skimage <span class="im">as</span> ski</span>
-<span id="cb122-2"><a href="" aria-label="2"></a></span>
-<span id="cb122-3"><a href="" aria-label="3"></a>image <span class="op">=</span> ski.io.imread(<span class="st">"nuclei.tif"</span>)                  <span class="co"># a NumPy array</span></span>
-<span id="cb122-4"><a href="" aria-label="4"></a>smooth <span class="op">=</span> ski.filters.gaussian(image, sigma<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb122-5"><a href="" aria-label="5"></a>mask <span class="op">=</span> smooth <span class="op">&gt;</span> ski.filters.threshold_otsu(smooth)   <span class="co"># a boolean mask</span></span>
-<span id="cb122-6"><a href="" aria-label="6"></a>labels <span class="op">=</span> ski.measure.label(mask)                     <span class="co"># 0 = background, 1..N = objects</span></span>
-<span id="cb122-7"><a href="" aria-label="7"></a>table <span class="op">=</span> ski.measure.regionprops_table(labels, properties<span class="op">=</span>[<span class="st">"area"</span>, <span class="st">"eccentricity"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb120"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb120-1"><a href="" aria-label="1"></a><span class="im">import</span> skimage <span class="im">as</span> ski</span>
+<span id="cb120-2"><a href="" aria-label="2"></a></span>
+<span id="cb120-3"><a href="" aria-label="3"></a>image <span class="op">=</span> ski.io.imread(<span class="st">"nuclei.tif"</span>)                  <span class="co"># a NumPy array</span></span>
+<span id="cb120-4"><a href="" aria-label="4"></a>smooth <span class="op">=</span> ski.filters.gaussian(image, sigma<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb120-5"><a href="" aria-label="5"></a>mask <span class="op">=</span> smooth <span class="op">&gt;</span> ski.filters.threshold_otsu(smooth)   <span class="co"># a boolean mask</span></span>
+<span id="cb120-6"><a href="" aria-label="6"></a>labels <span class="op">=</span> ski.measure.label(mask)                     <span class="co"># 0 = background, 1..N = objects</span></span>
+<span id="cb120-7"><a href="" aria-label="7"></a>table <span class="op">=</span> ski.measure.regionprops_table(labels, properties<span class="op">=</span>[<span class="st">"area"</span>, <span class="st">"eccentricity"</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li class="fragment"><strong>Use it when:</strong> you filter, threshold, segment or measure microscopy (or any) images</li>
-<li class="fragment">Measurements come out as a table, ready for pandas and seaborn</li>
+<li class="fragment">Measurements come out as a table, ready for pandas</li>
 </ul>
 <div class="source-note">
 <p><a href="https://scikit-image.org/docs/stable/user_guide.html">scikit-image.org/docs/stable/user_guide</a>; SPL, <a href="https://lectures.scientific-python.org/packages/scikit-image/index.html">scikit-image: image processing</a></p>
@@ -2908,14 +2794,15 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </section>
 <section id="xarray-labelled-n-d-arrays" class="slide level2">
 <h2>xarray: labelled N-D arrays</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb123"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb123-1"><a href="" aria-label="1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
-<span id="cb123-2"><a href="" aria-label="2"></a></span>
-<span id="cb123-3"><a href="" aria-label="3"></a>lfp <span class="op">=</span> xr.DataArray(lfp_uv, dims<span class="op">=</span>(<span class="st">"time"</span>, <span class="st">"channel"</span>),</span>
-<span id="cb123-4"><a href="" aria-label="4"></a>                   coords<span class="op">=</span>{<span class="st">"time"</span>: time, <span class="st">"area"</span>: (<span class="st">"channel"</span>, area)})</span>
-<span id="cb123-5"><a href="" aria-label="5"></a>lfp.sel(time<span class="op">=</span><span class="bu">slice</span>(<span class="dv">2</span>, <span class="dv">4</span>)).mean(dim<span class="op">=</span><span class="st">"time"</span>)   <span class="co"># by label and by name, not position</span></span>
-<span id="cb123-6"><a href="" aria-label="6"></a>lfp.groupby(<span class="st">"area"</span>).mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb121"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb121-1"><a href="" aria-label="1"></a><span class="im">import</span> xarray <span class="im">as</span> xr</span>
+<span id="cb121-2"><a href="" aria-label="2"></a></span>
+<span id="cb121-3"><a href="" aria-label="3"></a><span class="co"># lfp_uv: (n_samples, n_channels); time: seconds; area: one label per channel</span></span>
+<span id="cb121-4"><a href="" aria-label="4"></a>lfp <span class="op">=</span> xr.DataArray(lfp_uv, dims<span class="op">=</span>(<span class="st">"time"</span>, <span class="st">"channel"</span>),</span>
+<span id="cb121-5"><a href="" aria-label="5"></a>                   coords<span class="op">=</span>{<span class="st">"time"</span>: time, <span class="st">"area"</span>: (<span class="st">"channel"</span>, area)})</span>
+<span id="cb121-6"><a href="" aria-label="6"></a>lfp.sel(time<span class="op">=</span><span class="bu">slice</span>(<span class="dv">2</span>, <span class="dv">4</span>)).mean(dim<span class="op">=</span><span class="st">"time"</span>)   <span class="co"># by label and by name, not position</span></span>
+<span id="cb121-7"><a href="" aria-label="7"></a>lfp.groupby(<span class="st">"area"</span>).mean()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
-<li class="fragment"><strong>Use it when:</strong> you keep forgetting which axis is time, or carry coordinates (seconds, µm, brain areas) alongside your arrays</li>
+<li class="fragment"><strong>Use it when:</strong> you want named dimensions, scales and attributes on N-D arrays</li>
 <li class="fragment">Reads and writes NetCDF and Zarr; pandas-style <code>groupby</code> on N-D data</li>
 </ul>
 <div class="source-note">
@@ -2924,12 +2811,13 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </section>
 <section id="dask-bigger-than-memory-in-parallel" class="slide level2">
 <h2>dask: bigger than memory, in parallel</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb124"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb124-1"><a href="" aria-label="1"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
-<span id="cb124-2"><a href="" aria-label="2"></a></span>
-<span id="cb124-3"><a href="" aria-label="3"></a><span class="cf">with</span> h5py.File(<span class="st">"big_recording.h5"</span>) <span class="im">as</span> f:</span>
-<span id="cb124-4"><a href="" aria-label="4"></a>    lfp <span class="op">=</span> da.from_array(f[<span class="st">"lfp/data"</span>], chunks<span class="op">=</span>(<span class="dv">100_000</span>, <span class="dv">384</span>))   <span class="co"># lazy: nothing read yet</span></span>
-<span id="cb124-5"><a href="" aria-label="5"></a>    channel_std <span class="op">=</span> lfp.std(axis<span class="op">=</span><span class="dv">0</span>)                               <span class="co"># NumPy code, still lazy</span></span>
-<span id="cb124-6"><a href="" aria-label="6"></a>    result <span class="op">=</span> channel_std.compute()                              <span class="co"># runs, chunk by chunk, on all cores</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb122"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb122-1"><a href="" aria-label="1"></a><span class="im">import</span> dask.array <span class="im">as</span> da</span>
+<span id="cb122-2"><a href="" aria-label="2"></a><span class="im">import</span> h5py</span>
+<span id="cb122-3"><a href="" aria-label="3"></a></span>
+<span id="cb122-4"><a href="" aria-label="4"></a><span class="cf">with</span> h5py.File(<span class="st">"big_recording.h5"</span>) <span class="im">as</span> f:</span>
+<span id="cb122-5"><a href="" aria-label="5"></a>    lfp <span class="op">=</span> da.from_array(f[<span class="st">"lfp/data"</span>], chunks<span class="op">=</span>(<span class="dv">100_000</span>, <span class="dv">384</span>))   <span class="co"># lazy: nothing read yet</span></span>
+<span id="cb122-6"><a href="" aria-label="6"></a>    channel_std <span class="op">=</span> lfp.std(axis<span class="op">=</span><span class="dv">0</span>)                               <span class="co"># NumPy code, still lazy</span></span>
+<span id="cb122-7"><a href="" aria-label="7"></a>    result <span class="op">=</span> channel_std.compute()                              <span class="co"># runs, chunk by chunk, on all cores</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li class="fragment"><strong>Use it when:</strong> your data do not fit in memory, or one core is too slow</li>
 <li class="fragment">NumPy- and pandas-like interfaces; xarray uses it under the hood</li>
@@ -2940,12 +2828,12 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </section>
 <section id="napari-look-at-your-data" class="slide level2">
 <h2>napari: look at your data</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb125"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb125-1"><a href="" aria-label="1"></a><span class="im">import</span> napari</span>
-<span id="cb125-2"><a href="" aria-label="2"></a></span>
-<span id="cb125-3"><a href="" aria-label="3"></a>viewer <span class="op">=</span> napari.Viewer()</span>
-<span id="cb125-4"><a href="" aria-label="4"></a>viewer.add_image(image, name<span class="op">=</span><span class="st">"nuclei"</span>)</span>
-<span id="cb125-5"><a href="" aria-label="5"></a>viewer.add_labels(labels, name<span class="op">=</span><span class="st">"segmentation"</span>)</span>
-<span id="cb125-6"><a href="" aria-label="6"></a>edited <span class="op">=</span> viewer.layers[<span class="st">"segmentation"</span>].data          <span class="co"># read your edits back as an array</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb123"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb123-1"><a href="" aria-label="1"></a><span class="im">import</span> napari</span>
+<span id="cb123-2"><a href="" aria-label="2"></a></span>
+<span id="cb123-3"><a href="" aria-label="3"></a>viewer <span class="op">=</span> napari.Viewer()</span>
+<span id="cb123-4"><a href="" aria-label="4"></a>viewer.add_image(image, name<span class="op">=</span><span class="st">"nuclei"</span>)</span>
+<span id="cb123-5"><a href="" aria-label="5"></a>viewer.add_labels(labels, name<span class="op">=</span><span class="st">"segmentation"</span>)</span>
+<span id="cb123-6"><a href="" aria-label="6"></a>edited <span class="op">=</span> viewer.layers[<span class="st">"segmentation"</span>].data          <span class="co"># read your edits back as an array</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li class="fragment"><strong>Use it when:</strong> you need to browse, check or annotate N-D images: z-stacks, time-lapses, many channels</li>
 <li class="fragment">Opens a desktop window: install it on your own machine</li>
@@ -2969,14 +2857,6 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>statsmodels</strong></td>
-<td>Regression models and statistical tests with full summary tables</td>
-</tr>
-<tr class="even">
-<td><strong>pingouin</strong></td>
-<td>Common statistical tests on DataFrames, with effect sizes</td>
-</tr>
-<tr class="odd">
 <td><strong>Zarr</strong></td>
 <td>Chunked, compressed N-D arrays on disk or in the cloud</td>
 </tr>
@@ -2995,7 +2875,7 @@ Name: lifeExp_2007, dtype: float64</code></pre>
 <h2>Wrap-up</h2>
 <ul>
 <li class="fragment"><strong>Tables:</strong> <code>loc</code> versus <code>iloc</code>, masks, <code>groupby</code>, and tidy (long) data</li>
-<li class="fragment"><strong>Plot</strong> with <code>fig, ax = plt.subplots()</code>; seaborn for tidy DataFrames</li>
+<li class="fragment"><strong>Plot</strong> with <code>fig, ax = plt.subplots()</code></li>
 <li class="fragment"><strong>scikit-learn:</strong> <code>X</code> is samples × features; <code>fit</code>, then score on held-out data against a baseline</li>
 <li class="fragment"><strong>Check the ecosystem</strong> before writing an algorithm yourself: SciPy, scikit-image, xarray, dask, napari</li>
 </ul>
